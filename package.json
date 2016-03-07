@@ -1,0 +1,52 @@
+{
+  "name": "leancloud-realtime",
+  "version": "2.4.0",
+  "description": "LeanCloud Realtime Message JavaScript SDK",
+  "main": "lib/realtime.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaxLeap/MaxIM-JavaScript.git"
+  },
+  "keywords": [
+    "leancloud",
+    "realtime",
+    "message"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MaxLeap/MaxIM-JavaScript/issues"
+  },
+  "homepage": "https://maxleap.cn",
+  "devDependencies": {
+    "envify": "^3.4.0",
+    "es6-promise": "^3",
+    "grunt": "^0.4.5",
+    "grunt-babel": "^5.0",
+    "grunt-browserify": "^4.0",
+    "grunt-contrib-connect": "^0.11",
+    "grunt-contrib-jshint": "^0.11.2",
+    "grunt-contrib-uglify": "^0.9.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-jscs": "^2.1",
+    "grunt-saucelabs": "^8.6.1",
+    "grunt-simple-mocha": "^0.4.0",
+    "load-grunt-tasks": "^3.2.0",
+    "should": "^7.0.2",
+    "should-sinon": "0.0.3",
+    "sinon": "^1.15.4"
+  },
+  "dependencies": {
+    "ws": "^0.8",
+    "xmlhttprequest": "^1.8",
+    "js-md5":"^0.4",
+    "underscore":"^1.8",
+    "socket.io-client":"^1.4",
+    "form-data":"^1.0.0-rc3"
+  },
+  "browser": {
+    "./lib/tool/xmlhttprequest.js": "./lib/tool/xmlhttprequest-browser.js"
+  }
+}

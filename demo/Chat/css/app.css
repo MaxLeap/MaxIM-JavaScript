@@ -1,0 +1,133 @@
+#basic-addon1 {
+  min-width: 80px;
+}
+.input-group {
+  margin-bottom: 20px;
+}
+
+.ToolBar{
+  width: 10%;
+  height: 100%;
+  float: left;
+  height: 600px;
+  border: 1px ;
+  border-color: #f8f8f8;
+  border-style: solid;
+  border-collapse: collapse;
+}
+
+.ConvList{
+  width: 30%;
+  height: 100%;
+  float: left;
+  height: 600px;
+  border: 1px ;
+  border-color: #f8f8f8;
+  border-style: solid;
+  border-collapse: collapse;
+}
+
+.ConvMain{
+  width: 60%;
+  height: 100%;
+  float: left;
+  height: 600px;
+  border: 1px ;
+  border-color: #f8f8f8;
+  border-style: solid;
+  border-collapse: collapse;
+}
+
+.Bar{
+  width: 100%;
+  padding: 10px;
+  margin-top: 40px;
+}
+
+.tab-content {
+  margin-top: 20px;
+}
+
+.Conversation{
+  width: 100%;
+  height: 70px;
+  padding: 5px;
+  padding-left: 15px;
+  line-height: 60px;
+  margin: 2px;
+}
+
+.Conversation .icon{
+  float: left;
+  margin-right: 10px;
+  height:60px;
+  line-height: 60px;
+}
+
+.Conversation .icon i{
+  line-height: 60px;
+}
+
+.Conversation .unread {
+  line-height: 60px;
+  float: right;
+  margin-right: 10px;
+}
+
+.Conversation .name{
+  float: left;
+  font-size: 36px;
+  line-height: 60px;
+  height:60px;
+}
+
+.Conversation .online{
+  float: left;
+  margin-left: 10px;
+}
+
+.Conversation .msgs{
+  float: right;
+}
+
+.Header {
+  margin-bottom: 0px;
+}
+
+.add-member{
+  float: right;
+}
+
+.ConvBox {
+  padding: 10px;
+  height: 440px;
+  overflow: scroll;
+}
+
+.ConvMsg {
+  width: 100%;
+  height: 40px;
+  font-size: 24px;
+  line-height: 40px;
+}
+
+.ConvInput {
+  padding: 10px;
+  height: 120px;
+  padding-top: 30px;
+}
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
+}
+
+.other {
+  text-align: left;
+}
+
+.me {
+  text-align: right;
+}
