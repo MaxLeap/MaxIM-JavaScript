@@ -31,7 +31,7 @@ module.exports = function(options, callback) {
       }
 
     } else {
-      callback(JSON.parse(xhr.responseText));
+      callback(xhr.responseText);
     }
   };
 
