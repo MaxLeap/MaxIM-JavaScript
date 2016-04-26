@@ -14,7 +14,7 @@ var CN_IM_REST_URL = 'http://im.maxleap.cn';
 var US_IM_REST_URL = 'http://im.maxleap.com';
 var CN_IM_SOCKET_URL = 'http://im.maxleap.cn/chat';
 var US_IM_SOCKET_URL = 'http://im.maxleap.com/chat';
-
+var UAT_TEST_URL = 'http://imuat.maxleap.cn/';
 // 配置项
 var config = {
   reconnection: true,
@@ -46,6 +46,65 @@ var restAgent = function() {
       var opts = {};
       opts.url = cache.server.rest + '/ctx/' + user;
       opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts, callback);
+    },
+    searchUsers: function searchUsers(cache, size, skip , sort, data, callback) {
+      var kvs = '';
+      if(typeof data =='object'){
+        for(var idx in data){
+          kvs = kvs+ '&' + idx  +'='+ data[idx];
+        }
+      }
+      var tempUrl = '?_skip=' + (skip!= null ? skip : 0 );
+      if(size){
+        tempUrl = tempUrl + '&_limit=' + size;
+      }
+      if(sort){
+        tempUrl = tempUrl + '&_sort=' + sort;
+      }
+      var opts = {};
+      opts.url = cache.server.rest + '/ctx'+ tempUrl + kvs;
+      opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts, callback);
+    },
+    setUserAttributes: function setUserAttributes(cache, user, data, callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/ctx/' + user + '/attributes';
+      opts.method = 'post';
+      opts.data = data;
+      opts.headers = engine.genHeader(cache);
+      opts.headers['Content-Type'] = 'application/json';
+      ajax(opts, callback);
+    },
+    coverSetUserAttributes: function coverSetUserAttributes(cache, user, data, callback){
+      var opts = {};
+      opts.url = cache.server.rest + '/ctx/' + user +'/attributes';
+      opts.method = 'put';
+      opts.data = data;
+      opts.headers = engine.genHeader(cache);
+      opts.headers['Content-Type'] = 'application/json';
+      ajax(opts, callback);
+    },
+    getUserAttributes: function getUserAttributes(cache, user, callback){
+      var opts = {};
+      opts.url = cache.server.rest + '/ctx/' + user + '/attributes';
+      opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts,callback);
+    },
+    getUserOneAttribute: function getUserOneAttribute(cache, user, attr, callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/ctx/' + user + '/attributes/' + attr;
+      opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts,callback);
+    },
+    rmUserAttributes: function rmUserAttributes(cache, user, callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/ctx/' + user + '/attributes/';
+      opts.method = 'delete';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
@@ -123,6 +182,65 @@ var restAgent = function() {
       opts.headers['Content-Type'] = 'application/json';
       ajax(opts, callback);
     },
+    searchGroups: function searchGroups(cache, size, skip , sort, data, callback) {
+      var kvs = '';
+      if(typeof data =='object'){
+        for(var idx in data){
+          kvs = kvs+ '&' + idx  +'='+ data[idx];
+        }
+      }
+      var tempUrl = '?_skip=' + (skip!= null ? skip : 0 );
+      if(size){
+        tempUrl = tempUrl + '&_limit=' + size;
+      }
+      if(sort){
+        tempUrl = tempUrl + '&_sort=' + sort;
+      }
+      var opts = {};
+      opts.url = cache.server.rest + '/groups' + tempUrl + kvs;
+      opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts, callback);
+    },
+    setGroupAttributes: function setGroupAttributes(cache, group, data , callback){
+      var opts = {};
+      opts.url = cache.server.rest + '/groups/' + group + '/attributes';
+      opts.method = 'post';
+      opts.data = data;
+      opts.headers = engine.genHeader(cache);
+      opts.headers['Content-Type'] = 'application/json';
+      ajax(opts, callback);
+    },
+    coverSetGroupAttributes: function coverSetGroupAttributes(cache, group, data, callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/groups/' + group + '/attributes';
+      opts.method = 'put';
+      opts.data = data;
+      opts.headers = engine.genHeader(cache);
+      opts.headers['Content-Type'] = 'application/json';
+      ajax(opts, callback);
+    },
+    getGroupAttributes: function getGroupAttributes(cache, group , callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/groups/' + group + '/attributes';
+      opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts, callback);
+    },
+    getGroupOneAttribute: function getGroupOneAttribute(cache, group, attr, callback) {
+      var opts = {};
+      opts.url = cache.server.rest +'/groups/' + group +'/attributes/'+attr;
+      opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts, callback);
+    },
+    rmGroupAttributes: function rmGroupAttributes(cache, group, callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/groups/' + group + '/attributes/';
+      opts.method = 'delete';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts, callback);
+    },
     addRoom: function(cache, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms';
@@ -143,6 +261,65 @@ var restAgent = function() {
       var opts = {};
       opts.url = cache.server.rest + '/rooms/' + _id;
       opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts, callback);
+    },
+    searchRooms: function searchRooms(cache, size, skip, sort, data, callback) {
+      var kvs = '';
+      if(typeof data =='object'){
+        for(var idx in data){
+          kvs = kvs+ '&' + idx  +'='+ data[idx];
+        }
+      }
+      var tempUrl = '?_skip=' + (skip!= null ? skip : 0 );
+      if(size){
+        tempUrl = tempUrl + '&_limit=' + size;
+      }
+      if(sort){
+        tempUrl = tempUrl + '&_sort=' + sort;
+      }
+      var opts = {};
+      opts.url = cache.server.rest + '/rooms' + tempUrl + kvs;
+      opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts, callback);
+    },
+    setRoomAttributes: function setRoomAttributes(cache, room , data , callback){
+      var opts = {};
+      opts.url = cache.server.rest + '/rooms/' + room + '/attributes';
+      opts.method = 'post';
+      opts.data = data;
+      opts.headers = engine.genHeader(cache);
+      opts.headers['Content-Type'] = 'application/json';
+      ajax(opts, callback);
+    },
+    coverSetRoomAttributes: function coverSetRoomAttributes(cache, room, data, callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/rooms/' + room + '/attributes';
+      opts.method = 'put';
+      opts.data = data;
+      opts.headers = engine.genHeader(cache);
+      opts.headers['Content-Type'] = 'application/json';
+      ajax(opts, callback);
+    },
+    getRoomAttributes: function getRoomAttributes(cache, room , callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/rooms/' + room + '/attributes';
+      opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts, callback);
+    },
+    getRoomOneAttribute: function getRoomOneAttribute(cache, room, attr, callback) {
+      var opts = {};
+      opts.url = cache.server.rest +'/rooms/' + room +'/attributes/'+attr;
+      opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts, callback);
+    },
+    rmRoomAttributes: function rmRoomAttributes(cache, room, callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/rooms/' + room + '/attributes/';
+      opts.method = 'delete';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
@@ -255,6 +432,30 @@ var restAgent = function() {
       opts.url = cache.server.rest + '/attachment';
       opts.method = 'post';
       opts.data = data;
+      opts.headers = engine.genHeader(cache);
+      ajax(opts, callback);
+    },
+    //游客相关 rest API
+    addOrModifyPassenger: function addOrModifyPassenger(cache, data, callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/passengers/';
+      opts.method = 'post';
+      opts.data = data;
+      opts.headers = engine.genHeader(cache);
+      opts.headers['Content-Type'] = 'application/json';
+      ajax(opts, callback);
+    },
+    getPassenger: function getPassenger(cache, passengerId, callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/passengers/' + passengerId;
+      opts.method = 'get';
+      opts.headers = engine.genHeader(cache);
+      ajax(opts,callback);
+    },
+    getPassengerRecentChat: function getPassengerRecentChat(cache, passengerId, userId, ts, size, callback) {
+      var opts = {};
+      opts.url = cache.server.rest + '/passengers/' + passengerId + '/chats/'+ userId +'?ts=' + ts + '&limit=' + size;
+      opts.method = 'get';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     }
@@ -489,6 +690,10 @@ engine.getServer = function(cache, options) {
     case 'us':
       cache.server.socket = US_IM_SOCKET_URL;
       cache.server.rest = US_IM_REST_URL;
+      break;
+    case 'cnTest':
+      cache.server.socket = UAT_TEST_URL;
+      cache.server.rest = UAT_TEST_URL;
       break;
     default:
       throw new Error('There is no this region.');
