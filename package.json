@@ -1,8 +1,8 @@
 {
   "name": "maxleap-im",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "maxleap JavaScript SDK",
-  "main": "lib/realtime.js",
+  "main": "lib/ML.im.js",
   "directories": {
     "test": "test"
   },
