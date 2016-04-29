@@ -4,9 +4,9 @@
 
 'use strict';
 const options = {
-    appId: '56a86320e9db7300015438f7',
-    clientId: 'M3pyVEdsSFBBZm5UTDlLMTB3a0xYdw',
-    region: 'cnTest'
+    appId: '5722fe2360b23771c2eee2b5',
+    clientId: 'Z1NwNUhuT1pEMW0yZGN5RTVkMzZEdw',
+    region: 'cn'
 };
 let im = ML.im(options);
 let data= {
@@ -18,7 +18,7 @@ let data= {
 };
 
 let user = {
-    userId: 'foo',
+    userId: 'zxz',
     installId: "M3pyVEdsSFBBZm5UTDlLMTB3a0xYdw!",
     attributes :{
         'name':"猴哥",

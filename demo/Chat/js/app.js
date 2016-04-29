@@ -315,10 +315,9 @@
  var Login = React.createClass({
    getInitialState: function(){
      return {
-       appId: '56d41c6c667a230001275f41',
-       clientId: 'Y3FxbHE2aTJmQ2dQazYtQVlvc0NnQQ',
-       userId: 'zhoucen',
-       installId: "M3pyVEdsSFBBZm5UTDlLMTB3a0xYdw!"
+       appId: '5722fe2360b23771c2eee2b5',
+       clientId: 'Z1NwNUhuT1pEMW0yZGN5RTVkMzZEdw',
+       userId: 'zxz'
      }
    },
    componentDidMount: function() {
@@ -353,10 +352,6 @@
             <div className="input-group">
               <span className="input-group-addon" id="basic-addon1">UserId</span>
               <input type="text" className="form-control" placeholder="UserId" aria-describedby="basic-addon1" id="userId" value={this.state.userId} onChange={this.onChange} />
-            </div>
-            <div className="input-group">
-              <span className="input-group-addon" id="basic-addon1">InstallId</span>
-              <input type="text" className="form-control" placeholder="InstallId" aria-describedby="basic-addon1" id="installId" value={this.state.installId} onChange={this.onChange} />
             </div>
             </div>
             <div className="modal-footer">
