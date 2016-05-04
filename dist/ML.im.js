@@ -23,7 +23,6 @@ var CN_IM_REST_URL = 'http://im.maxleap.cn';
 var US_IM_REST_URL = 'http://im.maxleap.com';
 var CN_IM_SOCKET_URL = 'http://im.maxleap.cn/chat';
 var US_IM_SOCKET_URL = 'http://im.maxleap.com/chat';
-var UAT_TEST_URL = 'http://imuat.maxleap.cn/';
 // 配置项
 var config = {
   reconnection: true,
@@ -54,7 +53,7 @@ var restAgent = function restAgent() {
     userInfo: function userInfo(cache, user, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/ctx/' + user;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
@@ -74,14 +73,14 @@ var restAgent = function restAgent() {
       }
       var opts = {};
       opts.url = cache.server.rest + '/ctx' + tempUrl + kvs;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     setUserAttributes: function setUserAttributes(cache, user, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/ctx/' + user + '/attributes';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -90,7 +89,7 @@ var restAgent = function restAgent() {
     coverSetUserAttributes: function coverSetUserAttributes(cache, user, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/ctx/' + user + '/attributes';
-      opts.method = 'put';
+      opts.method = 'PUT';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -99,21 +98,21 @@ var restAgent = function restAgent() {
     getUserAttributes: function getUserAttributes(cache, user, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/ctx/' + user + '/attributes';
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     getUserOneAttribute: function getUserOneAttribute(cache, user, attr, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/ctx/' + user + '/attributes/' + attr;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     rmUserAttributes: function rmUserAttributes(cache, user, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/ctx/' + user + '/attributes/';
-      opts.method = 'delete';
+      opts.method = 'DELETE';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
@@ -123,42 +122,42 @@ var restAgent = function restAgent() {
       if (withDetail) {
         opts.url = opts.url + '?detail';
       }
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     addFriend: function addFriend(cache, user, friend, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/ctx/' + user + '/friends/' + friend;
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     rmFriend: function rmFriend(cache, user, friend, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/ctx/' + user + '/friends/' + friend;
-      opts.method = 'delete';
+      opts.method = 'DELETE';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     getFriendshipInfo: function getFriendshipInfo(cache, user, friend, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/ctx/' + user + '/friends/' + friend;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     getRecentChat: function getRecentChat(cache, user, friend, ts, size, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/ctx/' + user + '/friends/' + friend + '/chats?ts=' + ts + '&limit=' + size;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     getGroupChat: function getGroupChat(cache, group, ts, size, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups/' + group + '/chats?ts=' + ts + '&limit=' + size;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
@@ -168,7 +167,7 @@ var restAgent = function restAgent() {
       if (withDetail) {
         opts.url = opts.url + '?detail';
       }
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
@@ -178,14 +177,14 @@ var restAgent = function restAgent() {
       if (withDetail) {
         opts.url = opts.url + '?detail';
       }
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     addGroup: function addGroup(cache, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -207,14 +206,14 @@ var restAgent = function restAgent() {
       }
       var opts = {};
       opts.url = cache.server.rest + '/groups' + tempUrl + kvs;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     setGroupAttributes: function setGroupAttributes(cache, group, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups/' + group + '/attributes';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -223,7 +222,7 @@ var restAgent = function restAgent() {
     coverSetGroupAttributes: function coverSetGroupAttributes(cache, group, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups/' + group + '/attributes';
-      opts.method = 'put';
+      opts.method = 'PUT';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -232,28 +231,28 @@ var restAgent = function restAgent() {
     getGroupAttributes: function getGroupAttributes(cache, group, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups/' + group + '/attributes';
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     getGroupOneAttribute: function getGroupOneAttribute(cache, group, attr, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups/' + group + '/attributes/' + attr;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     rmGroupAttributes: function rmGroupAttributes(cache, group, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups/' + group + '/attributes/';
-      opts.method = 'delete';
+      opts.method = 'DELETE';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     addRoom: function addRoom(cache, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -262,14 +261,14 @@ var restAgent = function restAgent() {
     getGroup: function getGroup(cache, _id, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups/' + _id;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     getRoom: function getRoom(cache, _id, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms/' + _id;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
@@ -289,14 +288,14 @@ var restAgent = function restAgent() {
       }
       var opts = {};
       opts.url = cache.server.rest + '/rooms' + tempUrl + kvs;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     setRoomAttributes: function setRoomAttributes(cache, room, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms/' + room + '/attributes';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -305,7 +304,7 @@ var restAgent = function restAgent() {
     coverSetRoomAttributes: function coverSetRoomAttributes(cache, room, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms/' + room + '/attributes';
-      opts.method = 'put';
+      opts.method = 'PUT';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -314,28 +313,28 @@ var restAgent = function restAgent() {
     getRoomAttributes: function getRoomAttributes(cache, room, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms/' + room + '/attributes';
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     getRoomOneAttribute: function getRoomOneAttribute(cache, room, attr, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms/' + room + '/attributes/' + attr;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     rmRoomAttributes: function rmRoomAttributes(cache, room, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms/' + room + '/attributes/';
-      opts.method = 'delete';
+      opts.method = 'DELETE';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     updateGroup: function updateGroup(cache, _id, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups/' + _id;
-      opts.method = 'put';
+      opts.method = 'PUT';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -344,7 +343,7 @@ var restAgent = function restAgent() {
     updateRoom: function updateRoom(cache, _id, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms/' + _id;
-      opts.method = 'put';
+      opts.method = 'PUT';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -353,21 +352,21 @@ var restAgent = function restAgent() {
     rmGroup: function rmGroup(cache, _id, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups/' + _id;
-      opts.method = 'delete';
+      opts.method = 'DELETE';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     rmRoom: function rmRoom(cache, _id, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms/' + _id;
-      opts.method = 'delete';
+      opts.method = 'DELETE';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     addGroupMembers: function addGroupMembers(cache, _id, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups/' + _id + '/members';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -376,7 +375,7 @@ var restAgent = function restAgent() {
     addRoomMembers: function addRoomMembers(cache, _id, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms/' + _id + '/members';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -385,7 +384,7 @@ var restAgent = function restAgent() {
     rmGroupMembers: function rmGroupMembers(cache, _id, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/groups/' + _id + '/members';
-      opts.method = 'delete';
+      opts.method = 'DELETE';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -394,7 +393,7 @@ var restAgent = function restAgent() {
     rmRoomMembers: function rmRoomMembers(cache, _id, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/rooms/' + _id + '/members';
-      opts.method = 'delete';
+      opts.method = 'DELETE';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -403,7 +402,7 @@ var restAgent = function restAgent() {
     sysToAll: function sysToAll(cache, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/system';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -412,7 +411,7 @@ var restAgent = function restAgent() {
     sysToUser: function sysToUser(cache, _id, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/system/' + _id;
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -421,7 +420,7 @@ var restAgent = function restAgent() {
     sysToGroup: function sysToGroup(cache, _id, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/system/' + _id + '?group';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -430,7 +429,7 @@ var restAgent = function restAgent() {
     sysToRoom: function sysToRoom(cache, _id, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/system/' + _id + '?room';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -439,7 +438,7 @@ var restAgent = function restAgent() {
     attachment: function attachment(cache, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/attachment';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
@@ -448,7 +447,7 @@ var restAgent = function restAgent() {
     addOrModifyPassenger: function addOrModifyPassenger(cache, data, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/passengers/';
-      opts.method = 'post';
+      opts.method = 'POST';
       opts.data = data;
       opts.headers = engine.genHeader(cache);
       opts.headers['Content-Type'] = 'application/json';
@@ -457,14 +456,14 @@ var restAgent = function restAgent() {
     getPassenger: function getPassenger(cache, passengerId, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/passengers/' + passengerId;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     },
     getPassengerRecentChat: function getPassengerRecentChat(cache, passengerId, userId, ts, size, callback) {
       var opts = {};
       opts.url = cache.server.rest + '/passengers/' + passengerId + '/chats/' + userId + '?ts=' + ts + '&limit=' + size;
-      opts.method = 'get';
+      opts.method = 'GET';
       opts.headers = engine.genHeader(cache);
       ajax(opts, callback);
     }
@@ -702,10 +701,6 @@ engine.getServer = function (cache, options) {
     case 'us':
       cache.server.socket = US_IM_SOCKET_URL;
       cache.server.rest = US_IM_REST_URL;
-      break;
-    case 'cnTest':
-      cache.server.socket = UAT_TEST_URL;
-      cache.server.rest = UAT_TEST_URL;
       break;
     default:
       throw new Error('There is no this region.');
