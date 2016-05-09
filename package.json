@@ -1,6 +1,6 @@
 {
   "name": "maxleap-im",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "maxleap JavaScript SDK",
   "main": "lib/ML.im.js",
   "directories": {
@@ -38,12 +38,12 @@
     "sinon": "^1.15.4"
   },
   "dependencies": {
+    "blueimp-md5": "^2.3.0",
+    "form-data": "^1.0.0-rc3",
+    "socket.io-client": "1.3.7",
+    "underscore": "^1.8",
     "ws": "^0.8",
-    "xmlhttprequest": "^1.8",
-    "js-md5":"^0.4",
-    "underscore":"^1.8",
-    "socket.io-client":"^1.4",
-    "form-data":"^1.0.0-rc3"
+    "xmlhttprequest": "^1.8"
   },
   "browser": {
     "./lib/tool/xmlhttprequest.js": "./lib/tool/xmlhttprequest-browser.js"

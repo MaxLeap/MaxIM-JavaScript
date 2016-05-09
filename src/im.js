@@ -5,6 +5,9 @@ var FormData = require('form-data');
 var tool = require('./tool');
 var ajax = tool.ajax;
 var extend = tool.extend;
+if(window.navigator.userAgent == undefined) {
+  window.navigator.userAgent = 'react-native';
+}
 var io = require('socket.io-client');
 
 // 当前版本

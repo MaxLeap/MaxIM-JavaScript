@@ -1,6 +1,6 @@
 'use strict';
 
-var md5 = require('js-md5');
+var md5 = require('blueimp-md5');
 var FormData = require('form-data');
 
 var tool = {};
