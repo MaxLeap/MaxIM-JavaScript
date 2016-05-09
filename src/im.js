@@ -19,7 +19,8 @@ var config = {
   reconnection: true,
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
-  timeout: 20000
+  timeout: 20000,
+  transports: [ 'websocket' ]//默认使用 websocket
 };
 
 // 命名空间，挂载私有方法
@@ -490,7 +491,6 @@ var socketAgent = function() {
       if (cache.options.oauth !== undefined) {
         auth.oauth = cache.options.oauth;
       }
-
       config.query = 'auth=' + JSON.stringify(auth);
       this.ws = io.connect(url, config);
       this.ws.on('login', function(res) {

@@ -7,7 +7,9 @@ const options = {
     appId: '5722fe2360b23771c2eee2b5',
     clientId: 'Z1NwNUhuT1pEMW0yZGN5RTVkMzZEdw',
     region: 'cn'
+
 };
+//var ML = require('./../src/im.js'); //当使用命令行的调用 或者webstorm的时候调用 页面mocha的时候 注释掉
 let im = ML.im(options);
 let data= {
     size:20,
