@@ -14,8 +14,11 @@ var FormData = require('form-data');
 var tool = require('./tool');
 var ajax = tool.ajax;
 var extend = tool.extend;
-if (window.navigator.userAgent == undefined) {
-  window.navigator.userAgent = 'react-native';
+var window = window || null;
+if (window) {
+  if (window.navigator.userAgent == undefined) {
+    window.navigator.userAgent = 'react-native';
+  }
 }
 var io = require('socket.io-client');
 
@@ -505,6 +508,10 @@ var socketAgent = function socketAgent() {
       if (cache.options.oauth !== undefined) {
         auth.oauth = cache.options.oauth;
       }
+      //模式5
+      if (cache.options.passenger !== undefined) {
+        auth.passenger = cache.options.passenger;
+      }
       config.query = 'auth=' + JSON.stringify(auth);
       this.ws = io.connect(url, config);
       this.ws.on('login', function (res) {
@@ -672,6 +679,8 @@ var im = function im(options, callback) {
       phone: options.phone,
       //oauth
       oauth: options.oauth,
+      //passenger
+      passenger: options.passenger,
       // 服务器地区选项，默认为中国大陆
       region: options.region || 'cn'
     };
