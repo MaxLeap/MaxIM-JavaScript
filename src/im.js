@@ -603,6 +603,13 @@ var newimObject = function() {
       };
       return this;
     },
+    file: function(data) {
+      this.req.content = {
+        media: ( typeof data.media ) != 'undefined' ? data.media: mediaEnum.text,
+        body: data
+      };
+      return this;
+    },
     ok: function() {
       var me = this;
       var filedata;
