@@ -606,7 +606,7 @@ var newimObject = function() {
     file: function(data) {
       this.req.content = {
         media: ( typeof data.media ) != 'undefined' ? data.media: mediaEnum.text,
-        body: data
+        body: data.body
       };
       return this;
     },
