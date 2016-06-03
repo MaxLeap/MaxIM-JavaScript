@@ -6,9 +6,12 @@ var tool = require('./tool');
 var ajax = tool.ajax;
 var extend = tool.extend;
 
-navigator = navigator || {};
-navigator.userAgent = 'react-native';
+try{
+  navigator = navigator || {};
+  navigator.userAgent = 'react-native';
+}catch(e) {
 
+}
 
 var io = require('socket.io-client');
 
