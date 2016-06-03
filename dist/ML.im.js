@@ -14,12 +14,10 @@ var FormData = require('form-data');
 var tool = require('./tool');
 var ajax = tool.ajax;
 var extend = tool.extend;
-var window = window || null;
-if (window) {
-  if (window.navigator.userAgent == undefined) {
-    window.navigator.userAgent = 'react-native';
-  }
-}
+
+navigator = navigator || {};
+navigator.userAgent = 'react-native';
+
 var io = require('socket.io-client');
 
 // 当前版本
@@ -614,7 +612,7 @@ var newimObject = function newimObject() {
       };
       return this;
     },
-    file: function file(data) {
+    mediaUrl: function mediaUrl(data) {
       this.req.content = {
         media: typeof data.media != 'undefined' ? data.media : mediaEnum.text,
         body: data.body
@@ -643,6 +641,11 @@ var newimObject = function newimObject() {
       } else {
         cache.socketAgent.say(JSON.stringify(this.req));
       }
+    },
+    send: function send() {
+      this.req.ts = tool.now();
+      var cache = this.cache;
+      cache.socketAgent.say(JSON.stringify(this.req));
     },
     chunk: function chunk() {
       var me = this;
