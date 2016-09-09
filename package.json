@@ -1,34 +1,33 @@
 {
-    "name": "maxleap-im",
-    "version": "4.0.0",
-    "description": "MaxLeap JavaScript SDK for IM.",
-    "main": "lib/ML.im.js",
-    "directories": {
-        "lib": "lib",
-        "test": "test"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/MaxLeap/MaxIM-JavaScript.git"
-    },
-    "keywords": [
-        "maxleap",
-        "maxleap-im"
-    ],
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/MaxLeap/MaxIM-JavaScript/issues"
-    },
-    "homepage": "https://www.maxleap.cn",
-    "dependencies": {
-        "requirejs": "^2.3.1",
-        "socket.io-client": "^1.4.8",
-        "whatwg-fetch": "^1.0.0"
-    },
-    "scripts": {
-        "preinstall": "rm -rf ./lib",
-        "postinstall": "tsc"
-
-    }
-
+  "name": "maxleap-im",
+  "version": "4.0.0",
+  "description": "MaxLeap JavaScript SDK for IM.",
+  "main": "lib/ML.im.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaxLeap/MaxIM-JavaScript.git"
+  },
+  "keywords": [
+    "maxleap",
+    "maxleap-im"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MaxLeap/MaxIM-JavaScript/issues"
+  },
+  "homepage": "https://www.maxleap.cn",
+  "dependencies": {
+    "lodash": "^4.15.0",
+    "requirejs": "^2.3.1",
+    "socket.io-client": "^1.4.8",
+    "whatwg-fetch": "^1.0.0"
+  },
+  "scripts": {
+    "preinstall": "rm -rf ./lib",
+    "postinstall": "tsc"
+  }
 }

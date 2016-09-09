@@ -1,14 +1,20 @@
-import _ = require('lodash');
-import socketio = require('socket.io-client');
-import {Management} from "./management";
+import {Context} from "./service/context";
+const TEST_RES = {
+    server: 'http://imuat.maxleap.cn',
+    app: '56a86320e9db7300015438f7',
+    sign: 'bWU4SS1uUEx6Z3lqeGwzMVdhRXVrZw',
+    me: 'foo'
+};
 
-let management = new Management('http://imuat.maxleap.cn', '56a86320e9db7300015438f7', 'bWU4SS1uUEx6Z3lqeGwzMVdhRXVrZw', 'foo');
+let context = new Context(TEST_RES.server, TEST_RES.app, TEST_RES.sign, 'foo');
 
-management.userInfo('foo', (err, user) => {
-    if (err) {
-        console.error('error: %s', err);
-    } else {
-        alert(JSON.stringify(user));
-        console.info('user info: %O', user);
-    }
-});
+context
+    .listFriends((err, friends) => {
+        console.log('friends: %O', friends);
+    })
+    .listGroups((err, groups) => {
+        console.log('groups: %O', groups);
+    })
+    .listRooms((err, rooms) => {
+        console.log('rooms: %O', rooms);
+    });

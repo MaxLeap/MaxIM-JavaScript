@@ -1,4 +1,16 @@
-import {UserInfo} from "./models";
+import {UserDetail} from "./models";
+
+interface IManagement {
+    //basic
+    userInfo(userid: string, callback: (err: Error, data?: UserDetail) => void);
+    searchUsers(size: number, skip: number, sort: string, data: any, callback: (err: Error, data: UserDetail[]) => void);
+    // attributes
+    setUserAttributes(userid: string, data: any, callback: (err: Error) => void);
+    coverSetUserAttributes(userid: string, data: any, callback: (err: Error) => void);
+    getUserAttributes(userid: string, callback: (err: Error, attributes: any) => void);
+    getUserOneAttribute(userid: string, attrbuteName: string, callback: (err: Error, value: any)=>void);
+    rmUserAttributes(userid: string, callback: (err: Error) => void);
+}
 
 export class Management {
     app: string;
@@ -25,7 +37,7 @@ export class Management {
         };
     }
 
-    userInfo(userid: string, callback: (err: Error, data?: UserInfo)=>void) {
+    userInfo(userid: string, callback: (err: Error, data?: UserDetail) => void) {
         let url = `${this.server}/ctx/${userid}`;
         let opts = {
             headers: this._headers()
@@ -39,18 +51,10 @@ export class Management {
                 }
             })
             .then(result => {
-                callback(null, <UserInfo>result);
+                callback(null, <UserDetail>result);
             })
             .catch(e => {
                 callback(e);
             });
-    }
-
-    searchUsers(size: number, skip: number, sort: string, data: any, callback: (err: Error, data: UserInfo[]) => void) {
-        //TODO
-    }
-
-    setUserAttributes(userid: string, data: any, callback: (err: Error) => void) {
-        //TODO
     }
 }
