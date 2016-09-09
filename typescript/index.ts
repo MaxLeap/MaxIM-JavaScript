@@ -8,6 +8,7 @@ management.userInfo('foo', (err, user) => {
     if (err) {
         console.error('error: %s', err);
     } else {
+        alert(JSON.stringify(user));
         console.info('user info: %O', user);
     }
 });

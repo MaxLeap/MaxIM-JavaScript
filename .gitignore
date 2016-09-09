@@ -4,3 +4,4 @@ test/browser/specs.browser.js
 .idea
 typings/
 lib/
+*.log
