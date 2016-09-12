@@ -95,8 +95,7 @@ class SayImpl implements Say {
                 body: text
             }
         };
-
-        if (remark) {
+        if (!_.isUndefined(remark) && !_.isNull(remark)) {
             this.message.remark = remark;
         }
     }
