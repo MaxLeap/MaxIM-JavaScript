@@ -16,7 +16,7 @@ interface LoadBuilder {
     forRoom(callback: Callback<RoomInfo>);
 }
 
-interface ICommonService {
+export interface ICommonService {
     // search something
     search(query?: {[key: string]: any}, skip?: number, limit?: number, sort?: string[]): SearchBuilder;
     // load something

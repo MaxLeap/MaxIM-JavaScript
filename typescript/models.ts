@@ -25,7 +25,7 @@ export interface GroupInfo {
 }
 
 export interface MyGroup extends GroupInfo {
-    recent?: History;
+    recent?: ChatRecord;
 }
 
 export interface RoomInfo {
@@ -35,7 +35,7 @@ export interface RoomInfo {
     attributes?: {[key: string]: any};
 }
 
-export interface History {
+export interface ChatRecord {
     speaker: string;
     content: Content;
     ts: number;
@@ -45,7 +45,7 @@ export interface History {
 export interface Friend {
     id: string;
     online: boolean;
-    recent?: History;
+    recent?: ChatRecord;
 }
 
 export interface Friendship {
