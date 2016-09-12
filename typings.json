@@ -3,6 +3,7 @@
   "dependencies": {},
   "globalDependencies": {
     "core-js": "registry:dt/core-js#0.0.0+20160725163759",
+    "cryptojs": "registry:dt/cryptojs#3.1.2+20160317120654",
     "lodash": "registry:dt/lodash#4.14.0+20160830145422",
     "socket.io-client": "registry:dt/socket.io-client#1.4.4+20160317120654",
     "whatwg-fetch": "registry:dt/whatwg-fetch#0.0.0+20160829180742"

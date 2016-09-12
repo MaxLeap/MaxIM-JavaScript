@@ -39,12 +39,19 @@ export interface History {
     speaker: string;
     content: Content;
     ts: number;
+    remark?: string;
 }
 
 export interface Friend {
     id: string;
     online: boolean;
     recent?: History;
+}
+
+export interface Friendship {
+    from: string;
+    to: string;
+    ts: number;
 }
 
 export interface LoginToken {

@@ -23,8 +23,10 @@ interface ICommonService {
     load(id: string): LoadBuilder;
 }
 
-interface APIOptions {
+export interface APIOptions {
     server: string;
+    app: string;
+    sign: string;
     headers: {[key: string]: string};
 }
 
@@ -144,6 +146,8 @@ export class CommonService implements ICommonService {
     constructor(server: string, app: string, sign: string) {
         this._options = {
             server: server,
+            app: app,
+            sign: sign,
             headers: {
                 'x-ml-appid': app,
                 'x-ml-apikey': sign

@@ -1,14 +1,14 @@
 // Define all message struct.
 
 // Message media type:  0=text,1=image,2=audio,3=video
-enum Media{
+export enum Media{
     TEXT = 0,
     IMAGE = 1,
     AUDIO = 2,
     VIDEO = 3
 }
 
-enum Receiver{
+export enum Receiver{
     ACTOR = 0,
     GROUP = 1,
     ROOM = 2,
@@ -27,14 +27,18 @@ export interface MessageTo {
         type?: Receiver;
     };
     content: Content;
-    push?: {
-        enable?: boolean;
-        sound?: string;
-        prefix?: string;
-        suffix?: string;
-        contentAvailable?: boolean;
-    };
+    push?: PushSettings;
     remark?: string;
+}
+
+export interface PushSettings {
+    enable?: boolean;
+    sound?: string;
+    prefix?: string;
+    suffix?: string;
+    overwrite?: string;
+    badge?: number;
+    contentAvailable?: boolean;
 }
 
 
