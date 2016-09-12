@@ -28,17 +28,30 @@ let apiOptions: APIOptions = {
  });
  */
 
-login(apiOptions).simple(me).ok((err, session) => {
-    if (err) {
-        console.error('login failed');
-    } else {
-        console.log('login success');
-        let fn = () => {
-            console.log('speak success @ %d', _.now());
-        };
-        session
-            .say('hello bar~~~~').toFriend('bar').ok(fn)
-            .say('hello bar2~~~~').toFriend('bar').ok(fn);
-
-    }
-});
+login(apiOptions)
+    .simple(me)
+    .onFriendMessage((friendid, msg) => {
+        console.log('from friend %s: %O', friendid, msg);
+    })
+    .onGroupMessage((groupid, userid, msg) => {
+        console.log('from %s in group %s: %O', userid, groupid, msg);
+    })
+    .onRoomMessage((roomid, userid, msg) => {
+        console.log('from %s in room %s: %O', userid, roomid, msg);
+    })
+    .onYourself(msg => {
+        console.log('yourself message: %s', JSON.stringify(msg));
+    })
+    .ok((err, session) => {
+        if (err) {
+            console.error('login failed');
+        } else {
+            console.log('login success');
+            let fn = () => {
+                console.log('speak success @ %d', _.now());
+            };
+            session
+                .say('hello bar~~~~').toFriend('bar').ok(fn)
+                .say('hello bar2~~~~').toFriend('bar').ok(fn);
+        }
+    });

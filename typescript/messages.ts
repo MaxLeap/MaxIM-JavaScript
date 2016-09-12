@@ -41,23 +41,6 @@ export interface PushSettings {
     contentAvailable?: boolean;
 }
 
-
-/*    message struct
- {
- from: {
- id: 'FROM_ID',
- type: 0,    // 0 = friend, 1 = group, 2 = room, 3 = passenger, 4 = stranger
- gid: 'GROUP_OR_ROOM_ID'    //require if type is 1 or 2
- },
- content: {
- media: 0,
- body: 'YOUR_MESSAGE_BODY'
- },
- ts: 1455613127766, // send timestamp
- remark: 'YOUR_MESSAGE_REMARK'
- }
- */
-
 export interface MessageFrom {
     from: {
         id: string;
@@ -69,7 +52,24 @@ export interface MessageFrom {
     remark?: string;
 }
 
+export interface BasicMessageFrom {
+    content: Content;
+    ts: number;
+    remark?: string;
+}
+
 export interface SystemMessageFrom {
+    content: Content;
+    ts: number;
+    remark?: string;
+}
+
+
+export interface YourselfMessageFrom {
+    to: {
+        id: string;
+        type?: Receiver;
+    };
     content: Content;
     ts: number;
     remark?: string;

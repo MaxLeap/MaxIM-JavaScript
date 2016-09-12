@@ -1,6 +1,16 @@
 import {Callback, APIOptions} from "./common";
-import {Media, MessageTo, PushSettings, Receiver} from "../messages";
+import {
+    Media,
+    MessageTo,
+    PushSettings,
+    Receiver,
+    MessageFrom,
+    YourselfMessageFrom,
+    SystemMessageFrom,
+    BasicMessageFrom
+} from "../messages";
 import Socket = SocketIOClient.Socket;
+import isUndefined = require("lodash/isUndefined");
 
 interface Say {
     asText(): Say;
@@ -34,14 +44,38 @@ interface Session {
 }
 
 interface Login {
-    simple(userid: string): LoginBuilder;
-    byMaxleapUser(username: string, password: string): LoginBuilder;
-    byPhone(phone: string, verify: string): LoginBuilder;
+    simple(userid: string): SessionBuilder;
+    byMaxleapUser(username: string, password: string): SessionBuilder;
+    byPhone(phone: string, verify: string): SessionBuilder;
 }
 
-interface LoginBuilder {
-    setNotifyAll(enable: boolean): LoginBuilder;
-    setInstallation(installation: string): LoginBuilder;
+interface Handler1<T> {
+    (t: T): void;
+}
+
+interface Handler2<T,U> {
+    (t: T, u: U): void;
+}
+interface Handler3<T,U,V> {
+    (t: T, u: U, v: V): void;
+}
+
+interface SessionBuilder {
+    setNotifyAll(enable: boolean): SessionBuilder;
+    setInstallation(installation: string): SessionBuilder;
+
+    onFriendMessage(handler: Handler2<string,BasicMessageFrom>): SessionBuilder;
+    onGroupMessage(handler: Handler3<string, string,BasicMessageFrom>): SessionBuilder;
+    onRoomMessage(handler: Handler3<string,string,BasicMessageFrom>): SessionBuilder;
+    onPassengerMessage(handler: Handler2<string,BasicMessageFrom>): SessionBuilder;
+    onStrangerMessage(handler: Handler2<string,BasicMessageFrom>): SessionBuilder;
+    onFriendOnline(handler: Handler1<string>): SessionBuilder;
+    onFriendOffline(handler: Handler1<string>): SessionBuilder;
+    onStrangerOnline(handler: Handler1<string>): SessionBuilder;
+    onStrangerOffline(handler: Handler1<string>): SessionBuilder;
+    onSystemMessage(handler: Handler1<SystemMessageFrom>): SessionBuilder;
+    onYourself(handler: Handler1<YourselfMessageFrom>): SessionBuilder;
+
     ok(callback: Callback<Session>);
 }
 
@@ -178,7 +212,19 @@ class SayBuilder implements Say2 {
 
 }
 
-class LoginBuilderImpl implements LoginBuilder {
+class LoginBuilderImpl implements SessionBuilder {
+
+    private friends: Handler2<string,BasicMessageFrom>[];
+    private groups: Handler3<string,string,BasicMessageFrom>[];
+    private rooms: Handler3<string,string,BasicMessageFrom>[];
+    private passengers: Handler2<string,BasicMessageFrom>[];
+    private strangers: Handler2<string,BasicMessageFrom>[];
+    private friendonlines: Handler1<string>[];
+    private friendofflines: Handler1<string>[];
+    private strangeronlineds: Handler1<string>[];
+    private strangerofflines: Handler1<string>[];
+    private systems: Handler1<SystemMessageFrom>[];
+    private yourselfs: Handler1<YourselfMessageFrom>[];
 
     private apiOptions: APIOptions;
     private authdata: {};
@@ -186,16 +232,95 @@ class LoginBuilderImpl implements LoginBuilder {
     constructor(apiOptions: APIOptions, authdata: {}) {
         this.apiOptions = apiOptions;
         this.authdata = authdata;
+
+        this.friends = [];
+        this.groups = [];
+        this.rooms = [];
+        this.passengers = [];
+        this.strangers = [];
+
+        this.friendonlines = [];
+        this.friendofflines = [];
+        this.strangeronlineds = [];
+        this.strangerofflines = [];
+        this.systems = [];
+        this.yourselfs = [];
     }
 
-    setNotifyAll(enable: boolean): LoginBuilder {
+    setNotifyAll(enable: boolean): SessionBuilder {
         _.extend(this.authdata, {notifyAll: enable});
         return this;
     }
 
-    setInstallation(installation: string): LoginBuilder {
+    setInstallation(installation: string): SessionBuilder {
         _.extend(this.authdata, {install: installation});
         return this;
+    }
+
+    onFriendMessage(handler: Handler2<string,BasicMessageFrom>): SessionBuilder {
+        this.friends.push(handler);
+        return this;
+    }
+
+    onGroupMessage(handler: Handler3<string,string,MessageFrom>): SessionBuilder {
+        this.groups.push(handler);
+        return this;
+    }
+
+    onRoomMessage(handler: Handler3<string,string,MessageFrom>): SessionBuilder {
+        this.rooms.push(handler);
+        return this;
+    }
+
+    onPassengerMessage(handler: Handler2<string,MessageFrom>): SessionBuilder {
+        this.passengers.push(handler);
+        return this;
+    }
+
+    onStrangerMessage(handler: Handler2<string,MessageFrom>): SessionBuilder {
+        this.strangers.push(handler);
+        return this;
+    }
+
+    onFriendOnline(handler: Handler1<string>): SessionBuilder {
+        this.friendonlines.push(handler);
+        return this;
+    }
+
+    onFriendOffline(handler: Handler1<string>): SessionBuilder {
+        this.friendofflines.push(handler);
+        return this;
+    }
+
+    onStrangerOnline(handler: Handler1<string>): SessionBuilder {
+        this.strangeronlineds.push(handler);
+        return this;
+    }
+
+    onStrangerOffline(handler: Handler1<string>): SessionBuilder {
+        this.strangerofflines.push(handler);
+        return this;
+    }
+
+    onSystemMessage(handler: Handler1<SystemMessageFrom>): SessionBuilder {
+        this.systems.push(handler);
+        return this;
+    }
+
+    onYourself(handler: Handler1<YourselfMessageFrom>): SessionBuilder {
+        this.yourselfs.push(handler);
+        return this;
+    }
+
+    private static convert(origin: MessageFrom): BasicMessageFrom {
+        let ret: BasicMessageFrom = {
+            content: origin.content,
+            ts: origin.ts
+        };
+        if (!_.isUndefined(origin.remark) && !_.isNull(origin.remark)) {
+            ret.remark = origin.remark;
+        }
+        return ret;
     }
 
     ok(callback: Callback<Session>) {
@@ -211,6 +336,78 @@ class LoginBuilderImpl implements LoginBuilder {
             } else {
                 callback(new Error(`error: ${foo.error}`));
             }
+        });
+
+        socket.on('message', income => {
+            let msg = income as MessageFrom;
+            let basicmsg = LoginBuilderImpl.convert(msg);
+            switch (msg.from.type) {
+                case Receiver.ACTOR:
+                    _.each(this.friends, (handler: Handler2<string,BasicMessageFrom>) => {
+                        handler(msg.from.id, basicmsg);
+                    });
+                    break;
+                case Receiver.GROUP:
+                    _.each(this.groups, (handler: Handler3<string,string,BasicMessageFrom>) => {
+                        handler(msg.from.gid, msg.from.id, basicmsg);
+                    });
+                    break;
+                case Receiver.ROOM:
+                    _.each(this.rooms, (handler: Handler3<string,string,BasicMessageFrom>) => {
+                        handler(msg.from.gid, msg.from.id, basicmsg);
+                    });
+                    break;
+                case Receiver.PASSENGER:
+                    _.each(this.passengers, (handler: Handler2<string,BasicMessageFrom>) => {
+                        handler(msg.from.id, basicmsg);
+                    });
+                    break;
+                case Receiver.STRANGER:
+                    _.each(this.strangers, (handler: Handler2<string,BasicMessageFrom>) => {
+                        handler(msg.from.id, basicmsg);
+                    });
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        socket.on('online', onlineid => {
+            _.each(this.friendonlines, handler => {
+                handler(onlineid as string);
+            });
+        });
+
+        socket.on('offline', offlineid=> {
+            _.each(this.friendofflines, handler => {
+                handler(offlineid as string);
+            });
+        });
+
+        socket.on('online_x', onlineid => {
+            _.each(this.strangeronlineds, handler=> {
+                handler(onlineid as string);
+            });
+        });
+
+        socket.on('offline_x', offlineid => {
+            _.each(this.strangerofflines, handler=> {
+                handler(offlineid as string);
+            });
+        });
+
+        socket.on('sys', income => {
+            let msg = income as SystemMessageFrom;
+            _.each(this.systems, handler => {
+                handler(msg);
+            });
+        });
+
+        socket.on('yourself', income => {
+            let msg = income as YourselfMessageFrom;
+            _.each(this.yourselfs, handler=> {
+                handler(msg);
+            });
         });
     }
 }
@@ -230,7 +427,7 @@ class LoginImpl implements Login {
         }
     }
 
-    simple(userid: string): LoginBuilder {
+    simple(userid: string): SessionBuilder {
         let authdata = _.extend({client: userid}, this.basicAuth);
         return new LoginBuilderImpl(this.apiOptions, authdata);
     }
