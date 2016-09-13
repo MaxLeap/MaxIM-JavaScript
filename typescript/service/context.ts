@@ -91,8 +91,17 @@ interface IContext {
      */
     setMyAttribute(name: string, value: any, callback?: Callback<void>): IContext;
 
+    /**
+     * 获取当前上下文用户的属性列表
+     * @param callback
+     */
     getMyAttributes(callback?: Callback<Attributes>): IContext;
 
+    /**
+     * 获取当前上下文用户的某个属性
+     * @param attributeName
+     * @param callback
+     */
     getMyAttribute(attributeName: string, callback?: Callback<any>): IContext;
 
 }

@@ -1,5 +1,6 @@
 import {Callback, ICommonService, CommonService, successful} from "./common";
 import {SystemMessageTo, Media, Receiver, PushSettings} from "../messages";
+import {Attributes} from "../models";
 
 interface Admin extends ICommonService {
     /**
@@ -14,7 +15,7 @@ interface Admin extends ICommonService {
      * @param attributes
      * @param overwrite
      */
-    setAttributes(attributes: {[key: string]: any}, overwrite?: boolean): AttributeBuilder;
+    setAttributes(attributes: Attributes, overwrite?: boolean): AttributeBuilder;
 
     /**
      * 创建聊天室
@@ -26,6 +27,131 @@ interface Admin extends ICommonService {
      * @param callback
      */
     destroyRoom(roomid: string, callback: Callback<void>): Admin;
+
+    /**
+     * 移除成员
+     * @param first
+     * @param others
+     */
+    removeMembers(first: string, ...others: string[]): MemberRemoveCommand;
+
+    /**
+     * 追加成员
+     * @param first
+     * @param others
+     */
+    appendMembers(first: string, ...others: string[]): MemberAppendCommand;
+
+}
+
+interface MemberAppendCommand {
+    intoRoom(roomid: string, callback?: Callback<void>): Admin;
+    intoGroup(groupid: string, callback?: Callback<void>): Admin;
+}
+
+interface MemberRemoveCommand {
+    fromRoom(roomid: string, callback?: Callback<void>): Admin;
+    fromGroup(groupid: string, callback?: Callback<void>): Admin;
+}
+
+class MemberAppendCommandImpl implements MemberAppendCommand {
+
+    private admin: AdminImpl;
+    private members: {
+        members: string[]
+    };
+
+    constructor(admin: AdminImpl, members: string[]) {
+        this.admin = admin;
+        this.members = {
+            members: members
+        };
+    }
+
+    private _append(path: string, callback?: Callback<void>): Admin {
+        let url = `${this.admin.options().server}${path}/members`;
+        let opts = {
+            method: 'POST',
+            headers: this.admin.options().headers,
+            body: JSON.stringify(this.members)
+        };
+
+        fetch(url, opts)
+            .then(response => {
+                if (successful(response)) {
+                    if (callback) {
+                        callback(null, null);
+                    }
+                } else {
+                    throw new Error(`error: ${response.status}`);
+                }
+            })
+            .catch(e => {
+                if (callback) {
+                    callback(e);
+                }
+            });
+        return this.admin;
+    }
+
+    intoRoom(roomid: string, callback?: Callback<void>): Admin {
+        return this._append(`/rooms/${roomid}`, callback);
+    }
+
+    intoGroup(groupid: string, callback?: Callback<void>): Admin {
+        return this._append(`/groups/${groupid}`, callback);
+    }
+
+}
+
+class MemberRemoveCommandImpl implements MemberRemoveCommand {
+
+    private admin: AdminImpl;
+    private members: {
+        members: string[];
+    };
+
+    constructor(admin: AdminImpl, members: string[]) {
+        this.admin = admin;
+        this.members = {
+            members: members
+        };
+    }
+
+    private _delete(path: string, callback?: Callback<void>): Admin {
+        let op = this.admin.options();
+        let url = `${op.server}${path}/members`;
+        let opts = {
+            method: 'DELETE',
+            body: JSON.stringify(this.members),
+            headers: op.headers
+        };
+        fetch(url, opts)
+            .then(response => {
+                if (successful(response)) {
+                    if (callback) {
+                        callback(null, null);
+                    }
+                } else {
+                    throw new Error(`error: ${response.status}`);
+                }
+            })
+            .catch(e => {
+                if (callback) {
+                    callback(e);
+                }
+            });
+        return this.admin;
+    }
+
+    fromRoom(roomid: string, callback?: Callback<void>): Admin {
+        return this._delete(`/rooms/${roomid}`, callback);
+    }
+
+    fromGroup(groupid: string, callback?: Callback<void>): Admin {
+        return this._delete(`/groups/${groupid}`, callback);
+    }
+
 }
 
 interface MessageBuilder {
@@ -52,9 +178,7 @@ interface MessageLanucher {
     ok(callback?: Callback<void>): Admin;
 }
 
-
 class MessageBuilderImpl implements MessageBuilder {
-
 
     private admin: AdminImpl;
     private receiver: {
@@ -235,10 +359,10 @@ interface AttributeBuilder {
 class AttributeBuilderImpl implements AttributeBuilder {
 
     private admin: AdminImpl;
-    private attributes: {[key: string]: any};
+    private attributes: Attributes;
     private overwrite: boolean;
 
-    constructor(admin: AdminImpl, attributes: {[key: string]: any}, overwrite?: boolean) {
+    constructor(admin: AdminImpl, attributes: Attributes, overwrite?: boolean) {
         this.admin = admin;
         this.attributes = attributes;
         this.overwrite = overwrite || false;
@@ -375,7 +499,7 @@ export class AdminImpl extends CommonService implements Admin {
         return new MessageBuilderImpl(this, text, remark);
     }
 
-    setAttributes(attributes: {}, overwrite?: boolean): AttributeBuilder {
+    setAttributes(attributes: Attributes, overwrite?: boolean): AttributeBuilder {
         return new AttributeBuilderImpl(this, attributes, overwrite);
     }
 
@@ -405,5 +529,13 @@ export class AdminImpl extends CommonService implements Admin {
                 }
             });
         return this;
+    }
+
+    removeMembers(first: string, ...others): MemberRemoveCommand {
+        return new MemberRemoveCommandImpl(this, _.concat(first, others));
+    }
+
+    appendMembers(first: string, ...others): MemberAppendCommand {
+        return new MemberAppendCommandImpl(this, _.concat(first, others));
     }
 }

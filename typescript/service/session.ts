@@ -38,7 +38,6 @@ interface Say2 {
 }
 
 interface Session {
-    //TODO
     say(text: string, remark?: string): Say;
     close(callback?: Callback<void>): void;
 }
@@ -205,10 +204,18 @@ class SayBuilder implements Say2 {
     }
 
     ok(callback?: Callback<void>): Session {
-        this.session.socket.emit('say', this.message);
+        try {
+            this.session.socket.emit('say', this.message);
+            if (callback) {
+                callback(null, null);
+            }
+        } catch (e: Error) {
+            if (callback) {
+                callback(e);
+            }
+        }
         return this.session;
     }
-
 }
 
 class LoginBuilderImpl implements SessionBuilder {
