@@ -1,6 +1,7 @@
 import {login} from "./service/session";
 import {APIOptions} from "./service/common";
 import {Context} from "./service/context";
+import {AdminImpl} from "./service/admin";
 
 
 let me = 'foo';
@@ -58,3 +59,11 @@ context
     .ofFriend('bar', (err, records) => {
         console.log('records: %s', JSON.stringify(records));
     });
+
+let admin = new AdminImpl(apiOptions.server, apiOptions.app, apiOptions.sign);
+
+admin.say(`SYSTEM MESSAGE WAHAHA @ ${new Date()}`, 'REMARK!!!!').toAll().ok();
+
+setInterval(() => {
+    admin.say(`SYSTEM MESSAGE WAHAHA @ ${new Date()}`, 'REMARK!!!!').toAll().ok();
+}, 30000);

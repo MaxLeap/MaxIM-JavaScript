@@ -150,12 +150,13 @@ export class CommonService implements ICommonService {
             sign: sign,
             headers: {
                 'x-ml-appid': app,
-                'x-ml-apikey': sign
+                'x-ml-apikey': sign,
+                'content-type': 'application/json; charset=utf-8'
             }
         };
     }
 
-    protected options(): APIOptions {
+    public options(): APIOptions {
         return this._options;
     }
 
