@@ -17,11 +17,92 @@ interface LoadBuilder {
     forPassenger(callback: Callback<Passenger>);
 }
 
+interface GetAttributesBuilder {
+    forUser(callback?: Callback<any>);
+    forGroup(callback?: Callback<any>);
+    forRoom(callback?: Callback<any>);
+}
+
+class GetAttributesBuilderImpl implements GetAttributesBuilder {
+
+    private id: string;
+    private attr: string;
+    private common: CommonService;
+
+    constructor(common: CommonService, id: string, attr?: string) {
+        this.common = common;
+        this.id = id;
+        this.attr = attr;
+    }
+
+    private forAttr(path: string, callback: Callback<any>) {
+
+        let url = `${this.common.options().server}${path}/attributes`;
+        if (this.attr) {
+            url += `/${this.attr}`;
+        }
+        let opts = {
+            method: 'GET',
+            headers: this.common.options().headers
+        };
+        fetch(url, opts)
+            .then(response => {
+                if (successful(response)) {
+                    return response.json();
+                } else {
+                    throw new Error(`error: ${response.status}`);
+                }
+            })
+            .then(result => {
+                callback(null, result);
+            })
+            .catch(e => {
+                callback(e);
+            });
+    }
+
+    forUser(callback?: Callback<any>) {
+        if (!callback) {
+            return;
+        }
+        this.forAttr(`/ctx/${this.id}`, callback);
+    }
+
+    forGroup(callback?: Callback<any>) {
+        if (!callback) {
+            return;
+        }
+        this.forAttr(`/groups/${this.id}`, callback);
+    }
+
+    forRoom(callback?: Callback<any>) {
+        if (!callback) {
+            return;
+        }
+        this.forAttr(`/rooms/${this.id}`, callback);
+    }
+}
+
 export interface ICommonService {
-    // search something
+    /**
+     * 搜索对象
+     * @param query 查询条件
+     * @param skip 跳过记录数
+     * @param limit 返回记录条数
+     * @param sort 排序
+     */
     search(query?: {[key: string]: any}, skip?: number, limit?: number, sort?: string[]): SearchBuilder;
-    // load something
+    /**
+     * 载入对象
+     * @param id 对象ID
+     */
     load(id: string): LoadBuilder;
+
+    /**
+     * 获取属性
+     * @param id
+     */
+    getAttributes(id: string, attributeName?: string): GetAttributesBuilder;
 }
 
 export interface APIOptions {
@@ -186,4 +267,7 @@ export class CommonService implements ICommonService {
         return new LoadBuilderImpl(this._options, opts);
     }
 
+    public getAttributes(id: string, attributeName?: string): GetAttributesBuilder {
+        return new GetAttributesBuilderImpl(this, id, attributeName);
+    }
 }

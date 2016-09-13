@@ -1,5 +1,5 @@
 import {Callback, CommonService, successful, APIOptions} from "./common";
-import {Friend, MyGroup, RoomInfo, ChatRecord} from "../models";
+import {Friend, MyGroup, RoomInfo, ChatRecord, Attributes} from "../models";
 import sortedIndexBy = require("lodash/sortedIndexBy");
 import unary = require("lodash/unary");
 import isUndefined = require("lodash/isUndefined");
@@ -74,6 +74,27 @@ interface IContext {
      * @param callback
      */
     leaveRoom(roomid: string, callback?: Callback<boolean>): IContext;
+
+    /**
+     * 设置当前上下文用户的属性
+     * @param attributes 属性表
+     * @param overwrite 强制覆盖
+     * @param callback 回调
+     */
+    setMyAttributes(attributes: Attributes, overwrite?: boolean, callback?: Callback<void>): IContext;
+
+    /**
+     * 设置当前上下文用户的单个属性
+     * @param name 属性名
+     * @param value 属性表
+     * @param callback 回调
+     */
+    setMyAttribute(name: string, value: any, callback?: Callback<void>): IContext;
+
+    getMyAttributes(callback?: Callback<Attributes>): IContext;
+
+    getMyAttribute(attributeName: string, callback?: Callback<any>): IContext;
+
 }
 
 /**
@@ -338,5 +359,50 @@ export class Context extends CommonService implements IContext {
     public leaveRoom(roomid: string, callback?: Callback<boolean>): IContext {
         let path = `/rooms/${roomid}/members/${this.you}`;
         return this.deleteSomething(path, callback);
+    }
+
+    public setMyAttributes(attributes: Attributes, overwrite?: boolean, callback?: Callback<void>): IContext {
+        let url = `/ctx/${this.you}/attributes`;
+        let opts = {
+            method: overwrite ? 'PUT' : 'POST',
+            body: JSON.stringify(attributes),
+            headers: this.options().headers
+        };
+        fetch(url, opts)
+            .then(response => {
+                if (successful(response)) {
+                    if (callback) {
+                        callback(null, null);
+                    }
+                } else {
+                    throw new Error(`error: ${response.status}`);
+                }
+            })
+            .catch(e=> {
+                if (callback) {
+                    callback(e);
+                }
+            });
+        return this;
+    }
+
+    public setMyAttribute(name: string, value: any, callback?: Callback<void>): IContext {
+        let attributes = {};
+        attributes[name] = value;
+        return this.setMyAttributes(attributes, false, callback);
+    }
+
+    public getMyAttributes(callback?: Callback<Attributes>): IContext {
+        if (callback) {
+            super.getAttributes(this.you).forUser(callback);
+        }
+        return this;
+    }
+
+    public getMyAttribute(attributeName: string, callback?: Callback<any>): IContext {
+        if (callback) {
+            super.getAttributes(this.you, attributeName).forUser(callback);
+        }
+        return this;
     }
 }

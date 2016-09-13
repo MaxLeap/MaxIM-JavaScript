@@ -58,6 +58,10 @@ export interface Passenger {
     [key: string]: any;
 }
 
+export interface Attributes {
+    [key: string]: any;
+}
+
 export interface LoginToken {
     appId: string;
     clientId: string;

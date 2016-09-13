@@ -46,6 +46,9 @@ login(apiOptions)
 
 let context = new Context(apiOptions.server, apiOptions.app, apiOptions.sign, 'foo');
 context
+    .getMyAttributes((err, attrs) => {
+        console.log('MY ATTRIBUTES: %O', attrs);
+    })
     .listFriends((err, friends) => {
         console.log('friends: %O', friends);
     })
@@ -59,6 +62,7 @@ context
     .ofFriend('bar', (err, records) => {
         console.log('records: %s', JSON.stringify(records));
     });
+
 
 let admin = new AdminImpl(apiOptions.server, apiOptions.app, apiOptions.sign);
 
