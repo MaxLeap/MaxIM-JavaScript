@@ -27,7 +27,7 @@ class MaxIMImpl implements MaxIM {
     private _admin: Admin;
 
     constructor(options: MaxIMOptions) {
-        if (!options || !options.app || options.key) {
+        if (!options || !options.app || !options.key) {
             throw new Error(`invalid options: ${JSON.stringify(options)}`);
         }
 
@@ -38,6 +38,9 @@ class MaxIMImpl implements MaxIM {
                 break;
             case 'cn':
                 server = 'im.maxleap.cn';
+                break;
+            case 'uat':
+                server = 'imuat.maxleap.cn';
                 break;
             default:
                 throw new Error(`invalid region ${options.region}`);

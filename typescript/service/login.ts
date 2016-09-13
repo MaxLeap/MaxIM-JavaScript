@@ -1,5 +1,6 @@
 import {SessionBuilder, SessionBuilderImpl} from "./session";
 import {APIOptions} from "../models";
+import {md5} from "../helper/md5";
 
 /**
  * 登录器
@@ -35,7 +36,7 @@ export class LoginImpl implements Login {
     constructor(apiOptions: APIOptions) {
         this._options = apiOptions;
         let foo = _.now();
-        let bar = CryptoJS.MD5(`${foo}${this._options.sign}`).toString() + ',' + foo;
+        let bar = md5(`${foo}${this._options.sign}`) + ',' + foo;// let bar = CryptoJS.MD5(`${foo}${this._options.sign}`).toString() + ',' + foo;
         this._basicAuth = {
             app: this._options.app,
             sign: bar

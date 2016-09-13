@@ -21,7 +21,6 @@
   },
   "homepage": "https://www.maxleap.cn",
   "dependencies": {
-    "crypto-js": "^3.1.6",
     "lodash": "^4.15.0",
     "requirejs": "^2.3.1",
     "socket.io-client": "^1.4.8",

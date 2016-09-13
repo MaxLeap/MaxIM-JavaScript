@@ -305,7 +305,7 @@ export class SessionBuilderImpl implements SessionBuilder {
         socket.once('login', result => {
             let foo = result as LoginResult;
             if (foo.success) {
-                let session = new SessionImpl(socket);
+                let session = new SessionImpl(socket, foo.id);
                 let ctx = new ContextImpl(this.apiOptions, result.id);
                 callback(null, session, ctx);
             } else {
@@ -389,11 +389,18 @@ export class SessionBuilderImpl implements SessionBuilder {
 
 class SessionImpl implements Session {
     private closed: boolean;
+    private userid: string;
+
     socket: Socket;
 
-    constructor(socket: Socket) {
+    constructor(socket: Socket, userid: string) {
         this.closed = false;
         this.socket = socket;
+        this.userid = userid;
+    }
+
+    current(): string {
+        return this.userid;
     }
 
     say(text: string, remark?: string): Say {
@@ -414,6 +421,7 @@ class SessionImpl implements Session {
 }
 
 export interface Session {
+    current(): string;
     say(text: string, remark?: string): Say;
     close(callback?: Callback<void>): void;
 }
