@@ -1,3 +1,5 @@
+// see http://www.myersdaily.org/joseph/javascript/md5.js
+
 function md5cycle(x: number[], k: number[]) {
     let a = x[0], b = x[1], c = x[2], d = x[3];
     a = ff(a, b, c, d, k[0], 7, -680876936);
