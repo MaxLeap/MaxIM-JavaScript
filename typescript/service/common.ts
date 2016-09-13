@@ -1,8 +1,4 @@
-import {UserDetail, GroupInfo, RoomInfo, UserOutline, Passenger} from "../models";
-
-export interface Callback<T> {
-    (err: Error, data?: T): void;
-}
+import {UserDetail, GroupInfo, RoomInfo, UserOutline, Passenger, APIOptions, Callback} from "../models";
 
 interface SearchBuilder {
     forUsers(callback: Callback<UserOutline[]>);
@@ -27,9 +23,9 @@ class GetAttributesBuilderImpl implements GetAttributesBuilder {
 
     private id: string;
     private attr: string;
-    private common: CommonService;
+    private common: CommonServiceImpl;
 
-    constructor(common: CommonService, id: string, attr?: string) {
+    constructor(common: CommonServiceImpl, id: string, attr?: string) {
         this.common = common;
         this.id = id;
         this.attr = attr;
@@ -83,7 +79,11 @@ class GetAttributesBuilderImpl implements GetAttributesBuilder {
     }
 }
 
-export interface ICommonService {
+export interface CommonService {
+    /**
+     * 获取当前基础设定
+     */
+    options(): APIOptions;
     /**
      * 搜索对象
      * @param query 查询条件
@@ -103,13 +103,6 @@ export interface ICommonService {
      * @param id
      */
     getAttributes(id: string, attributeName?: string): GetAttributesBuilder;
-}
-
-export interface APIOptions {
-    server: string;
-    app: string;
-    sign: string;
-    headers: {[key: string]: string};
 }
 
 interface LoadOptions {
@@ -229,28 +222,19 @@ class SearchBuilderImpl extends Builder<SearchOptions> implements SearchBuilder 
     }
 }
 
-export class CommonService implements ICommonService {
+export class CommonServiceImpl implements CommonService {
 
     private _options: APIOptions;
 
-    constructor(server: string, app: string, sign: string) {
-        this._options = {
-            server: server,
-            app: app,
-            sign: sign,
-            headers: {
-                'x-ml-appid': app,
-                'x-ml-apikey': sign,
-                'content-type': 'application/json; charset=utf-8'
-            }
-        };
+    constructor(apiOptions: APIOptions) {
+        this._options = apiOptions;
     }
 
-    public options(): APIOptions {
+    options(): APIOptions {
         return this._options;
     }
 
-    public search(query?: {}, skip?: number, limit?: number, sort?: string[]): SearchBuilder {
+    search(query?: {}, skip?: number, limit?: number, sort?: string[]): SearchBuilder {
         let searchOptions: SearchOptions = {
             limit: limit,
             skip: skip,
@@ -260,14 +244,14 @@ export class CommonService implements ICommonService {
         return new SearchBuilderImpl(this._options, searchOptions);
     }
 
-    public load(id: string): LoadBuilder {
+    load(id: string): LoadBuilder {
         let opts = {
             id: id
         };
         return new LoadBuilderImpl(this._options, opts);
     }
 
-    public getAttributes(id: string, attributeName?: string): GetAttributesBuilder {
+    getAttributes(id: string, attributeName?: string): GetAttributesBuilder {
         return new GetAttributesBuilderImpl(this, id, attributeName);
     }
 }

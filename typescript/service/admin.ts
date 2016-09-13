@@ -1,33 +1,29 @@
-import {Callback, ICommonService, CommonService, successful} from "./common";
+import {CommonService, CommonServiceImpl, successful} from "./common";
 import {SystemMessageTo, Media, Receiver, PushSettings} from "../messages";
-import {Attributes} from "../models";
+import {Attributes, Callback} from "../models";
 
-interface Admin extends ICommonService {
+export interface Admin extends CommonService {
     /**
      * 发送系统消息
      * @param text
      * @param remark
      */
     say(text: string, remark?: string): MessageBuilder;
-
     /**
      * 属性设置
      * @param attributes
      * @param overwrite
      */
     setAttributes(attributes: Attributes, overwrite?: boolean): AttributeBuilder;
+    /**
+     * 创建
+     */
+    create(): CreateCommand;
 
     /**
-     * 创建聊天室
+     * 销毁
      */
-    createRoom(): RoomBuilder;
-    /**
-     * 销毁聊天室
-     * @param roomid
-     * @param callback
-     */
-    destroyRoom(roomid: string, callback: Callback<void>): Admin;
-
+    destroy(): DestroyCommand;
     /**
      * 移除成员
      * @param first
@@ -41,6 +37,205 @@ interface Admin extends ICommonService {
      * @param others
      */
     appendMembers(first: string, ...others: string[]): MemberAppendCommand;
+
+}
+
+interface CreateCommand {
+    group(owner: string): GroupBuilder;
+    room(): RoomBuilder;
+}
+
+interface DestroyCommand {
+    group(groupid: string): GroupDestroy;
+    room(roomid: string): RoomDestroy;
+}
+
+interface GroupDestroy {
+    ok(callback?: Callback<void>): Admin;
+}
+
+class GroupDestroyImpl implements GroupDestroy {
+
+    private admin: AdminImpl;
+    private groupid: string;
+
+    constructor(admin: AdminImpl, groupid: string) {
+        this.admin = admin;
+        this.groupid = groupid;
+    }
+
+    ok(callback?: Callback<void>): Admin {
+        let url = `${this.admin.options().server}/groups/${this.groupid}`;
+        let opts = {
+            method: 'DELETE',
+            headers: this.admin.options().headers
+        };
+        fetch(url, opts)
+            .then(response => {
+                if (successful(response)) {
+                    if (callback) {
+                        callback(null, null);
+                    }
+                } else {
+                    throw new Error(`error: ${response.status}`);
+                }
+            })
+            .catch(e => {
+                if (callback) {
+                    callback(e);
+                }
+            });
+        return this.admin;
+    }
+}
+
+interface RoomDestroy {
+    ok(callback?: Callback<void>): Admin;
+}
+
+class RoomDestroyImpl implements RoomDestroy {
+
+    private admin: AdminImpl;
+    private roomid: string;
+
+    constructor(admin: AdminImpl, roomid: string) {
+        this.admin = admin;
+        this.roomid = roomid;
+    }
+
+    ok(callback?: Callback<void>): Admin {
+        let url = `${this.admin.options().server}/rooms/${this.roomid}`;
+        let opts = {
+            method: 'DELETE',
+            headers: this.admin.options().headers
+        };
+        fetch(url, opts)
+            .then(response => {
+                if (successful(response)) {
+                    if (callback) {
+                        callback(null, null);
+                    }
+                } else {
+                    throw new Error(`error: ${response.status}`);
+                }
+            })
+            .catch(e => {
+                if (callback) {
+                    callback(e);
+                }
+            });
+        return this.admin;
+    }
+
+}
+
+class DestroyCommandImpl implements DestroyCommand {
+
+    private admin: AdminImpl;
+
+    constructor(admin: AdminImpl) {
+        this.admin = admin;
+    }
+
+    group(groupid: string): GroupDestroy {
+        return new GroupDestroyImpl(this.admin, groupid);
+    }
+
+    room(roomid: string): RoomDestroy {
+        return new RoomDestroyImpl(this.admin, roomid);
+    }
+}
+
+
+class CreateCommandImpl implements CreateCommand {
+
+    private admin: AdminImpl;
+
+    constructor(admin: AdminImpl) {
+        this.admin = admin;
+    }
+
+    group(owner: string): GroupBuilder {
+        return new GroupBuilderImpl(this.admin, owner);
+    }
+
+    room(): RoomBuilder {
+        return new RoomBuilderImpl(this.admin);
+    }
+}
+
+interface GroupBuilder {
+    attribute(key: string, value: any): GroupBuilder;
+    members(first: string, ...others: string[]): GroupBuilder;
+    ok(callback?: Callback<string>): Admin;
+}
+
+class GroupBuilderImpl implements GroupBuilder {
+
+    private admin: AdminImpl;
+    private owner: string;
+    private appends: string[];
+    private attributes: Attributes;
+
+    constructor(admin: AdminImpl, owner: string) {
+        this.admin = admin;
+        this.appends = [];
+        this.owner = owner;
+    }
+
+    attribute(key: string, value: any): GroupBuilder {
+        if (!this.attributes) {
+            this.attributes = {};
+        }
+        this.attributes[key] = value;
+        return this;
+    }
+
+    members(first: string, others: string): GroupBuilder {
+        this.appends.push(first);
+        _.each(others, this.appends.push);
+        return this;
+    }
+
+    ok(callback?: Callback<string>): Admin {
+        let op = this.admin.options();
+        let url = `${op.server}/groups`;
+        let data = {
+            owner: this.owner,
+            members: this.appends
+        };
+        let opts = {
+            method: 'POST',
+            headers: op.headers,
+            body: JSON.stringify(data)
+        };
+
+        fetch(url, opts)
+            .then(response => {
+                if (successful(response)) {
+                    return response.json();
+                } else {
+                    throw new Error(`error: ${response.status}`);
+                }
+            })
+            .then(groupid => {
+                this.admin
+                    .setAttributes(this.attributes)
+                    .forGroup(groupid, (err) => {
+                        if (err && callback) {
+                            callback(err);
+                        } else {
+                            callback(null, groupid);
+                        }
+                    });
+            })
+            .catch(e => {
+                if (callback) {
+                    callback(e);
+                }
+            });
+        return this.admin;
+    }
 
 }
 
@@ -493,7 +688,7 @@ class RoomBuilderImpl implements RoomBuilder {
     }
 }
 
-export class AdminImpl extends CommonService implements Admin {
+export class AdminImpl extends CommonServiceImpl implements Admin {
 
     say(text: string, remark?: string): MessageBuilder {
         return new MessageBuilderImpl(this, text, remark);
@@ -503,39 +698,19 @@ export class AdminImpl extends CommonService implements Admin {
         return new AttributeBuilderImpl(this, attributes, overwrite);
     }
 
-    createRoom(): RoomBuilder {
-        return new RoomBuilderImpl(this);
-    }
-
-    destroyRoom(roomid: string, callback?: Callback<void>): Admin {
-        let url = `${this.options().server}/rooms/${roomid}`;
-        let opts = {
-            method: 'DELETE',
-            headers: this.options().headers
-        };
-        fetch(url, opts)
-            .then(response => {
-                if (successful(response)) {
-                    if (callback) {
-                        callback(null, null);
-                    }
-                } else {
-                    throw new Error(`error: ${response.status}`);
-                }
-            })
-            .catch(e => {
-                if (callback) {
-                    callback(e);
-                }
-            });
-        return this;
-    }
-
     removeMembers(first: string, ...others): MemberRemoveCommand {
         return new MemberRemoveCommandImpl(this, _.concat(first, others));
     }
 
     appendMembers(first: string, ...others): MemberAppendCommand {
         return new MemberAppendCommandImpl(this, _.concat(first, others));
+    }
+
+    create(): CreateCommand {
+        return new CreateCommandImpl(this);
+    }
+
+    destroy(): DestroyCommand {
+        return new DestroyCommandImpl(this);
     }
 }

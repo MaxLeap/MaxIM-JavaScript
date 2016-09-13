@@ -1,4 +1,3 @@
-import {Callback, APIOptions} from "./common";
 import {
     Media,
     MessageTo,
@@ -9,6 +8,8 @@ import {
     SystemMessageFrom,
     BasicMessageFrom
 } from "../messages";
+import {Context, ContextImpl} from "./context";
+import {APIOptions, Handler2, Handler3, Handler1, Callback} from "../models";
 import Socket = SocketIOClient.Socket;
 import isUndefined = require("lodash/isUndefined");
 
@@ -37,46 +38,12 @@ interface Say2 {
     ok(callback?: Callback<void>): Session;
 }
 
-interface Session {
-    say(text: string, remark?: string): Say;
-    close(callback?: Callback<void>): void;
+interface LoginResult {
+    success: boolean;
+    id?: string;
+    error?: number;
 }
 
-interface Login {
-    simple(userid: string): SessionBuilder;
-    byMaxleapUser(username: string, password: string): SessionBuilder;
-    byPhone(phone: string, verify: string): SessionBuilder;
-}
-
-interface Handler1<T> {
-    (t: T): void;
-}
-
-interface Handler2<T,U> {
-    (t: T, u: U): void;
-}
-interface Handler3<T,U,V> {
-    (t: T, u: U, v: V): void;
-}
-
-interface SessionBuilder {
-    setNotifyAll(enable: boolean): SessionBuilder;
-    setInstallation(installation: string): SessionBuilder;
-
-    onFriendMessage(handler: Handler2<string,BasicMessageFrom>): SessionBuilder;
-    onGroupMessage(handler: Handler3<string, string,BasicMessageFrom>): SessionBuilder;
-    onRoomMessage(handler: Handler3<string,string,BasicMessageFrom>): SessionBuilder;
-    onPassengerMessage(handler: Handler2<string,BasicMessageFrom>): SessionBuilder;
-    onStrangerMessage(handler: Handler2<string,BasicMessageFrom>): SessionBuilder;
-    onFriendOnline(handler: Handler1<string>): SessionBuilder;
-    onFriendOffline(handler: Handler1<string>): SessionBuilder;
-    onStrangerOnline(handler: Handler1<string>): SessionBuilder;
-    onStrangerOffline(handler: Handler1<string>): SessionBuilder;
-    onSystemMessage(handler: Handler1<SystemMessageFrom>): SessionBuilder;
-    onYourself(handler: Handler1<YourselfMessageFrom>): SessionBuilder;
-
-    ok(callback: Callback<Session>);
-}
 
 class SayImpl implements Say {
 
@@ -209,7 +176,7 @@ class SayBuilder implements Say2 {
             if (callback) {
                 callback(null, null);
             }
-        } catch (e: Error) {
+        } catch (e) {
             if (callback) {
                 callback(e);
             }
@@ -218,7 +185,7 @@ class SayBuilder implements Say2 {
     }
 }
 
-class LoginBuilderImpl implements SessionBuilder {
+export class SessionBuilderImpl implements SessionBuilder {
 
     private friends: Handler2<string,BasicMessageFrom>[];
     private groups: Handler3<string,string,BasicMessageFrom>[];
@@ -329,7 +296,7 @@ class LoginBuilderImpl implements SessionBuilder {
         return ret;
     }
 
-    ok(callback: Callback<Session>) {
+    ok(callback: Handler3<Error,Session,Context>) {
         let url = `${this.apiOptions.server}/chat`;
         let socket = io.connect(url, {
             query: `auth=${JSON.stringify(this.authdata)}`,
@@ -338,15 +305,17 @@ class LoginBuilderImpl implements SessionBuilder {
         socket.once('login', result => {
             let foo = result as LoginResult;
             if (foo.success) {
-                callback(null, new SessionImpl(socket));
+                let session = new SessionImpl(socket);
+                let ctx = new ContextImpl(this.apiOptions, result.id);
+                callback(null, session, ctx);
             } else {
-                callback(new Error(`error: ${foo.error}`));
+                callback(new Error(`error: ${foo.error}`), null, null);
             }
         });
 
         socket.on('message', income => {
             let msg = income as MessageFrom;
-            let basicmsg = LoginBuilderImpl.convert(msg);
+            let basicmsg = SessionBuilderImpl.convert(msg);
             switch (msg.from.type) {
                 case Receiver.ACTOR:
                     _.each(this.friends, (handler: Handler2<string,BasicMessageFrom>) => {
@@ -418,45 +387,6 @@ class LoginBuilderImpl implements SessionBuilder {
     }
 }
 
-class LoginImpl implements Login {
-
-    private apiOptions: APIOptions;
-    private basicAuth: {};
-
-    constructor(apiOptions: APIOptions) {
-        this.apiOptions = apiOptions;
-        let foo = _.now();
-        let bar = CryptoJS.MD5(`${foo}${this.apiOptions.sign}`).toString() + ',' + foo;
-        this.basicAuth = {
-            app: this.apiOptions.app,
-            sign: bar
-        }
-    }
-
-    simple(userid: string): SessionBuilder {
-        let authdata = _.extend({client: userid}, this.basicAuth);
-        return new LoginBuilderImpl(this.apiOptions, authdata);
-    }
-
-    byMaxleapUser(username: string, password: string) {
-        let authdata = {
-            username: username,
-            password: password
-        };
-        _.extend(authdata, this.basicAuth);
-        return new LoginBuilderImpl(this.apiOptions, authdata);
-    }
-
-    byPhone(phone: string, verify: string) {
-        let authdata = {
-            phone: phone,
-            password: verify
-        };
-        _.extend(authdata, this.basicAuth);
-        return new LoginBuilderImpl(this.apiOptions, authdata);
-    }
-}
-
 class SessionImpl implements Session {
     private closed: boolean;
     socket: Socket;
@@ -483,12 +413,26 @@ class SessionImpl implements Session {
 
 }
 
-interface LoginResult {
-    success: boolean;
-    id?: string;
-    error?: number;
+export interface Session {
+    say(text: string, remark?: string): Say;
+    close(callback?: Callback<void>): void;
 }
 
-export function login(apiOptions: APIOptions): Login {
-    return new LoginImpl(apiOptions);
+export interface SessionBuilder {
+    setNotifyAll(enable: boolean): SessionBuilder;
+    setInstallation(installation: string): SessionBuilder;
+
+    onFriendMessage(handler: Handler2<string,BasicMessageFrom>): SessionBuilder;
+    onGroupMessage(handler: Handler3<string, string,BasicMessageFrom>): SessionBuilder;
+    onRoomMessage(handler: Handler3<string,string,BasicMessageFrom>): SessionBuilder;
+    onPassengerMessage(handler: Handler2<string,BasicMessageFrom>): SessionBuilder;
+    onStrangerMessage(handler: Handler2<string,BasicMessageFrom>): SessionBuilder;
+    onFriendOnline(handler: Handler1<string>): SessionBuilder;
+    onFriendOffline(handler: Handler1<string>): SessionBuilder;
+    onStrangerOnline(handler: Handler1<string>): SessionBuilder;
+    onStrangerOffline(handler: Handler1<string>): SessionBuilder;
+    onSystemMessage(handler: Handler1<SystemMessageFrom>): SessionBuilder;
+    onYourself(handler: Handler1<YourselfMessageFrom>): SessionBuilder;
+
+    ok(callback: Handler3<Error,Session,Context>);
 }

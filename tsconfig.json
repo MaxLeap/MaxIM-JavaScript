@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "amd",
+    "module": "umd",
     "target": "es5",
     "sourceMap": true,
     "outDir": "./lib"
