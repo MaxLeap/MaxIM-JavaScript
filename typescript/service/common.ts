@@ -1,4 +1,4 @@
-import {UserDetail, GroupInfo, RoomInfo, UserOutline} from "../models";
+import {UserDetail, GroupInfo, RoomInfo, UserOutline, Passenger} from "../models";
 
 export interface Callback<T> {
     (err: Error, data?: T): void;
@@ -14,6 +14,7 @@ interface LoadBuilder {
     forUser(callback: Callback<UserDetail>);
     forGroup(callback: Callback<GroupInfo>);
     forRoom(callback: Callback<RoomInfo>);
+    forPassenger(callback: Callback<Passenger>);
 }
 
 export interface ICommonService {
@@ -91,6 +92,10 @@ class LoadBuilderImpl extends Builder<LoadOptions> implements LoadBuilder {
     forRoom(callback: Callback<RoomInfo>) {
         this.forSomething('/rooms', callback);
     }
+
+    forPassenger(callback: Callback<Passenger>) {
+        this.forSomething('/passengers', callback);
+    }
 }
 
 class SearchBuilderImpl extends Builder<SearchOptions> implements SearchBuilder {
@@ -119,22 +124,26 @@ class SearchBuilderImpl extends Builder<SearchOptions> implements SearchBuilder 
                 }
             })
             .then(results => {
-                callback(null, results as T);
+                if (callback) {
+                    callback(null, results as T);
+                }
             })
             .catch(e => {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
     }
 
-    forUsers(callback: Callback<UserOutline[]>) {
+    forUsers(callback?: Callback<UserOutline[]>) {
         this.forSomething('/ctx', callback);
     }
 
-    forGroups(callback: Callback<GroupInfo[]>) {
+    forGroups(callback?: Callback<GroupInfo[]>) {
         this.forSomething('/groups', callback);
     }
 
-    forRooms(callback: Callback<RoomInfo[]>) {
+    forRooms(callback?: Callback<RoomInfo[]>) {
         this.forSomething('/rooms', callback);
     }
 }

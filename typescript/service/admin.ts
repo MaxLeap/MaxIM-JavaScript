@@ -1,5 +1,5 @@
 import {Callback, ICommonService, CommonService, successful} from "./common";
-import {SystemMessageTo, Media, Receiver} from "../messages";
+import {SystemMessageTo, Media, Receiver, PushSettings} from "../messages";
 
 interface Admin extends ICommonService {
     /**
@@ -34,6 +34,14 @@ interface MessageBuilder {
     asAudio(): MessageBuilder;
     asVideo(): MessageBuilder;
 
+    disablePush(): MessageBuilder;
+    setPushSound(sound: string): MessageBuilder;
+    setPushBadge(badge: number): MessageBuilder;
+    setPushContentAvailable(contentAvailable: boolean): MessageBuilder;
+    setPushPrefix(prefix: string): MessageBuilder;
+    setPushSuffix(suffix: string): MessageBuilder;
+    setPushTextOverwrite(text: string): MessageBuilder;
+
     toAll(): MessageLanucher;
     toUser(userid: string): MessageLanucher;
     toGroup(groupid: string): MessageLanucher;
@@ -46,6 +54,7 @@ interface MessageLanucher {
 
 
 class MessageBuilderImpl implements MessageBuilder {
+
 
     private admin: AdminImpl;
     private receiver: {
@@ -65,6 +74,48 @@ class MessageBuilderImpl implements MessageBuilder {
         if (!_.isUndefined(remark) && !_.isNull(remark)) {
             this.message.remark = remark;
         }
+    }
+
+    private touchPush(): PushSettings {
+        if (!this.message.push) {
+            this.message.push = {};
+        }
+        return this.message.push;
+    }
+
+    disablePush(): MessageBuilder {
+        this.touchPush().enable = false;
+        return this;
+    }
+
+    setPushSound(sound: string): MessageBuilder {
+        this.touchPush().sound = sound;
+        return this;
+    }
+
+    setPushBadge(badge: number): MessageBuilder {
+        this.touchPush().badge = badge;
+        return this;
+    }
+
+    setPushContentAvailable(contentAvailable: boolean): MessageBuilder {
+        this.touchPush().contentAvailable = contentAvailable;
+        return this;
+    }
+
+    setPushPrefix(prefix: string): MessageBuilder {
+        this.touchPush().prefix = prefix;
+        return this;
+    }
+
+    setPushSuffix(suffix: string): MessageBuilder {
+        this.touchPush().suffix = suffix;
+        return this;
+    }
+
+    setPushTextOverwrite(text: string): MessageBuilder {
+        this.touchPush().overwrite = text;
+        return this;
     }
 
     asText(): MessageBuilder {
@@ -176,9 +227,9 @@ class MessageLanucherImpl implements MessageLanucher {
 }
 
 interface AttributeBuilder {
-    forUser(userid: string, callback: Callback<void>): Admin;
-    forGroup(groupid: string, callback: Callback<void>): Admin;
-    forRoom(roomid: string, callback: Callback<void>): Admin;
+    forUser(userid: string, callback?: Callback<void>): Admin;
+    forGroup(groupid: string, callback?: Callback<void>): Admin;
+    forRoom(roomid: string, callback?: Callback<void>): Admin;
 }
 
 class AttributeBuilderImpl implements AttributeBuilder {
@@ -209,12 +260,15 @@ class AttributeBuilderImpl implements AttributeBuilder {
                 }
             })
             .then(() => {
-                callback(null, null);
+                if (callback) {
+                    callback(null, null);
+                }
             })
             .catch(e => {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
-
         return this.admin;
     }
 
@@ -232,7 +286,6 @@ class AttributeBuilderImpl implements AttributeBuilder {
         let path = `/rooms/${roomid}/attributes`;
         return this.process(path, callback);
     }
-
 }
 
 interface RoomBuilder {
@@ -330,7 +383,7 @@ export class AdminImpl extends CommonService implements Admin {
         return new RoomBuilderImpl(this);
     }
 
-    destroyRoom(roomid: string, callback: Callback<void>): Admin {
+    destroyRoom(roomid: string, callback?: Callback<void>): Admin {
         let url = `${this.options().server}/rooms/${roomid}`;
         let opts = {
             method: 'DELETE',
@@ -339,13 +392,17 @@ export class AdminImpl extends CommonService implements Admin {
         fetch(url, opts)
             .then(response => {
                 if (successful(response)) {
-                    callback(null, null);
+                    if (callback) {
+                        callback(null, null);
+                    }
                 } else {
                     throw new Error(`error: ${response.status}`);
                 }
             })
             .catch(e => {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
         return this;
     }

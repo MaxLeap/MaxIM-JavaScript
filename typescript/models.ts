@@ -54,6 +54,10 @@ export interface Friendship {
     ts: number;
 }
 
+export interface Passenger {
+    [key: string]: any;
+}
+
 export interface LoginToken {
     appId: string;
     clientId: string;
