@@ -48,21 +48,44 @@ export interface Friend {
     recent?: ChatRecord;
 }
 
-export interface Friendship {
-    from: string;
-    to: string;
-    ts: number;
+export interface Passenger {
+    [key: string]: any;
 }
 
-export interface LoginToken {
-    appId: string;
-    clientId: string;
-    userId?: string;
-    username?: string;
-    password?: string;
-    phone?: string;
-    oauth?: any;
-    passenger?: any;
-    installId?: string;
+export interface Attributes {
+    [key: string]: any;
+}
+
+export class APIOptions {
+    server: string;
+    app: string;
+    sign: string;
+    headers: {[key: string]: string};
+
+    constructor(server: string, app: string, sign: string) {
+        this.server = server;
+        this.app = app;
+        this.sign = sign;
+        this.headers = {
+            'x-ml-appid': app,
+            'x-ml-apikey': sign,
+            'content-type': 'application/json; charset=utf-8'
+        };
+    }
+}
+
+export interface Handler1<T> {
+    (t: T): void;
+}
+
+export interface Handler2<T,U> {
+    (t: T, u: U): void;
+}
+export interface Handler3<T,U,V> {
+    (t: T, u: U, v: V): void;
+}
+
+export interface Callback<T> {
+    (err: Error, data?: T): void;
 }
 

@@ -1,34 +1,35 @@
-import {Callback, CommonService, successful, APIOptions} from "./common";
-import {Friend, MyGroup, RoomInfo, ChatRecord} from "../models";
+import {CommonServiceImpl, successful} from "./common";
+import {Friend, MyGroup, RoomInfo, ChatRecord, Attributes, APIOptions, Callback} from "../models";
 import sortedIndexBy = require("lodash/sortedIndexBy");
 import unary = require("lodash/unary");
 import isUndefined = require("lodash/isUndefined");
 
 interface TalkingBuilder {
-    ofFriend(friendid: string, callback: Callback<ChatRecord[]>): IContext;
-    ofGroup(groupid: string, callback: Callback<ChatRecord[]>): IContext;
-    ofStranger(strangerid: string, callback: Callback<ChatRecord[]>): IContext;
+    ofFriend(friendid: string, callback?: Callback<ChatRecord[]>): Context;
+    ofGroup(groupid: string, callback?: Callback<ChatRecord[]>): Context;
+    ofStranger(strangerid: string, callback?: Callback<ChatRecord[]>): Context;
+    ofPassenger(passengerid: string, callback?: Callback<ChatRecord[]>): Context;
 }
 
-interface IContext {
+export interface Context {
 
     /**
      * 列出好友详情
      * @param callback
      */
-    listFriends(callback: Callback<Friend[]>): IContext;
+    listFriends(callback?: Callback<Friend[]>): Context;
 
     /**
      * 列出已加入的群组
      * @param callback
      */
-    listGroups(callback: Callback<MyGroup[]>): IContext;
+    listGroups(callback?: Callback<MyGroup[]>): Context;
 
     /**
      * 列出已加入的聊天室
      * @param callback
      */
-    listRooms(callback: Callback<RoomInfo[]>): IContext;
+    listRooms(callback?: Callback<RoomInfo[]>): Context;
 
     /**
      * 查询聊天记录
@@ -42,37 +43,67 @@ interface IContext {
      * @param userid 好友用户ID
      * @param callback
      */
-    joinFriend(userid: string, callback: Callback<boolean>): IContext;
+    joinFriend(userid: string, callback?: Callback<boolean>): Context;
     /**
      * 加入某个群组
      * @param groupid 群组ID
      * @param callback
      */
-    joinGroup(groupid: string, callback: Callback<boolean>): IContext;
+    joinGroup(groupid: string, callback?: Callback<boolean>): Context;
     /**
      * 加入某个聊天室
      * @param roomid 聊天室ID
      * @param callback
      */
-    joinRoom(roomid: string, callback: Callback<boolean>): IContext;
+    joinRoom(roomid: string, callback?: Callback<boolean>): Context;
     /**
      * 解除某个好友
      * @param userid 好友ID
      * @param callback
      */
-    leaveFriend(userid: string, callback: Callback<boolean>): IContext;
+    leaveFriend(userid: string, callback?: Callback<boolean>): Context;
     /**
      * 离开某个群组
      * @param groupid 群组ID
      * @param callback
      */
-    leaveGroup(groupid: string, callback: Callback<boolean>): IContext;
+    leaveGroup(groupid: string, callback?: Callback<boolean>): Context;
     /**
      * 离开某个聊天室
      * @param roomid 聊天室ID
      * @param callback
      */
-    leaveRoom(roomid: string, callback: Callback<boolean>): IContext;
+    leaveRoom(roomid: string, callback?: Callback<boolean>): Context;
+
+    /**
+     * 设置当前上下文用户的属性
+     * @param attributes 属性表
+     * @param overwrite 强制覆盖
+     * @param callback 回调
+     */
+    setMyAttributes(attributes: Attributes, overwrite?: boolean, callback?: Callback<void>): Context;
+
+    /**
+     * 设置当前上下文用户的单个属性
+     * @param name 属性名
+     * @param value 属性表
+     * @param callback 回调
+     */
+    setMyAttribute(name: string, value: any, callback?: Callback<void>): Context;
+
+    /**
+     * 获取当前上下文用户的属性列表
+     * @param callback
+     */
+    getMyAttributes(callback?: Callback<Attributes>): Context;
+
+    /**
+     * 获取当前上下文用户的某个属性
+     * @param attributeName
+     * @param callback
+     */
+    getMyAttribute(attributeName: string, callback?: Callback<any>): Context;
+
 }
 
 /**
@@ -82,11 +113,11 @@ class TalkingBuilderImpl implements TalkingBuilder {
 
     private ts: number;
     private size: number;
-    private context: IContext;
+    private context: Context;
     private you: string;
     private apiOptions: APIOptions;
 
-    constructor(context: IContext, ts: number, size: number, you: string, apiOptions: APIOptions) {
+    constructor(context: Context, ts: number, size: number, you: string, apiOptions: APIOptions) {
         this.ts = ts;
         this.size = size;
         this.context = context;
@@ -94,7 +125,7 @@ class TalkingBuilderImpl implements TalkingBuilder {
         this.apiOptions = apiOptions;
     }
 
-    private listHistories(path: string, callback: Callback<ChatRecord[]>): IContext {
+    private listHistories(path: string, callback: Callback<ChatRecord[]>): Context {
         let url = `${this.apiOptions.server}${path}`;
         let q: string[] = [];
         if (this.ts > 0) {
@@ -126,18 +157,35 @@ class TalkingBuilderImpl implements TalkingBuilder {
         return this.context;
     }
 
-    ofFriend(friendid: string, callback: Callback<ChatRecord[]>): IContext {
+    ofFriend(friendid: string, callback?: Callback<ChatRecord[]>): Context {
+        if (!callback) {
+            return this.context;
+        }
         let path = `/ctx/${this.you}/friends/${friendid}/chats`;
         return this.listHistories(path, callback);
     }
 
-    ofGroup(groupid: string, callback: Callback<ChatRecord[]>): IContext {
+    ofGroup(groupid: string, callback?: Callback<ChatRecord[]>): Context {
+        if (!callback) {
+            return this.context;
+        }
         let path = `/groups/${groupid}/chats`;
         return this.listHistories(path, callback);
     }
 
-    ofStranger(strangerid: string, callback: Callback<ChatRecord[]>): IContext {
+    ofStranger(strangerid: string, callback?: Callback<ChatRecord[]>): Context {
+        if (!callback) {
+            return this.context;
+        }
         let path = `/ctx/${this.you}/strangers/${strangerid}/chats`;
+        return this.listHistories(path, callback);
+    }
+
+    ofPassenger(passengerid: string, callback?: Callback<ChatRecord[]>): Context {
+        if (!callback) {
+            return this.context;
+        }
+        let path = `/passengers/${passengerid}/chats/${this.you}`;
         return this.listHistories(path, callback);
     }
 }
@@ -145,12 +193,12 @@ class TalkingBuilderImpl implements TalkingBuilder {
 /**
  * 用户上下文实现类
  */
-export class Context extends CommonService implements IContext {
+export class ContextImpl extends CommonServiceImpl implements Context {
 
     private you: string;
 
-    constructor(server: string, app: string, sign: string, you: string) {
-        super(server, app, sign);
+    constructor(apiOptions: APIOptions, you: string) {
+        super(apiOptions);
         this.you = you;
     }
 
@@ -176,22 +224,31 @@ export class Context extends CommonService implements IContext {
         return this;
     }
 
-    public listFriends(callback: Callback<Friend[]>): IContext {
+    public listFriends(callback?: Callback<Friend[]>): Context {
+        if (!callback) {
+            return this;
+        }
         let path = `/ctx/${this.you}/friends?detail`;
         return this.listSomething(path, callback);
     }
 
-    public listGroups(callback: Callback<MyGroup[]>): IContext {
+    public listGroups(callback?: Callback<MyGroup[]>): Context {
+        if (!callback) {
+            return this;
+        }
         let path = `/ctx/${this.you}/groups?detail`;
         return this.listSomething(path, callback);
     }
 
-    public listRooms(callback: Callback<RoomInfo[]>): IContext {
+    public listRooms(callback?: Callback<RoomInfo[]>): Context {
+        if (!callback) {
+            return this;
+        }
         let path = `/ctx/${this.you}/rooms?detail`;
         return this.listSomething(path, callback);
     }
 
-    public joinFriend(userid: string, callback: Callback<boolean>): IContext {
+    public joinFriend(userid: string, callback?: Callback<boolean>): Context {
         let url = `${super.options().server}/ctx/${this.you}/friends/${userid}`;
         let opts = {
             method: 'POST',
@@ -200,18 +257,22 @@ export class Context extends CommonService implements IContext {
         fetch(url, opts)
             .then(response => {
                 if (successful(response)) {
-                    callback(null, true);
+                    if (callback) {
+                        callback(null, true);
+                    }
                 } else {
                     throw new Error(`error: ${response.status}`);
                 }
             })
             .catch(e => {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
         return this;
     }
 
-    public joinGroup(groupid: string, callback: Callback<boolean>): IContext {
+    public joinGroup(groupid: string, callback?: Callback<boolean>): Context {
         let url = `${super.options().server}/groups/${groupid}/members/${this.you}`;
 
         let opts = {
@@ -222,18 +283,22 @@ export class Context extends CommonService implements IContext {
         fetch(url, opts)
             .then(response => {
                 if (successful(response)) {
-                    callback(null, true);
+                    if (callback) {
+                        callback(null, true);
+                    }
                 } else {
                     throw new Error(`error: ${response.status}`);
                 }
             })
             .catch(e=> {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
         return this;
     }
 
-    public joinRoom(roomid: string, callback: Callback<boolean>): IContext {
+    public joinRoom(roomid: string, callback?: Callback<boolean>): Context {
         let url = `${super.options().server}/rooms/${roomid}/members/${this.you}`;
 
         let opts = {
@@ -244,13 +309,17 @@ export class Context extends CommonService implements IContext {
         fetch(url, opts)
             .then(response => {
                 if (successful(response)) {
-                    callback(null, true);
+                    if (callback) {
+                        callback(null, true);
+                    }
                 } else {
                     throw new Error(`error: ${response.status}`);
                 }
             })
             .catch(e => {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
         return this;
     }
@@ -259,7 +328,7 @@ export class Context extends CommonService implements IContext {
         return new TalkingBuilderImpl(this, endTimestamp || 0, size || 0, this.you, super.options());
     }
 
-    private deleteSomething(path: string, callback: Callback<boolean>): IContext {
+    private deleteSomething(path: string, callback: Callback<boolean>): Context {
         let url = `${super.options().server}${path}`;
         let opts = {
             method: 'DELETE',
@@ -274,26 +343,75 @@ export class Context extends CommonService implements IContext {
                 }
             })
             .then(result => {
-                callback(null, result);
+                if (callback) {
+                    callback(null, result);
+                }
             })
             .catch(e=> {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
         return this;
     }
 
-    public leaveFriend(userid: string, callback: Callback<boolean>): IContext {
+    public leaveFriend(userid: string, callback?: Callback<boolean>): Context {
         let path = `/ctx/${this.you}/friends/${userid}`;
         return this.deleteSomething(path, callback);
     }
 
-    public leaveGroup(groupid: string, callback: Callback<boolean>): IContext {
+    public leaveGroup(groupid: string, callback?: Callback<boolean>): Context {
         let path = `/groups/${groupid}/members/${this.you}`;
         return this.deleteSomething(path, callback);
     }
 
-    public leaveRoom(roomid: string, callback: Callback<boolean>): IContext {
+    public leaveRoom(roomid: string, callback?: Callback<boolean>): Context {
         let path = `/rooms/${roomid}/members/${this.you}`;
         return this.deleteSomething(path, callback);
+    }
+
+    public setMyAttributes(attributes: Attributes, overwrite?: boolean, callback?: Callback<void>): Context {
+        let url = `/ctx/${this.you}/attributes`;
+        let opts = {
+            method: overwrite ? 'PUT' : 'POST',
+            body: JSON.stringify(attributes),
+            headers: this.options().headers
+        };
+        fetch(url, opts)
+            .then(response => {
+                if (successful(response)) {
+                    if (callback) {
+                        callback(null, null);
+                    }
+                } else {
+                    throw new Error(`error: ${response.status}`);
+                }
+            })
+            .catch(e=> {
+                if (callback) {
+                    callback(e);
+                }
+            });
+        return this;
+    }
+
+    public setMyAttribute(name: string, value: any, callback?: Callback<void>): Context {
+        let attributes = {};
+        attributes[name] = value;
+        return this.setMyAttributes(attributes, false, callback);
+    }
+
+    public getMyAttributes(callback?: Callback<Attributes>): Context {
+        if (callback) {
+            super.getAttributes(this.you).forUser(callback);
+        }
+        return this;
+    }
+
+    public getMyAttribute(attributeName: string, callback?: Callback<any>): Context {
+        if (callback) {
+            super.getAttributes(this.you, attributeName).forUser(callback);
+        }
+        return this;
     }
 }

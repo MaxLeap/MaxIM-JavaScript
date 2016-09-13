@@ -28162,7 +28162,7 @@ function PathVisitor() {
         hasOwn.call(this._methodNameTable, "Block") ||
         hasOwn.call(this._methodNameTable, "Line");
 
-    this.Context = makeContextConstructor(this);
+    this.ContextImpl = makeContextConstructor(this);
 
     // State reset every time PathVisitor.prototype.visit is called.
     this._visiting = false;
@@ -28307,7 +28307,7 @@ PVp.reset = function(path/*, additional arguments */) {
 
 PVp.visitWithoutReset = function(path) {
     if (this instanceof this.Context) {
-        // Since this.Context.prototype === this, there's a chance we
+        // Since this.ContextImpl.prototype === this, there's a chance we
         // might accidentally call context.visitWithoutReset. If that
         // happens, re-invoke the method against context.visitor.
         return this.visitor.visitWithoutReset(path);
@@ -28415,7 +28415,7 @@ function makeContextConstructor(visitor) {
 
     assert.ok(visitor instanceof PathVisitor);
 
-    // Note that the visitor object is the prototype of Context.prototype,
+    // Note that the visitor object is the prototype of ContextImpl.prototype,
     // so all visitor methods are inherited by context objects.
     var Cp = Context.prototype = Object.create(visitor);
 
@@ -28425,14 +28425,14 @@ function makeContextConstructor(visitor) {
     return Context;
 }
 
-// Every PathVisitor has a different this.Context constructor and
-// this.Context.prototype object, but those prototypes can all use the
+// Every PathVisitor has a different this.ContextImpl constructor and
+// this.ContextImpl.prototype object, but those prototypes can all use the
 // same reset, invokeVisitorMethod, and traverse function objects.
 var sharedContextProtoMethods = Object.create(null);
 
 sharedContextProtoMethods.reset =
 function reset(path) {
-    assert.ok(this instanceof this.Context);
+    assert.ok(this instanceof this.ContextImpl);
     assert.ok(path instanceof NodePath);
 
     this.currentPath = path;
@@ -28443,7 +28443,7 @@ function reset(path) {
 
 sharedContextProtoMethods.invokeVisitorMethod =
 function invokeVisitorMethod(methodName) {
-    assert.ok(this instanceof this.Context);
+    assert.ok(this instanceof this.ContextImpl);
     assert.ok(this.currentPath instanceof NodePath);
 
     var result = this.visitor[methodName].call(this, this.currentPath);
@@ -28477,7 +28477,7 @@ function invokeVisitorMethod(methodName) {
 
 sharedContextProtoMethods.traverse =
 function traverse(path, newVisitor) {
-    assert.ok(this instanceof this.Context);
+    assert.ok(this instanceof this.ContextImpl);
     assert.ok(path instanceof NodePath);
     assert.ok(this.currentPath instanceof NodePath);
 
@@ -28490,7 +28490,7 @@ function traverse(path, newVisitor) {
 
 sharedContextProtoMethods.visit =
 function visit(path, newVisitor) {
-    assert.ok(this instanceof this.Context);
+    assert.ok(this instanceof this.ContextImpl);
     assert.ok(path instanceof NodePath);
     assert.ok(this.currentPath instanceof NodePath);
 

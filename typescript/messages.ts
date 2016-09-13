@@ -64,6 +64,11 @@ export interface SystemMessageFrom {
     remark?: string;
 }
 
+export interface SystemMessageTo {
+    push?: PushSettings;
+    content: Content;
+    remark?: string;
+}
 
 export interface YourselfMessageFrom {
     to: {

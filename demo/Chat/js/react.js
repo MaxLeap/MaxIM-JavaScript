@@ -842,7 +842,7 @@ assign(CallbackQueue.prototype, {
    * Enqueues a callback to be invoked when `notifyAll` is invoked.
    *
    * @param {function} callback Invoked when `notifyAll` is invoked.
-   * @param {?object} context Context to call `callback` with.
+   * @param {?object} context ContextImpl to call `callback` with.
    * @internal
    */
   enqueue: function (callback, context) {
@@ -4213,7 +4213,7 @@ function escapeUserProvidedKey(text) {
  *
  * @constructor ForEachBookKeeping
  * @param {!function} forEachFunction Function to perform traversal with.
- * @param {?*} forEachContext Context to perform context with.
+ * @param {?*} forEachContext ContextImpl to perform context with.
  */
 function ForEachBookKeeping(forEachFunction, forEachContext) {
   this.func = forEachFunction;
@@ -4242,7 +4242,7 @@ function forEachSingleChild(bookKeeping, child, name) {
  *
  * @param {?*} children Children tree container.
  * @param {function(*, int)} forEachFunc
- * @param {*} forEachContext Context for forEachContext.
+ * @param {*} forEachContext ContextImpl for forEachContext.
  */
 function forEachChildren(children, forEachFunc, forEachContext) {
   if (children == null) {
@@ -4260,7 +4260,7 @@ function forEachChildren(children, forEachFunc, forEachContext) {
  * @constructor MapBookKeeping
  * @param {!*} mapResult Object containing the ordered map of results.
  * @param {!function} mapFunction Function to perform mapping with.
- * @param {?*} mapContext Context to perform mapping with.
+ * @param {?*} mapContext ContextImpl to perform mapping with.
  */
 function MapBookKeeping(mapResult, keyPrefix, mapFunction, mapContext) {
   this.result = mapResult;
@@ -4316,7 +4316,7 @@ function mapIntoWithKeyPrefixInternal(children, array, prefix, func, context) {
  *
  * @param {?*} children Children tree container.
  * @param {function(*, int)} func The map function.
- * @param {*} context Context for mapFunction.
+ * @param {*} context ContextImpl for mapFunction.
  * @return {object} Object containing the ordered map of results.
  */
 function mapChildren(children, func, context) {
@@ -5743,7 +5743,7 @@ var ReactCompositeComponentMixin = {
             // Preface gives us something to blacklist in warning module
             "development" !== 'production' ? warning(false, 'Failed Composite propType: %s%s', error.message, addendum) : undefined;
           } else {
-            "development" !== 'production' ? warning(false, 'Failed Context Types: %s%s', error.message, addendum) : undefined;
+            "development" !== 'production' ? warning(false, 'Failed ContextImpl Types: %s%s', error.message, addendum) : undefined;
           }
         }
       }
@@ -16090,7 +16090,7 @@ var traverseAllChildren = _dereq_(127);
 var warning = _dereq_(155);
 
 /**
- * @param {function} traverseContext Context passed through traversal.
+ * @param {function} traverseContext ContextImpl passed through traversal.
  * @param {?ReactComponent} child React child component.
  * @param {!string} name String name of key path to child.
  */
@@ -17177,7 +17177,7 @@ function traverseAllChildrenImpl(children, nameSoFar, callback, traverseContext)
  *
  * @param {?*} children Children tree object.
  * @param {!function} callback To invoke upon traversing each child.
- * @param {?*} traverseContext Context for traversal.
+ * @param {?*} traverseContext ContextImpl for traversal.
  * @return {!number} The number of children in this subtree.
  */
 function traverseAllChildren(children, callback, traverseContext) {
