@@ -2,7 +2,7 @@
   "name": "maxleap-im",
   "version": "4.0.0",
   "description": "MaxLeap JavaScript SDK for IM.",
-  "main": "lib/ML.im.js",
+  "main": "dist/index.js",
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -25,12 +25,9 @@
     "requirejs": "^2.3.1",
     "socket.io-client": "^1.4.8"
   },
-  "scripts": {
-    "preinstall": "rm -rf ./lib",
-    "postinstall": "tsc"
-  },
   "devDependencies": {
     "browserify": "^13.1.0",
+    "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-typescript": "^2.13.6",
     "tsify": "^1.0.7",
