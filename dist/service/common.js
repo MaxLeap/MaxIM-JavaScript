@@ -14,14 +14,14 @@ var __extends = (this && this.__extends) || function (d, b) {
     "use strict";
     var fetch = require("isomorphic-fetch");
     var AttachmentBuilderImpl = (function () {
-        function AttachmentBuilderImpl(apiOptions, file) {
+        function AttachmentBuilderImpl(apiOptions, attachment) {
             this.apiOptions = apiOptions;
-            this.file = file;
+            this.attachment = attachment;
         }
         AttachmentBuilderImpl.prototype.ok = function (callback) {
             //TODO
             var data = new FormData();
-            data.append('attachment', this.file);
+            data.append('attachment', this.attachment);
             var url = this.apiOptions.server + "/attachment";
             var header = {};
             for (var k in this.apiOptions.headers) {
@@ -29,7 +29,7 @@ var __extends = (this && this.__extends) || function (d, b) {
                     header[k] = this.apiOptions.headers[k];
                 }
             }
-            header['content-type'] = 'multipart/form-data';
+            header['content-type'] = 'multipart/form-data;';
             var opts = {
                 method: 'POST',
                 headers: header,
@@ -233,8 +233,8 @@ var __extends = (this && this.__extends) || function (d, b) {
         CommonServiceImpl.prototype.getAttributes = function (id, attributeName) {
             return new GetAttributesBuilderImpl(this, id, attributeName);
         };
-        CommonServiceImpl.prototype.attachment = function (file) {
-            return new AttachmentBuilderImpl(this._options, file);
+        CommonServiceImpl.prototype.attachment = function (attachment) {
+            return new AttachmentBuilderImpl(this._options, attachment);
         };
         return CommonServiceImpl;
     }());

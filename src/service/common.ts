@@ -47,9 +47,9 @@ interface CommonService {
 
     /**
      * 上传附件
-     * @param file
+     * @param attachment
      */
-    attachment(file: File): AttachmentBuilder;
+    attachment(attachment: File): AttachmentBuilder;
 }
 
 interface AttachmentBuilder {
@@ -71,17 +71,17 @@ interface SearchOptions {
 class AttachmentBuilderImpl implements AttachmentBuilder {
 
     private apiOptions: APIOptions;
-    private file: File;
+    private attachment: File;
 
-    constructor(apiOptions: APIOptions, file: File) {
+    constructor(apiOptions: APIOptions, attachment: File) {
         this.apiOptions = apiOptions;
-        this.file = file;
+        this.attachment = attachment;
     }
 
     ok(callback?: Callback<string[]>): void {
         //TODO
         let data: FormData = new FormData();
-        data.append('attachment', this.file);
+        data.append('attachment', this.attachment);
         let url = `${this.apiOptions.server}/attachment`;
         let header: {[key: string]: string} = {};
         for (let k in this.apiOptions.headers) {
@@ -89,7 +89,7 @@ class AttachmentBuilderImpl implements AttachmentBuilder {
                 header[k] = this.apiOptions.headers[k];
             }
         }
-        header['content-type'] = 'multipart/form-data';
+        header['content-type'] = 'multipart/form-data;';
         let opts = {
             method: 'POST',
             headers: header,
@@ -315,8 +315,8 @@ class CommonServiceImpl implements CommonService {
         return new GetAttributesBuilderImpl(this, id, attributeName);
     }
 
-    attachment(file: File): AttachmentBuilder {
-        return new AttachmentBuilderImpl(this._options, file);
+    attachment(attachment: File): AttachmentBuilder {
+        return new AttachmentBuilderImpl(this._options, attachment);
     }
 }
 

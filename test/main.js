@@ -16,10 +16,17 @@ require(['maxim/im'], function () {
         useHttp: true
     };
     var im = ML.im(config);
+
     im.login().simple('foo').ok(function (err, session, context) {
         if (err) {
             console.error('login failed: %s', err);
         } else {
+            document.getElementById('upload').addEventListener('click', function (e) {
+                let file = document.getElementById('attachment').files[0];
+                context.attachment(file).ok(function (urls) {
+                    console.log('upload success: %s', urls);
+                });
+            });
 
             context.listFriends(function (err, friends) {
                 friends.forEach(function (friend) {
