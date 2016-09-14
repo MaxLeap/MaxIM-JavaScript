@@ -2,7 +2,7 @@
   "name": "maxleap-im",
   "version": "4.0.0",
   "description": "MaxLeap JavaScript SDK for IM.",
-  "main": "dist/index.js",
+  "main": "dist/im.js",
   "directories": {
     "lib": "lib",
     "test": "test"

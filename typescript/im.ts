@@ -1,6 +1,6 @@
 import {Admin, AdminImpl} from "./service/admin";
 import {Login, LoginImpl} from "./service/login";
-import {APIOptions} from "./models";
+import {APIOptions} from "./model/models";
 
 interface MaxIMOptions {
     app: string;

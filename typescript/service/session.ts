@@ -7,9 +7,9 @@ import {
     YourselfMessageFrom,
     SystemMessageFrom,
     BasicMessageFrom
-} from "../messages";
+} from "../model/messages";
 import {Context, ContextImpl} from "./context";
-import {APIOptions, Handler2, Handler3, Handler1, Callback, Callback2} from "../models";
+import {APIOptions, Handler2, Handler3, Handler1, Callback, Callback2} from "../model/models";
 import io = require('socket.io-client');
 import Socket = SocketIOClient.Socket;
 

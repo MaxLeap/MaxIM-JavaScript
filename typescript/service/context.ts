@@ -1,5 +1,5 @@
 import {CommonServiceImpl, successful} from "./common";
-import {Friend, MyGroup, RoomInfo, ChatRecord, Attributes, APIOptions, Callback} from "../models";
+import {Friend, MyGroup, RoomInfo, ChatRecord, Attributes, APIOptions, Callback} from "../model/models";
 import * as fetch from "isomorphic-fetch";
 
 interface TalkingBuilder {

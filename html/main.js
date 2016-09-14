@@ -1,12 +1,12 @@
 require.config({
-    baseUrl: '../dist',
     paths: {
         'socket.io-client': '../bower_components/socket.io-client/socket.io',
         'fetch': '../bower_components/fetch/fetch',
-        'isomorphic-fetch': '../bower_components/isomorphic-fetch/fetch-bower'
+        'isomorphic-fetch': '../bower_components/isomorphic-fetch/fetch-bower',
+        'maxim': '../dist'
     }
 });
-require(['index'], function () {
+require(['maxim/im'], function () {
     "use strict";
 
     var config = {

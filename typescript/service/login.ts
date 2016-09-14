@@ -1,5 +1,5 @@
 import {SessionBuilder, SessionBuilderImpl} from "./session";
-import {APIOptions} from "../models";
+import {APIOptions} from "../model/models";
 import {md5} from "../helper/md5";
 
 /**

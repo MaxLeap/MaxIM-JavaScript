@@ -1,4 +1,4 @@
-import IM = require('../index');
+import IM = require('../im');
 
 let im = IM({
     app: '56a86320e9db7300015438f7',

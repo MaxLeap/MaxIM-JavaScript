@@ -1,7 +1,7 @@
 {
   "name": "maxleap-im",
   "description": "MaxLeap JavaScript SDK for IM.",
-  "main": "./dist/index.js",
+  "main": "./dist/im.js",
   "authors": [
     "Jeff.Tsai <wcai@maxleap.com>"
   ],
