@@ -193,7 +193,11 @@ class GroupBuilderImpl implements GroupBuilder {
 
     members(first: string, others: string): GroupBuilder {
         this.appends.push(first);
-        _.each(others, this.appends.push);
+        if (others && others.length > 0) {
+            for (let s of others) {
+                this.appends.push(s);
+            }
+        }
         return this;
     }
 
@@ -390,7 +394,7 @@ class MessageBuilderImpl implements MessageBuilder {
                 body: text
             }
         };
-        if (!_.isUndefined(remark) && !_.isNull(remark)) {
+        if (remark !== undefined && remark !== null) {
             this.message.remark = remark;
         }
     }
@@ -628,7 +632,9 @@ class RoomBuilderImpl implements RoomBuilder {
     members(first: string, ...others: string[]): RoomBuilder {
         this.appends.push(first);
         if (others) {
-            _.each(others, this.appends.push);
+            for (let s of others) {
+                this.appends.push(s);
+            }
         }
         return this;
     }
@@ -698,12 +704,23 @@ export class AdminImpl extends CommonServiceImpl implements Admin {
         return new AttributeBuilderImpl(this, attributes, overwrite);
     }
 
+    private static _concat(first: string, ...others): string[] {
+        let all: string[] = [];
+        all.push(first);
+        if (others && others.length > 0) {
+            for (let s of others) {
+                all.push(s);
+            }
+        }
+        return all;
+    }
+
     removeMembers(first: string, ...others): MemberRemoveCommand {
-        return new MemberRemoveCommandImpl(this, _.concat(first, others));
+        return new MemberRemoveCommandImpl(this, AdminImpl._concat(first, others));
     }
 
     appendMembers(first: string, ...others): MemberAppendCommand {
-        return new MemberAppendCommandImpl(this, _.concat(first, others));
+        return new MemberAppendCommandImpl(this, AdminImpl._concat(first, others));
     }
 
     create(): CreateCommand {

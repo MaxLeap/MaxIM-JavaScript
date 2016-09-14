@@ -176,9 +176,10 @@ class SearchBuilderImpl extends Builder<SearchOptions> implements SearchBuilder 
 
     private getUrl(path: string): string {
         let q: string[] = [];
-        _.each(this.extOptions.query, (v, k) => {
+        for (let k in this.extOptions.query) {
+            let v = this.extOptions.query[k];
             q.push(`${k}=${v}`);
-        });
+        }
         q.push(`_skip=${this.extOptions.skip || 0}`);
         q.push(`_limit=${this.extOptions.limit || 20}`);
         return `${this.apiOptions.server}${path}?${q.join('&')}`;

@@ -11,7 +11,6 @@ import {
 import {Context, ContextImpl} from "./context";
 import {APIOptions, Handler2, Handler3, Handler1, Callback} from "../models";
 import Socket = SocketIOClient.Socket;
-import isUndefined = require("lodash/isUndefined");
 
 interface Say {
     asText(): Say;
@@ -61,7 +60,7 @@ class SayImpl implements Say {
                 body: text
             }
         };
-        if (!_.isUndefined(remark) && !_.isNull(remark)) {
+        if (remark != null) {
             this.message.remark = remark;
         }
     }
@@ -221,12 +220,12 @@ export class SessionBuilderImpl implements SessionBuilder {
     }
 
     setNotifyAll(enable: boolean): SessionBuilder {
-        _.extend(this.authdata, {notifyAll: enable});
+        this.authdata['notifyAll'] = enable;
         return this;
     }
 
     setInstallation(installation: string): SessionBuilder {
-        _.extend(this.authdata, {install: installation});
+        this.authdata['install'] = installation;
         return this;
     }
 
@@ -290,7 +289,7 @@ export class SessionBuilderImpl implements SessionBuilder {
             content: origin.content,
             ts: origin.ts
         };
-        if (!_.isUndefined(origin.remark) && !_.isNull(origin.remark)) {
+        if (origin.remark != null) {
             ret.remark = origin.remark;
         }
         return ret;
@@ -318,29 +317,29 @@ export class SessionBuilderImpl implements SessionBuilder {
             let basicmsg = SessionBuilderImpl.convert(msg);
             switch (msg.from.type) {
                 case Receiver.ACTOR:
-                    _.each(this.friends, (handler: Handler2<string,BasicMessageFrom>) => {
+                    for (let handler of this.friends) {
                         handler(msg.from.id, basicmsg);
-                    });
+                    }
                     break;
                 case Receiver.GROUP:
-                    _.each(this.groups, (handler: Handler3<string,string,BasicMessageFrom>) => {
+                    for (let handler of this.groups) {
                         handler(msg.from.gid, msg.from.id, basicmsg);
-                    });
+                    }
                     break;
                 case Receiver.ROOM:
-                    _.each(this.rooms, (handler: Handler3<string,string,BasicMessageFrom>) => {
+                    for (let handler of this.rooms) {
                         handler(msg.from.gid, msg.from.id, basicmsg);
-                    });
+                    }
                     break;
                 case Receiver.PASSENGER:
-                    _.each(this.passengers, (handler: Handler2<string,BasicMessageFrom>) => {
+                    for (let handler of this.passengers) {
                         handler(msg.from.id, basicmsg);
-                    });
+                    }
                     break;
                 case Receiver.STRANGER:
-                    _.each(this.strangers, (handler: Handler2<string,BasicMessageFrom>) => {
+                    for (let handler of this.strangers) {
                         handler(msg.from.id, basicmsg);
-                    });
+                    }
                     break;
                 default:
                     break;
@@ -348,41 +347,41 @@ export class SessionBuilderImpl implements SessionBuilder {
         });
 
         socket.on('online', onlineid => {
-            _.each(this.friendonlines, handler => {
+            for (let handler of this.friendonlines) {
                 handler(onlineid as string);
-            });
+            }
         });
 
         socket.on('offline', offlineid=> {
-            _.each(this.friendofflines, handler => {
+            for (let handler of this.friendofflines) {
                 handler(offlineid as string);
-            });
+            }
         });
 
         socket.on('online_x', onlineid => {
-            _.each(this.strangeronlineds, handler=> {
+            for (let handler of this.strangeronlineds) {
                 handler(onlineid as string);
-            });
+            }
         });
 
         socket.on('offline_x', offlineid => {
-            _.each(this.strangerofflines, handler=> {
+            for (let handler of this.strangerofflines) {
                 handler(offlineid as string);
-            });
+            }
         });
 
         socket.on('sys', income => {
             let msg = income as SystemMessageFrom;
-            _.each(this.systems, handler => {
+            for (let handler of this.systems) {
                 handler(msg);
-            });
+            }
         });
 
         socket.on('yourself', income => {
             let msg = income as YourselfMessageFrom;
-            _.each(this.yourselfs, handler=> {
+            for (let handler of this.yourselfs) {
                 handler(msg);
-            });
+            }
         });
     }
 }

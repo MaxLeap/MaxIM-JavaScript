@@ -2,8 +2,6 @@ import {Admin, AdminImpl} from "./service/admin";
 import {Login, LoginImpl} from "./service/login";
 import {APIOptions} from "./models";
 
-const MAXLEAP_ROOT = 'ML';
-
 interface MaxIMOptions {
     app: string;
     key: string;
@@ -58,19 +56,15 @@ class MaxIMImpl implements MaxIM {
     }
 }
 
-function _initialize(options: MaxIMOptions): MaxIM {
-    return new MaxIMImpl(options);
-}
-
-
-if (window) {
-    if (!window[MAXLEAP_ROOT]) {
-        window[MAXLEAP_ROOT] = {};
+if (typeof window !== 'undefined') {
+    let ml = 'ML', im = 'im';
+    if (typeof window[ml] === 'undefined') {
+        window[ml] = {};
     }
-    _.extend(window[MAXLEAP_ROOT], {im: _initialize});
+    window[ml][im] = (options: MaxIMOptions) => new MaxIMImpl(options);
 }
 
-export default _initialize;
+export default (options: MaxIMOptions) => new MaxIMImpl(options);
 
 /*
 

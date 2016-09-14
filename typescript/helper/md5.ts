@@ -157,13 +157,10 @@ function rhex(n: number): string {
 }
 
 function hex(x): string {
-    for (let i = 0; i < x.length; i++)
+    for (let i = 0; i < x.length; i++) {
         x[i] = rhex(x[i]);
+    }
     return x.join('');
-}
-
-export function md5(s: string): string {
-    return hex(md51(s));
 }
 
 /* this function is much faster,
@@ -174,4 +171,8 @@ export function md5(s: string): string {
 
 function add32(a, b) {
     return (a + b) & 0xFFFFFFFF;
+}
+
+export function md5(s: string): string {
+    return hex(md51(s));
 }
