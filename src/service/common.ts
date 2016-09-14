@@ -20,6 +20,104 @@ interface GetAttributesBuilder {
     forRoom(callback?: Callback<any>);
 }
 
+interface CommonService {
+    /**
+     * 获取当前基础设定
+     */
+    options(): APIOptions;
+    /**
+     * 搜索对象
+     * @param query 查询条件
+     * @param skip 跳过记录数
+     * @param limit 返回记录条数
+     * @param sort 排序
+     */
+    search(query?: {[key: string]: any}, skip?: number, limit?: number, sort?: string[]): SearchBuilder;
+    /**
+     * 载入对象
+     * @param id 对象ID
+     */
+    load(id: string): LoadBuilder;
+
+    /**
+     * 获取属性
+     * @param id
+     */
+    getAttributes(id: string, attributeName?: string): GetAttributesBuilder;
+
+    /**
+     * 上传附件
+     * @param file
+     */
+    attachment(file: File): AttachmentBuilder;
+}
+
+interface AttachmentBuilder {
+    ok(callback?: Callback<string[]>): void;
+}
+
+interface LoadOptions {
+    id: string;
+}
+
+interface SearchOptions {
+    query?: {[key: string]: any};
+    skip?: number;
+    limit?: number;
+    sort?: string[];
+}
+
+
+class AttachmentBuilderImpl implements AttachmentBuilder {
+
+    private apiOptions: APIOptions;
+    private file: File;
+
+    constructor(apiOptions: APIOptions, file: File) {
+        this.apiOptions = apiOptions;
+        this.file = file;
+    }
+
+    ok(callback?: Callback<string[]>): void {
+        //TODO
+        let data: FormData = new FormData();
+        data.append('attachment', this.file);
+        let url = `${this.apiOptions.server}/attachment`;
+        let header: {[key: string]: string} = {};
+        for (let k in this.apiOptions.headers) {
+            if (k.toLowerCase() !== 'content-type') {
+                header[k] = this.apiOptions.headers[k];
+            }
+        }
+        header['content-type'] = 'multipart/form-data';
+        let opts = {
+            method: 'POST',
+            headers: header,
+            body: data
+        };
+        fetch(url, opts)
+            .then(response => {
+                if (successful(response)) {
+                    return response.json();
+                } else {
+                    throw new Error(`error: ${response.status}`);
+                }
+            })
+            .then(results => {
+                callback(null, results as string[]);
+            })
+            .catch(e => {
+                if (callback) {
+                    callback(e);
+                }
+            });
+    }
+}
+
+function successful(response: Response): boolean {
+    return response.status > 199 && response.status < 300;
+}
+
 class GetAttributesBuilderImpl implements GetAttributesBuilder {
 
     private id: string;
@@ -78,47 +176,6 @@ class GetAttributesBuilderImpl implements GetAttributesBuilder {
         }
         this.forAttr(`/rooms/${this.id}`, callback);
     }
-}
-
-export interface CommonService {
-    /**
-     * 获取当前基础设定
-     */
-    options(): APIOptions;
-    /**
-     * 搜索对象
-     * @param query 查询条件
-     * @param skip 跳过记录数
-     * @param limit 返回记录条数
-     * @param sort 排序
-     */
-    search(query?: {[key: string]: any}, skip?: number, limit?: number, sort?: string[]): SearchBuilder;
-    /**
-     * 载入对象
-     * @param id 对象ID
-     */
-    load(id: string): LoadBuilder;
-
-    /**
-     * 获取属性
-     * @param id
-     */
-    getAttributes(id: string, attributeName?: string): GetAttributesBuilder;
-}
-
-interface LoadOptions {
-    id: string;
-}
-
-interface SearchOptions {
-    query?: {[key: string]: any};
-    skip?: number;
-    limit?: number;
-    sort?: string[];
-}
-
-export function successful(response: Response): boolean {
-    return response.status > 199 && response.status < 300;
 }
 
 class Builder<T> {
@@ -224,7 +281,8 @@ class SearchBuilderImpl extends Builder<SearchOptions> implements SearchBuilder 
     }
 }
 
-export class CommonServiceImpl implements CommonService {
+class CommonServiceImpl implements CommonService {
+
 
     private _options: APIOptions;
 
@@ -256,4 +314,14 @@ export class CommonServiceImpl implements CommonService {
     getAttributes(id: string, attributeName?: string): GetAttributesBuilder {
         return new GetAttributesBuilderImpl(this, id, attributeName);
     }
+
+    attachment(file: File): AttachmentBuilder {
+        return new AttachmentBuilderImpl(this._options, file);
+    }
+}
+
+export {
+    successful,
+    CommonService,
+    CommonServiceImpl
 }

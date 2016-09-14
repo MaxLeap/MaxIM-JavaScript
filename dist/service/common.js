@@ -13,6 +13,52 @@ var __extends = (this && this.__extends) || function (d, b) {
 })(function (require, exports) {
     "use strict";
     var fetch = require("isomorphic-fetch");
+    var AttachmentBuilderImpl = (function () {
+        function AttachmentBuilderImpl(apiOptions, file) {
+            this.apiOptions = apiOptions;
+            this.file = file;
+        }
+        AttachmentBuilderImpl.prototype.ok = function (callback) {
+            //TODO
+            var data = new FormData();
+            data.append('attachment', this.file);
+            var url = this.apiOptions.server + "/attachment";
+            var header = {};
+            for (var k in this.apiOptions.headers) {
+                if (k.toLowerCase() !== 'content-type') {
+                    header[k] = this.apiOptions.headers[k];
+                }
+            }
+            header['content-type'] = 'multipart/form-data';
+            var opts = {
+                method: 'POST',
+                headers: header,
+                body: data
+            };
+            fetch(url, opts)
+                .then(function (response) {
+                if (successful(response)) {
+                    return response.json();
+                }
+                else {
+                    throw new Error("error: " + response.status);
+                }
+            })
+                .then(function (results) {
+                callback(null, results);
+            })
+                .catch(function (e) {
+                if (callback) {
+                    callback(e);
+                }
+            });
+        };
+        return AttachmentBuilderImpl;
+    }());
+    function successful(response) {
+        return response.status > 199 && response.status < 300;
+    }
+    exports.successful = successful;
     var GetAttributesBuilderImpl = (function () {
         function GetAttributesBuilderImpl(common, id, attr) {
             this.common = common;
@@ -64,10 +110,6 @@ var __extends = (this && this.__extends) || function (d, b) {
         };
         return GetAttributesBuilderImpl;
     }());
-    function successful(response) {
-        return response.status > 199 && response.status < 300;
-    }
-    exports.successful = successful;
     var Builder = (function () {
         function Builder(apiOptions, extOptions) {
             this.apiOptions = apiOptions;
@@ -190,6 +232,9 @@ var __extends = (this && this.__extends) || function (d, b) {
         };
         CommonServiceImpl.prototype.getAttributes = function (id, attributeName) {
             return new GetAttributesBuilderImpl(this, id, attributeName);
+        };
+        CommonServiceImpl.prototype.attachment = function (file) {
+            return new AttachmentBuilderImpl(this._options, file);
         };
         return CommonServiceImpl;
     }());
