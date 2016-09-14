@@ -16,13 +16,13 @@
   "homepage": "https://github.com/MaxLeap/MaxIM-JavaScript",
   "ignore": [
     ".*",
-    "changelog.md",
     "gulpfile.js",
     "package.json",
     "tsconfig.json",
     "typings.json",
     "node_modules",
     "bower_components",
+    "src",
     "test"
   ],
   "dependencies": {
