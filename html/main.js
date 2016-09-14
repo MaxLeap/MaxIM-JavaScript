@@ -15,6 +15,18 @@ require(['index'], function () {
         if (err) {
             console.error('login failed: %s', err);
         } else {
+
+            context.listFriends(function (err, friends) {
+                _.each(friends, function (friend) {
+                    console.log('>>> [ %s ] - [ %s ]', friend.id, friend.online ? 'ONLLINE' : 'OFFLINE');
+                });
+            });
+
+            setInterval(function () {
+                session.say('hello @' + new Date()).toFriend('bar').ok();
+            }, 10000);
+
+
             console.log('welcome %s!', session.current());
         }
     });

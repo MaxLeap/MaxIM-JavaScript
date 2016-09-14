@@ -135,9 +135,9 @@ function md51(s: string): number[] {
  * 8-bit unsigned value arrays.
  */
 function md5blk(s) { /* I figured global was faster.   */
-    let md5blks = [], i;
+    let md5blks = [];
     /* Andy King said do it this way. */
-    for (i = 0; i < 64; i += 4) {
+    for (let i = 0; i < 64; i += 4) {
         md5blks[i >> 2] = s.charCodeAt(i)
             + (s.charCodeAt(i + 1) << 8)
             + (s.charCodeAt(i + 2) << 16)
@@ -148,16 +148,16 @@ function md5blk(s) { /* I figured global was faster.   */
 
 const hex_chr = '0123456789abcdef'.split('');
 
-function rhex(n) {
-    var s = '', j = 0;
-    for (; j < 4; j++)
-        s += hex_chr[(n >> (j * 8 + 4)) & 0x0F]
-            + hex_chr[(n >> (j * 8)) & 0x0F];
+function rhex(n: number): string {
+    let s = '', j = 0;
+    for (; j < 4; j++) {
+        s += hex_chr[(n >> (j * 8 + 4)) & 0x0F] + hex_chr[(n >> (j * 8)) & 0x0F];
+    }
     return s;
 }
 
 function hex(x): string {
-    for (var i = 0; i < x.length; i++)
+    for (let i = 0; i < x.length; i++)
         x[i] = rhex(x[i]);
     return x.join('');
 }
