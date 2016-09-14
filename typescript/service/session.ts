@@ -9,31 +9,32 @@ import {
     BasicMessageFrom
 } from "../messages";
 import {Context, ContextImpl} from "./context";
-import {APIOptions, Handler2, Handler3, Handler1, Callback} from "../models";
+import {APIOptions, Handler2, Handler3, Handler1, Callback, Callback2} from "../models";
+import io = require('socket.io-client');
 import Socket = SocketIOClient.Socket;
 
-interface Say {
-    asText(): Say;
-    asImage(): Say;
-    asAudio(): Say;
-    asVideo(): Say;
+interface MessageBuilder {
+    asText(): MessageBuilder;
+    asImage(): MessageBuilder;
+    asAudio(): MessageBuilder;
+    asVideo(): MessageBuilder;
 
-    disablePush(): Say;
-    setPushSound(sound: string): Say;
-    setPushBadge(badge: number): Say;
-    setPushContentAvailable(contentAvailable: boolean): Say;
-    setPushPrefix(prefix: string): Say;
-    setPushSuffix(suffix: string): Say;
-    setPushTextOverwrite(text: string): Say;
+    disablePush(): MessageBuilder;
+    setPushSound(sound: string): MessageBuilder;
+    setPushBadge(badge: number): MessageBuilder;
+    setPushContentAvailable(contentAvailable: boolean): MessageBuilder;
+    setPushPrefix(prefix: string): MessageBuilder;
+    setPushSuffix(suffix: string): MessageBuilder;
+    setPushTextOverwrite(text: string): MessageBuilder;
 
-    toFriend(friend: string): Say2;
-    toGroup(groupid: string): Say2;
-    toRoom(roomid: string): Say2;
-    toPassenger(passengerid: string): Say2;
-    toStranger(strangerid: string): Say2;
+    toFriend(friend: string): MessageLauncher;
+    toGroup(groupid: string): MessageLauncher;
+    toRoom(roomid: string): MessageLauncher;
+    toPassenger(passengerid: string): MessageLauncher;
+    toStranger(strangerid: string): MessageLauncher;
 }
 
-interface Say2 {
+interface MessageLauncher {
     ok(callback?: Callback<void>): Session;
 }
 
@@ -44,7 +45,7 @@ interface LoginResult {
 }
 
 
-class SayImpl implements Say {
+class MessageBuilder implements MessageBuilder {
 
     message: MessageTo;
     session: SessionImpl;
@@ -65,22 +66,22 @@ class SayImpl implements Say {
         }
     }
 
-    asText(): Say {
+    asText(): MessageBuilder {
         this.message.content.media = Media.TEXT;
         return this;
     }
 
-    asImage(): Say {
+    asImage(): MessageBuilder {
         this.message.content.media = Media.IMAGE;
         return this;
     }
 
-    asAudio(): Say {
+    asAudio(): MessageBuilder {
         this.message.content.media = Media.AUDIO;
         return this;
     }
 
-    asVideo(): Say {
+    asVideo(): MessageBuilder {
         this.message.content.media = Media.VIDEO;
         return this;
     }
@@ -92,66 +93,66 @@ class SayImpl implements Say {
         return this.message.push;
     }
 
-    disablePush(): Say {
+    disablePush(): MessageBuilder {
         this.createPushIfNotExist().enable = false;
         return this;
     }
 
-    setPushSound(sound: string): Say {
+    setPushSound(sound: string): MessageBuilder {
         this.createPushIfNotExist().sound = sound;
         return this;
     }
 
-    setPushBadge(badge: number): Say {
+    setPushBadge(badge: number): MessageBuilder {
         this.createPushIfNotExist().badge = badge;
         return this;
     }
 
-    setPushContentAvailable(contentAvailable: boolean): Say {
+    setPushContentAvailable(contentAvailable: boolean): MessageBuilder {
         this.createPushIfNotExist().contentAvailable = contentAvailable;
         return this;
     }
 
-    setPushPrefix(prefix: string): Say {
+    setPushPrefix(prefix: string): MessageBuilder {
         this.createPushIfNotExist().prefix = prefix;
         return this;
     }
 
-    setPushSuffix(suffix: string): Say {
+    setPushSuffix(suffix: string): MessageBuilder {
         this.createPushIfNotExist().suffix = suffix;
         return this;
     }
 
-    setPushTextOverwrite(text: string): Say {
+    setPushTextOverwrite(text: string): MessageBuilder {
         this.createPushIfNotExist().overwrite = text;
         return this;
     }
 
-    toFriend(friend: string): Say2 {
+    toFriend(friend: string): MessageLauncher {
         this.message.to.id = friend;
         this.message.to.type = Receiver.ACTOR;
         return new SayBuilder(this.session, this.message);
     }
 
-    toGroup(groupid: string): Say2 {
+    toGroup(groupid: string): MessageLauncher {
         this.message.to.id = groupid;
         this.message.to.type = Receiver.GROUP;
         return new SayBuilder(this.session, this.message);
     }
 
-    toRoom(roomid: string): Say2 {
+    toRoom(roomid: string): MessageLauncher {
         this.message.to.id = roomid;
         this.message.to.type = Receiver.ROOM;
         return new SayBuilder(this.session, this.message);
     }
 
-    toPassenger(passengerid: string): Say2 {
+    toPassenger(passengerid: string): MessageLauncher {
         this.message.to.id = passengerid;
         this.message.to.type = Receiver.PASSENGER;
         return new SayBuilder(this.session, this.message);
     }
 
-    toStranger(strangerid: string): Say2 {
+    toStranger(strangerid: string): MessageLauncher {
         this.message.to.id = strangerid;
         this.message.to.type = Receiver.STRANGER;
         return new SayBuilder(this.session, this.message);
@@ -159,7 +160,7 @@ class SayImpl implements Say {
 
 }
 
-class SayBuilder implements Say2 {
+class SayBuilder implements MessageLauncher {
 
     session: SessionImpl;
     message: MessageTo;
@@ -295,7 +296,7 @@ export class SessionBuilderImpl implements SessionBuilder {
         return ret;
     }
 
-    ok(callback: Handler3<Error,Session,Context>) {
+    ok(callback: Callback2<Session,Context>) {
         let url = `${this.apiOptions.server}/chat`;
         let socket = io.connect(url, {
             query: `auth=${JSON.stringify(this.authdata)}`,
@@ -402,11 +403,11 @@ class SessionImpl implements Session {
         return this.userid;
     }
 
-    say(text: string, remark?: string): Say {
+    say(text: string, remark?: string): MessageBuilder {
         if (this.closed) {
             throw new Error('session is closed.');
         }
-        return new SayImpl(this, text, remark);
+        return new MessageBuilder(this, text, remark);
     }
 
     close(callback?: Callback<void>): void {
@@ -421,7 +422,7 @@ class SessionImpl implements Session {
 
 export interface Session {
     current(): string;
-    say(text: string, remark?: string): Say;
+    say(text: string, remark?: string): MessageBuilder;
     close(callback?: Callback<void>): void;
 }
 
@@ -441,5 +442,5 @@ export interface SessionBuilder {
     onSystemMessage(handler: Handler1<SystemMessageFrom>): SessionBuilder;
     onYourself(handler: Handler1<YourselfMessageFrom>): SessionBuilder;
 
-    ok(callback: Handler3<Error,Session,Context>);
+    ok(callback: Callback2<Session,Context>);
 }

@@ -3,8 +3,7 @@
   "dependencies": {},
   "globalDependencies": {
     "core-js": "registry:dt/core-js#0.0.0+20160725163759",
-    "socket.io-client": "registry:dt/socket.io-client#1.4.4+20160317120654",
-    "whatwg-fetch": "registry:dt/whatwg-fetch#0.0.0+20160829180742",
-    "whatwg-streams": "registry:dt/whatwg-streams#0.0.0+20160829180742"
+    "isomorphic-fetch": "registry:dt/isomorphic-fetch#0.0.0+20160830175641",
+    "socket.io-client": "registry:dt/socket.io-client#1.4.4+20160317120654"
   }
 }

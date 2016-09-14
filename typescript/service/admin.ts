@@ -1,6 +1,7 @@
 import {CommonService, CommonServiceImpl, successful} from "./common";
 import {SystemMessageTo, Media, Receiver, PushSettings} from "../messages";
 import {Attributes, Callback} from "../models";
+import * as fetch from "isomorphic-fetch";
 
 export interface Admin extends CommonService {
     /**

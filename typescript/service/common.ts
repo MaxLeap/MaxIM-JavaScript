@@ -1,4 +1,5 @@
 import {UserDetail, GroupInfo, RoomInfo, UserOutline, Passenger, APIOptions, Callback} from "../models";
+import * as fetch from "isomorphic-fetch";
 
 interface SearchBuilder {
     forUsers(callback: Callback<UserOutline[]>);

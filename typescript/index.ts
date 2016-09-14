@@ -61,11 +61,12 @@ if (typeof window !== 'undefined') {
     if (typeof window[ml] === 'undefined') {
         window[ml] = {};
     }
-    window[ml][im] = (options: MaxIMOptions) => new MaxIMImpl(options);
+    window[ml][im] = function (options: MaxIMOptions): MaxIM {
+        return new MaxIMImpl(options)
+    };
 }
 
-export default (options: MaxIMOptions) => new MaxIMImpl(options);
-
+export = (options: MaxIMOptions): MaxIM => new MaxIMImpl(options);
 /*
 
  let me = 'foo';

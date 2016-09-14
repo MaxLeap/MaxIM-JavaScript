@@ -1,5 +1,10 @@
 require.config({
-    baseUrl: '../lib'
+    baseUrl: '../lib',
+    paths: {
+        'socket.io-client': '../bower_components/socket.io-client/socket.io',
+        'fetch': '../bower_components/fetch/fetch',
+        'isomorphic-fetch': '../bower_components/isomorphic-fetch/fetch-bower'
+    }
 });
 require(['index'], function () {
     "use strict";
@@ -17,13 +22,13 @@ require(['index'], function () {
         } else {
 
             context.listFriends(function (err, friends) {
-                _.each(friends, function (friend) {
+                friends.forEach(function (friend) {
                     console.log('>>> [ %s ] - [ %s ]', friend.id, friend.online ? 'ONLLINE' : 'OFFLINE');
                 });
             });
 
             setInterval(function () {
-                session.say('hello @' + new Date()).toFriend('bar').ok();
+                session.say('hello @' + new Date().getTime()).toFriend('bar').ok();
             }, 10000);
 
 

@@ -75,17 +75,19 @@ export class APIOptions {
 }
 
 export interface Handler1<T> {
-    (t: T): void;
+    (t?: T): void;
 }
 
 export interface Handler2<T,U> {
-    (t: T, u: U): void;
+    (t?: T, u?: U): void;
 }
 export interface Handler3<T,U,V> {
-    (t: T, u: U, v: V): void;
+    (t?: T, u?: U, v?: V): void;
 }
 
-export interface Callback<T> {
-    (err: Error, data?: T): void;
+export interface Callback<T> extends Handler2<Error,T> {
 }
 
+export interface Callback2<T,U> extends Handler3<Error,T,U> {
+
+}
