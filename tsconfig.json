@@ -6,8 +6,8 @@
     "outDir": "./dist"
   },
   "include": [
-    "typescript/**/*.ts",
-    "typings/**/*.ts"
+    "src/**/*",
+    "typings/**/*"
   ],
   "exclude": [
     "node_modules",
