@@ -15,7 +15,7 @@
   ],
   "homepage": "https://github.com/MaxLeap/MaxIM-JavaScript",
   "ignore": [
-    "**/*",
+    ".*",
     "demo",
     "typings",
     "src",
@@ -23,8 +23,7 @@
     "typescript",
     "node_modules",
     "bower_components",
-    "test",
-    "tests"
+    "test"
   ],
   "dependencies": {
     "socket.io-client": "^1.4.8",
