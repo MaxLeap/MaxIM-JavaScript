@@ -2,9 +2,9 @@
   "name": "maxleap-im",
   "version": "4.0.0",
   "description": "MaxLeap JavaScript SDK for IM.",
-  "main": "lib/ML.im.js",
+  "main": "dist/im.js",
   "directories": {
-    "lib": "lib",
+    "lib": "dist",
     "test": "test"
   },
   "repository": {
@@ -21,14 +21,16 @@
   },
   "homepage": "https://www.maxleap.cn",
   "dependencies": {
-    "crypto-js": "^3.1.6",
-    "lodash": "^4.15.0",
+    "isomorphic-fetch": "^2.2.1",
     "requirejs": "^2.3.1",
-    "socket.io-client": "^1.4.8",
-    "whatwg-fetch": "^1.0.0"
+    "socket.io-client": "^1.4.8"
   },
-  "scripts": {
-    "preinstall": "rm -rf ./lib",
-    "postinstall": "tsc"
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^2.13.6",
+    "tsify": "^1.0.7",
+    "vinyl-source-stream": "^1.1.0"
   }
 }

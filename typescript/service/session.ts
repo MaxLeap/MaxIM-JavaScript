@@ -7,34 +7,34 @@ import {
     YourselfMessageFrom,
     SystemMessageFrom,
     BasicMessageFrom
-} from "../messages";
+} from "../model/messages";
 import {Context, ContextImpl} from "./context";
-import {APIOptions, Handler2, Handler3, Handler1, Callback} from "../models";
+import {APIOptions, Handler2, Handler3, Handler1, Callback, Callback2} from "../model/models";
+import io = require('socket.io-client');
 import Socket = SocketIOClient.Socket;
-import isUndefined = require("lodash/isUndefined");
 
-interface Say {
-    asText(): Say;
-    asImage(): Say;
-    asAudio(): Say;
-    asVideo(): Say;
+interface MessageBuilder {
+    asText(): MessageBuilder;
+    asImage(): MessageBuilder;
+    asAudio(): MessageBuilder;
+    asVideo(): MessageBuilder;
 
-    disablePush(): Say;
-    setPushSound(sound: string): Say;
-    setPushBadge(badge: number): Say;
-    setPushContentAvailable(contentAvailable: boolean): Say;
-    setPushPrefix(prefix: string): Say;
-    setPushSuffix(suffix: string): Say;
-    setPushTextOverwrite(text: string): Say;
+    disablePush(): MessageBuilder;
+    setPushSound(sound: string): MessageBuilder;
+    setPushBadge(badge: number): MessageBuilder;
+    setPushContentAvailable(contentAvailable: boolean): MessageBuilder;
+    setPushPrefix(prefix: string): MessageBuilder;
+    setPushSuffix(suffix: string): MessageBuilder;
+    setPushTextOverwrite(text: string): MessageBuilder;
 
-    toFriend(friend: string): Say2;
-    toGroup(groupid: string): Say2;
-    toRoom(roomid: string): Say2;
-    toPassenger(passengerid: string): Say2;
-    toStranger(strangerid: string): Say2;
+    toFriend(friend: string): MessageLauncher;
+    toGroup(groupid: string): MessageLauncher;
+    toRoom(roomid: string): MessageLauncher;
+    toPassenger(passengerid: string): MessageLauncher;
+    toStranger(strangerid: string): MessageLauncher;
 }
 
-interface Say2 {
+interface MessageLauncher {
     ok(callback?: Callback<void>): Session;
 }
 
@@ -45,7 +45,7 @@ interface LoginResult {
 }
 
 
-class SayImpl implements Say {
+class MessageBuilder implements MessageBuilder {
 
     message: MessageTo;
     session: SessionImpl;
@@ -61,27 +61,27 @@ class SayImpl implements Say {
                 body: text
             }
         };
-        if (!_.isUndefined(remark) && !_.isNull(remark)) {
+        if (remark != null) {
             this.message.remark = remark;
         }
     }
 
-    asText(): Say {
+    asText(): MessageBuilder {
         this.message.content.media = Media.TEXT;
         return this;
     }
 
-    asImage(): Say {
+    asImage(): MessageBuilder {
         this.message.content.media = Media.IMAGE;
         return this;
     }
 
-    asAudio(): Say {
+    asAudio(): MessageBuilder {
         this.message.content.media = Media.AUDIO;
         return this;
     }
 
-    asVideo(): Say {
+    asVideo(): MessageBuilder {
         this.message.content.media = Media.VIDEO;
         return this;
     }
@@ -93,66 +93,66 @@ class SayImpl implements Say {
         return this.message.push;
     }
 
-    disablePush(): Say {
+    disablePush(): MessageBuilder {
         this.createPushIfNotExist().enable = false;
         return this;
     }
 
-    setPushSound(sound: string): Say {
+    setPushSound(sound: string): MessageBuilder {
         this.createPushIfNotExist().sound = sound;
         return this;
     }
 
-    setPushBadge(badge: number): Say {
+    setPushBadge(badge: number): MessageBuilder {
         this.createPushIfNotExist().badge = badge;
         return this;
     }
 
-    setPushContentAvailable(contentAvailable: boolean): Say {
+    setPushContentAvailable(contentAvailable: boolean): MessageBuilder {
         this.createPushIfNotExist().contentAvailable = contentAvailable;
         return this;
     }
 
-    setPushPrefix(prefix: string): Say {
+    setPushPrefix(prefix: string): MessageBuilder {
         this.createPushIfNotExist().prefix = prefix;
         return this;
     }
 
-    setPushSuffix(suffix: string): Say {
+    setPushSuffix(suffix: string): MessageBuilder {
         this.createPushIfNotExist().suffix = suffix;
         return this;
     }
 
-    setPushTextOverwrite(text: string): Say {
+    setPushTextOverwrite(text: string): MessageBuilder {
         this.createPushIfNotExist().overwrite = text;
         return this;
     }
 
-    toFriend(friend: string): Say2 {
+    toFriend(friend: string): MessageLauncher {
         this.message.to.id = friend;
         this.message.to.type = Receiver.ACTOR;
         return new SayBuilder(this.session, this.message);
     }
 
-    toGroup(groupid: string): Say2 {
+    toGroup(groupid: string): MessageLauncher {
         this.message.to.id = groupid;
         this.message.to.type = Receiver.GROUP;
         return new SayBuilder(this.session, this.message);
     }
 
-    toRoom(roomid: string): Say2 {
+    toRoom(roomid: string): MessageLauncher {
         this.message.to.id = roomid;
         this.message.to.type = Receiver.ROOM;
         return new SayBuilder(this.session, this.message);
     }
 
-    toPassenger(passengerid: string): Say2 {
+    toPassenger(passengerid: string): MessageLauncher {
         this.message.to.id = passengerid;
         this.message.to.type = Receiver.PASSENGER;
         return new SayBuilder(this.session, this.message);
     }
 
-    toStranger(strangerid: string): Say2 {
+    toStranger(strangerid: string): MessageLauncher {
         this.message.to.id = strangerid;
         this.message.to.type = Receiver.STRANGER;
         return new SayBuilder(this.session, this.message);
@@ -160,7 +160,7 @@ class SayImpl implements Say {
 
 }
 
-class SayBuilder implements Say2 {
+class SayBuilder implements MessageLauncher {
 
     session: SessionImpl;
     message: MessageTo;
@@ -221,12 +221,12 @@ export class SessionBuilderImpl implements SessionBuilder {
     }
 
     setNotifyAll(enable: boolean): SessionBuilder {
-        _.extend(this.authdata, {notifyAll: enable});
+        this.authdata['notifyAll'] = enable;
         return this;
     }
 
     setInstallation(installation: string): SessionBuilder {
-        _.extend(this.authdata, {install: installation});
+        this.authdata['install'] = installation;
         return this;
     }
 
@@ -290,13 +290,13 @@ export class SessionBuilderImpl implements SessionBuilder {
             content: origin.content,
             ts: origin.ts
         };
-        if (!_.isUndefined(origin.remark) && !_.isNull(origin.remark)) {
+        if (origin.remark != null) {
             ret.remark = origin.remark;
         }
         return ret;
     }
 
-    ok(callback: Handler3<Error,Session,Context>) {
+    ok(callback: Callback2<Session,Context>) {
         let url = `${this.apiOptions.server}/chat`;
         let socket = io.connect(url, {
             query: `auth=${JSON.stringify(this.authdata)}`,
@@ -305,7 +305,7 @@ export class SessionBuilderImpl implements SessionBuilder {
         socket.once('login', result => {
             let foo = result as LoginResult;
             if (foo.success) {
-                let session = new SessionImpl(socket);
+                let session = new SessionImpl(socket, foo.id);
                 let ctx = new ContextImpl(this.apiOptions, result.id);
                 callback(null, session, ctx);
             } else {
@@ -318,29 +318,29 @@ export class SessionBuilderImpl implements SessionBuilder {
             let basicmsg = SessionBuilderImpl.convert(msg);
             switch (msg.from.type) {
                 case Receiver.ACTOR:
-                    _.each(this.friends, (handler: Handler2<string,BasicMessageFrom>) => {
+                    for (let handler of this.friends) {
                         handler(msg.from.id, basicmsg);
-                    });
+                    }
                     break;
                 case Receiver.GROUP:
-                    _.each(this.groups, (handler: Handler3<string,string,BasicMessageFrom>) => {
+                    for (let handler of this.groups) {
                         handler(msg.from.gid, msg.from.id, basicmsg);
-                    });
+                    }
                     break;
                 case Receiver.ROOM:
-                    _.each(this.rooms, (handler: Handler3<string,string,BasicMessageFrom>) => {
+                    for (let handler of this.rooms) {
                         handler(msg.from.gid, msg.from.id, basicmsg);
-                    });
+                    }
                     break;
                 case Receiver.PASSENGER:
-                    _.each(this.passengers, (handler: Handler2<string,BasicMessageFrom>) => {
+                    for (let handler of this.passengers) {
                         handler(msg.from.id, basicmsg);
-                    });
+                    }
                     break;
                 case Receiver.STRANGER:
-                    _.each(this.strangers, (handler: Handler2<string,BasicMessageFrom>) => {
+                    for (let handler of this.strangers) {
                         handler(msg.from.id, basicmsg);
-                    });
+                    }
                     break;
                 default:
                     break;
@@ -348,59 +348,66 @@ export class SessionBuilderImpl implements SessionBuilder {
         });
 
         socket.on('online', onlineid => {
-            _.each(this.friendonlines, handler => {
+            for (let handler of this.friendonlines) {
                 handler(onlineid as string);
-            });
+            }
         });
 
         socket.on('offline', offlineid=> {
-            _.each(this.friendofflines, handler => {
+            for (let handler of this.friendofflines) {
                 handler(offlineid as string);
-            });
+            }
         });
 
         socket.on('online_x', onlineid => {
-            _.each(this.strangeronlineds, handler=> {
+            for (let handler of this.strangeronlineds) {
                 handler(onlineid as string);
-            });
+            }
         });
 
         socket.on('offline_x', offlineid => {
-            _.each(this.strangerofflines, handler=> {
+            for (let handler of this.strangerofflines) {
                 handler(offlineid as string);
-            });
+            }
         });
 
         socket.on('sys', income => {
             let msg = income as SystemMessageFrom;
-            _.each(this.systems, handler => {
+            for (let handler of this.systems) {
                 handler(msg);
-            });
+            }
         });
 
         socket.on('yourself', income => {
             let msg = income as YourselfMessageFrom;
-            _.each(this.yourselfs, handler=> {
+            for (let handler of this.yourselfs) {
                 handler(msg);
-            });
+            }
         });
     }
 }
 
 class SessionImpl implements Session {
     private closed: boolean;
+    private userid: string;
+
     socket: Socket;
 
-    constructor(socket: Socket) {
+    constructor(socket: Socket, userid: string) {
         this.closed = false;
         this.socket = socket;
+        this.userid = userid;
     }
 
-    say(text: string, remark?: string): Say {
+    current(): string {
+        return this.userid;
+    }
+
+    say(text: string, remark?: string): MessageBuilder {
         if (this.closed) {
             throw new Error('session is closed.');
         }
-        return new SayImpl(this, text, remark);
+        return new MessageBuilder(this, text, remark);
     }
 
     close(callback?: Callback<void>): void {
@@ -414,7 +421,8 @@ class SessionImpl implements Session {
 }
 
 export interface Session {
-    say(text: string, remark?: string): Say;
+    current(): string;
+    say(text: string, remark?: string): MessageBuilder;
     close(callback?: Callback<void>): void;
 }
 
@@ -434,5 +442,5 @@ export interface SessionBuilder {
     onSystemMessage(handler: Handler1<SystemMessageFrom>): SessionBuilder;
     onYourself(handler: Handler1<YourselfMessageFrom>): SessionBuilder;
 
-    ok(callback: Handler3<Error,Session,Context>);
+    ok(callback: Callback2<Session,Context>);
 }

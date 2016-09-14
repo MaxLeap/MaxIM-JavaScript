@@ -1,8 +1,6 @@
 import {Admin, AdminImpl} from "./service/admin";
 import {Login, LoginImpl} from "./service/login";
-import {APIOptions} from "./models";
-
-const MAXLEAP_ROOT = 'ML';
+import {APIOptions} from "./model/models";
 
 interface MaxIMOptions {
     app: string;
@@ -27,7 +25,7 @@ class MaxIMImpl implements MaxIM {
     private _admin: Admin;
 
     constructor(options: MaxIMOptions) {
-        if (!options || !options.app || options.key) {
+        if (!options || !options.app || !options.key) {
             throw new Error(`invalid options: ${JSON.stringify(options)}`);
         }
 
@@ -38,6 +36,9 @@ class MaxIMImpl implements MaxIM {
                 break;
             case 'cn':
                 server = 'im.maxleap.cn';
+                break;
+            case 'uat':
+                server = 'imuat.maxleap.cn';
                 break;
             default:
                 throw new Error(`invalid region ${options.region}`);
@@ -55,20 +56,17 @@ class MaxIMImpl implements MaxIM {
     }
 }
 
-function _initialize(options: MaxIMOptions): MaxIM {
-    return new MaxIMImpl(options);
-}
-
-
-if (window) {
-    if (!window[MAXLEAP_ROOT]) {
-        window[MAXLEAP_ROOT] = {};
+if (typeof window !== 'undefined') {
+    let ml = 'ML', im = 'im';
+    if (typeof window[ml] === 'undefined') {
+        window[ml] = {};
     }
-    _.extend(window[MAXLEAP_ROOT], {im: _initialize});
+    window[ml][im] = function (options: MaxIMOptions): MaxIM {
+        return new MaxIMImpl(options)
+    };
 }
 
-export default _initialize;
-
+export = (options: MaxIMOptions): MaxIM => new MaxIMImpl(options);
 /*
 
  let me = 'foo';

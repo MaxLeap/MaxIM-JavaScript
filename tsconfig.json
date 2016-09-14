@@ -3,10 +3,14 @@
     "module": "umd",
     "target": "es5",
     "sourceMap": true,
-    "outDir": "./lib"
+    "outDir": "./dist"
   },
   "include": [
-    "typescript/**/*",
-    "typings/**/*"
+    "typescript/**/*.ts",
+    "typings/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "bower_components"
   ]
 }

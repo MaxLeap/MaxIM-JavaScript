@@ -1,8 +1,6 @@
 import {CommonServiceImpl, successful} from "./common";
-import {Friend, MyGroup, RoomInfo, ChatRecord, Attributes, APIOptions, Callback} from "../models";
-import sortedIndexBy = require("lodash/sortedIndexBy");
-import unary = require("lodash/unary");
-import isUndefined = require("lodash/isUndefined");
+import {Friend, MyGroup, RoomInfo, ChatRecord, Attributes, APIOptions, Callback} from "../model/models";
+import * as fetch from "isomorphic-fetch";
 
 interface TalkingBuilder {
     ofFriend(friendid: string, callback?: Callback<ChatRecord[]>): Context;
@@ -134,7 +132,8 @@ class TalkingBuilderImpl implements TalkingBuilder {
         if (this.size > 0) {
             q.push(`limit=${this.size}`);
         }
-        if (!_.isEmpty(q)) {
+
+        if (q.length > 0) {
             url += '?' + q.join('&');
         }
         let opts = {

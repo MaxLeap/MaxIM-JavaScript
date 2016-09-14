@@ -1,5 +1,6 @@
 import {SessionBuilder, SessionBuilderImpl} from "./session";
-import {APIOptions} from "../models";
+import {APIOptions} from "../model/models";
+import {md5} from "../helper/md5";
 
 /**
  * 登录器
@@ -34,16 +35,25 @@ export class LoginImpl implements Login {
 
     constructor(apiOptions: APIOptions) {
         this._options = apiOptions;
-        let foo = _.now();
-        let bar = CryptoJS.MD5(`${foo}${this._options.sign}`).toString() + ',' + foo;
+        let foo = new Date().getTime();
+        let bar = md5(`${foo}${this._options.sign}`) + ',' + foo;
         this._basicAuth = {
             app: this._options.app,
             sign: bar
         }
     }
 
+    private static _extend(target: {}, source: {}): void {
+        for (let k in source) {
+            target[k] = source[k];
+        }
+    }
+
     simple(userid: string): SessionBuilder {
-        let authdata = _.extend({client: userid}, this._basicAuth);
+        let authdata = {
+            client: userid
+        };
+        LoginImpl._extend(authdata, this._basicAuth);
         return new SessionBuilderImpl(this._options, authdata);
     }
 
@@ -52,7 +62,7 @@ export class LoginImpl implements Login {
             username: username,
             password: password
         };
-        _.extend(authdata, this._basicAuth);
+        LoginImpl._extend(authdata, this._basicAuth);
         return new SessionBuilderImpl(this._options, authdata);
     }
 
@@ -61,7 +71,7 @@ export class LoginImpl implements Login {
             phone: phone,
             password: verify
         };
-        _.extend(authdata, this._basicAuth);
+        LoginImpl._extend(authdata, this._basicAuth);
         return new SessionBuilderImpl(this._options, authdata);
     }
 }
