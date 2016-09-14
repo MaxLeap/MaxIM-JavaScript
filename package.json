@@ -28,5 +28,9 @@
   "scripts": {
     "preinstall": "rm -rf ./lib",
     "postinstall": "tsc"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^2.13.6"
   }
 }

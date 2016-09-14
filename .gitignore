@@ -3,5 +3,5 @@ node_modules
 test/browser/specs.browser.js
 .idea
 typings/
-lib/
+dist/
 *.log

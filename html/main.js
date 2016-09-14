@@ -1,5 +1,5 @@
 require.config({
-    baseUrl: '../lib',
+    baseUrl: '../dist',
     paths: {
         'socket.io-client': '../bower_components/socket.io-client/socket.io',
         'fetch': '../bower_components/fetch/fetch',
