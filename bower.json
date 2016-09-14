@@ -5,6 +5,9 @@
   "authors": [
     "Jeff.Tsai <wcai@maxleap.com>"
   ],
+  "moduleType": [
+    "amd"
+  ],
   "license": "MIT",
   "keywords": [
     "maxleap",
@@ -12,6 +15,7 @@
   ],
   "homepage": "https://github.com/MaxLeap/MaxIM-JavaScript",
   "ignore": [
+    "**/*",
     "demo",
     "typings",
     "src",
