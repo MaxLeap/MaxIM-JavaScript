@@ -158,7 +158,7 @@ require(['maxleap-im/im'],function(IM){
 | # | 参数名 | 类型 | 说明 |
 |----|----|----|----|
 | 1 | userid | string | 好友的用户ID | |
-| 2 | message | BasicMessage | 消息体 |
+| 2 | message | [BasicMessage](#basicmessage) | 消息体 |
 
 #### SessionBuilder#onGroupMessage(callback:(groupid,memberid,message)=>void):[SessionBuilder](#sessionbuilder)
  
@@ -168,7 +168,7 @@ require(['maxleap-im/im'],function(IM){
 |----|----|----|----|
 | 1 | groupid | string | 群组标识ID | |
 | 2 | memberid | string | 本消息的群组内发言人标识ID | |
-| 3 | message | BasicMessage | 消息体 |
+| 3 | message | [BasicMessage](#basicmessage) | 消息体 |
 
 #### SessionBuilder#onRoomMessage(callback:(roomid,memberid,message)=>void):[SessionBuilder](#sessionbuilder)
 
@@ -178,7 +178,7 @@ require(['maxleap-im/im'],function(IM){
 |----|----|----|----|
 | 1 | roomid | string | 聊天室标识ID | |
 | 2 | memberid | string | 本消息的聊天室内发言人标识ID | |
-| 3 | message | BasicMessage | 消息体 |
+| 3 | message | [BasicMessage](#basicmessage) | 消息体 |
 
 #### SessionBuilder#onPassengerMessage(callback:(passengerid,message)=>void):[SessionBuilder](#sessionbuilder)
 
@@ -187,7 +187,7 @@ require(['maxleap-im/im'],function(IM){
 | # | 参数名 | 类型 | 说明 |
 |----|----|----|----|
 | 1 | passengerid | string | 访客标识ID | |
-| 2 | message | BasicMessage | 消息体 |
+| 2 | message | [BasicMessage](#basicmessage) | 消息体 |
 
 #### SessionBuilder#onStrangerMessage(callback:(strangerid,message)=>void):[SessionBuilder](#sessionbuilder)
 
@@ -196,7 +196,7 @@ require(['maxleap-im/im'],function(IM){
 | # | 参数名 | 类型 | 说明 |
 |----|----|----|----|
 | 1 | strangerid | string | 陌生人用户标识ID | |
-| 2 | message | BasicMessage | 消息体 | |
+| 2 | message | [BasicMessage](#basicmessage) | 消息体 | |
 
 #### SessionBuilder#onSystemMessage(callback:(message)=>void):[SessionBuilder](#sessionbuilder)
 
@@ -503,3 +503,21 @@ require(['maxleap-im/im'],function(IM){
 #### MemberRemoveCommand#fromRoom(roomid:string,callback:(error)=>void):[Admin](#admin)
 
 结束链式调用, 移除聊天室成员并返回原始`Admin`实例。
+
+### BasicMessage
+---------------------------
+基础消息结构体。属性说明如下:
+
+| 属性名 | 类型 | 说明 |
+|------|------|------|
+| content | [Content](#content) | 消息正文 |
+| ts | number | 消息送达时间戳 |
+| remark | string | 消息备注(可选项) |
+
+### Content
+------------------------------
+消息正文结构体。属性说明如下:
+| 属性名 | 类型 | 说明 |
+|------|------|------|
+| media | number | 媒体类型: 0=纯文本, 1=图片, 2=音频, 3=视频 |
+| body | string | 正文文本 |

@@ -324,38 +324,38 @@ var __extends = (this && this.__extends) || function (d, b) {
         };
         MessageBuilderImpl.prototype.toAll = function () {
             this.receiver = {};
-            return new MessageLanucherImpl(this.admin, this.message, this.receiver);
+            return new MessageLauncherImpl(this.admin, this.message, this.receiver);
         };
         MessageBuilderImpl.prototype.toUser = function (userid) {
             this.receiver = {
                 id: userid,
                 type: messages_1.Receiver.ACTOR
             };
-            return new MessageLanucherImpl(this.admin, this.message, this.receiver);
+            return new MessageLauncherImpl(this.admin, this.message, this.receiver);
         };
         MessageBuilderImpl.prototype.toGroup = function (groupid) {
             this.receiver = {
                 id: groupid,
                 type: messages_1.Receiver.GROUP
             };
-            return new MessageLanucherImpl(this.admin, this.message, this.receiver);
+            return new MessageLauncherImpl(this.admin, this.message, this.receiver);
         };
         MessageBuilderImpl.prototype.toRoom = function (roomid) {
             this.receiver = {
                 id: roomid,
                 type: messages_1.Receiver.ROOM
             };
-            return new MessageLanucherImpl(this.admin, this.message, this.receiver);
+            return new MessageLauncherImpl(this.admin, this.message, this.receiver);
         };
         return MessageBuilderImpl;
     }());
-    var MessageLanucherImpl = (function () {
-        function MessageLanucherImpl(admin, message, receiver) {
+    var MessageLauncherImpl = (function () {
+        function MessageLauncherImpl(admin, message, receiver) {
             this.admin = admin;
             this.message = message;
             this.receiver = receiver;
         }
-        MessageLanucherImpl.prototype.ok = function (callback) {
+        MessageLauncherImpl.prototype.ok = function (callback) {
             var url = this.admin.options().server + "/system";
             if (this.receiver.id) {
                 url += "/" + this.receiver.id;
@@ -394,7 +394,7 @@ var __extends = (this && this.__extends) || function (d, b) {
             });
             return this.admin;
         };
-        return MessageLanucherImpl;
+        return MessageLauncherImpl;
     }());
     var AttributeBuilderImpl = (function () {
         function AttributeBuilderImpl(admin, attributes, overwrite) {
