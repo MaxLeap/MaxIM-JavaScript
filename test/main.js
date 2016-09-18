@@ -6,7 +6,7 @@ require.config({
         'maxim': '../dist'
     }
 });
-require(['maxim/im'], function () {
+require(['maxim/im'], function (IM) {
     "use strict";
 
     var config = {
@@ -15,7 +15,7 @@ require(['maxim/im'], function () {
         region: 'test',
         useHttp: true
     };
-    var im = ML.im(config);
+    var im = IM(config);
 
     im.login().simple('foo').ok(function (err, session, context) {
         if (err) {

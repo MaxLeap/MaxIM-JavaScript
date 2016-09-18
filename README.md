@@ -8,7 +8,7 @@ V4版SDK遵循UMD规范, 兼容NodeJS和浏览器端。
 
 您可以使用如下方式集成SDK:
 
-### 使用NPM
+### 使用NPM (NodeJS)
 
 ```shell
 $ npm install maxleap-im --save
@@ -26,7 +26,7 @@ var im = IM(options);
 // ......
 ```
 
-### 使用bower
+### 使用bower (浏览器)
 
 首先通过bower来安装依赖:
 
@@ -49,13 +49,13 @@ require.config({
   }
 });
 
-require(['maxleap-im/im'],function(){
+require(['maxleap-im/im'],function(IM){
   var opts = {
     app: 'YOUR_APP_ID',
       key: 'YOUR_APP_KEY'
   };
     
-  var im = ML.im(opts);
+  var im = IM(opts); // 或者 ML.im(opts)
    // ......
 });
 
