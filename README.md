@@ -56,7 +56,7 @@ require('maxleap-im');
 ### MaxIM
 --------------------------------------------------
 
-核心入口类
+> 核心入口类
 
 #### MaxIM#login():Login
 
@@ -69,7 +69,7 @@ require('maxleap-im');
 ### Login
 --------------------------------------------------
 
-登录器, 可进行登录设置并创建会话。
+> 登录器, 可进行登录设置并创建会话。
 
 #### Login#simple(userid:string):SessionBuilder
 
@@ -88,7 +88,8 @@ require('maxleap-im');
 ### SessionBuilder
 --------------------------------------------------
 
-session构造器, 用于初始化session设置, 绑定各种事件, 并进行登录调用。该类中的设置接口使用流畅接口风格, 您可以进行链式设置并最后调用`ok`进行最终提交创建。
+> session构造器, 用于初始化session设置, 绑定各种事件, 并进行登录调用。
+> 该类中的设置接口使用流畅接口风格, 您可以进行链式设置并最后调用`ok`进行最终提交创建。
 
 #### SessionBuilder#setNotifyAll(enable:boolean):SessionBuilder
 
@@ -205,7 +206,7 @@ session构造器, 用于初始化session设置, 绑定各种事件, 并进行登
 ### Session
 --------------------------------------------------
 
-用户登录会话, 该会话与服务器维持一个长连接, 您可以通过该类内的API进行核心的消息收发。
+> 用户登录会话, 该会话与服务器维持一个长连接, 您可以通过该类内的API进行核心的消息收发。
 
 #### Session#current():string
 
@@ -223,7 +224,7 @@ session构造器, 用于初始化session设置, 绑定各种事件, 并进行登
 ### MessageBuilder
 --------------------------------------------------
 
-消息构造器, 用于构造并最终发送消息。
+> 消息构造器, 用于构造并最终发送消息。
 
 #### MessageBuilder#asText():MessageBuilder
 
@@ -288,7 +289,7 @@ session构造器, 用于初始化session设置, 绑定各种事件, 并进行登
 ### MessageLauncher
 --------------------------------------------------
 
-消息发射器, 提交并最后发射消息。
+> 消息发射器, 提交并最后发射消息。
 
 #### MessageLauncher#ok(callback:(error)=>void):Sessiion
 
