@@ -149,6 +149,7 @@ require('maxleap-im');
 #### SessionBuilder#onSystemMessage(callback:(message)=>void):SessionBuilder
 
 绑定系统消息源。绑定该事件后, 所有的系统消息都会进行回调。其中回调句柄的参数用法:
+
 | # | 参数名 | 类型 | 说明 |
 |----|----|----|----|
 | 1 | message | SystemMessage | 消息体 |
