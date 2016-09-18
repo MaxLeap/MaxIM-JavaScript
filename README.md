@@ -8,7 +8,7 @@ V4版SDK遵循UMD规范, 兼容NodeJS和浏览器端。
 
 您可以使用如下方式集成SDK:
 
-1. 使用NPM
+### 使用NPM
 
 ```shell
 $ npm install maxleap-im --save
@@ -20,29 +20,81 @@ $ npm install maxleap-im --save
 var IM = require('maxleap-im');
 var options = {
   app: 'YOUR_APP_ID', // 应用ID
-  key: 'YOUR_API_KEY',  // 应用密钥
-  region: 'cn | us', // 服务器区域, 默认为中国区。 (可选项)
-  useHttp: true // 是否强制使用HTTP, 默认使用HTTPS。(可选项)
+  key: 'YOUR_API_KEY'  // 应用密钥
 };
-var maxim = IM(options);
+var im = IM(options);
+// ......
 ```
 
-2. 使用bower
+### 使用bower
+
+首先通过bower来安装依赖:
 
 ``` shell
 $ bower install maxleap-im --save
 ```
 
-您需要使用requirejs来载入:
+接着使用requirejs来载入:
 
 ``` javascript
-require('maxleap-im');
 
+// 初始化requirejs
+
+require.config({
+  paths: {
+    'socket.io-client': 'bower_components/socket.io-client/socket.io',
+    'fetch': 'bower_components/fetch/fetch',
+    'isomorphic-fetch': 'bower_components/isomorphic-fetch/fetch-bower',
+    'maxleap-im': 'bower_components/maxleap-im/dist'
+  }
+});
+
+require(['maxleap-im/im'],function(){
+  var opts = {
+    app: 'YOUR_APP_ID',
+      key: 'YOUR_APP_KEY'
+  };
+    
+  var im = ML.im(opts);
+   // ......
+});
+
+```
+
+### 入门
+
+以下为入门样例代码, 更高级的功能请参考下文的[API文档](#API文档)。
+
+``` javascript
+    // 通过上文的方式初始化MaxIM实例
+    im.login()
+      .simple('12345678')
+      .ok(function(error,session,context){
+        if(error){
+          console.error('login failed: %s',error.message);
+          return;
+        }
+        
+        context.listFriends(function(err,friends){
+            // process response
+        });
+        
+        session
+          .say('hello world!').toFriend('87654321') // first message
+          .ok()
+          .say('http://www.xxxxx.com/xxxx.jpg').asImage().toGroup('group1234') // second message
+          .ok(function(error){
+            session.close(function(error){
+              console.log('goodbye!');
+            });
+          });
+    });
 ```
 
 ## API文档
 
 ### IM(opts:Object):MaxIM
+--------------------------------------------------
 
 调用后对于给定的设置项初始化一个`MaxIM`实例, 该实例可以全局用于控制各种内部服务操作。`opts`设置项包含以下配置:
 
