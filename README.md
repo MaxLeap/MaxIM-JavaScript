@@ -347,3 +347,95 @@ require(['maxleap-im/im'],function(IM){
 #### MessageLauncher#ok(callback:(error)=>void):Sessiion
 
 发射消息并返回用户登录会话。当发射发生错误时, 回调句柄中的`error`对象会包含错误详情。
+
+### Admin
+
+> 管理类, 包含最高权限的一些操作封装。
+
+#### Admin#say(text:string,remark:string):MessageBuilder
+
+新建一个系统消息构造器实例。系统消息构造器可以用于构建设置并最终发送消息。`text`为您的消息文本(必填项), `remark`为本条消息的备注信息(可选项)。
+
+#### Admin#setAttributes(attributes:Object,overwrite:boolean):[AttributeBuilder](#attributebuilder)
+
+新建一个属性构造器实例。
+
+#### Admin#create():[CreateCommand](#createcommand)
+
+新建一个空白创建命令实例。您可以通过该命令来生成各种对象。
+
+#### Admin#destroy():[DestroyCommand](#destroycommand)
+
+新建一个空白的销毁命令实例。您可以通过该销毁命令来销毁各种对象。
+
+#### Admin#appendMembers(first:string,others:string...):[MemberAppendCommand](#memberappendcommand)
+
+新建一个成员追加命令。
+
+#### Admin#removeMembers(first:string,others:string...):[MemberRemoveCommand](#memberremovecommand)
+
+新建一个成员移除命令。
+
+### AttributeBuilder
+----------------------------------------
+
+> 属性构造器, 用于设置对象自定义属性。
+
+#### AttributeBuilder#forUser(userid:string,callback:(error)=>void):[Admin](#admin)
+
+将设置的属性应用于指定的用户。
+
+#### AttributeBuilder#forGroup(groupid:string,callback:(error)=>void):[Admin](#admin)
+
+将设置的属性应用于指定的群组。
+
+#### AttributeBuilder#forRoom(roomid:string,callback:(error)=>void):[Admin](#admin)
+
+将设置的属性应用于指定的聊天室。
+
+### CreateCommand
+---------------------------------------------
+
+> 对象创建命令。
+
+#### CreateCommand#group(owner:string):[GroupBuilder](#groupbuilder)
+
+新建并返回一个群组构造器, `owner`为群组创建者ID。
+
+#### CreateCommand#room():[RoomBuilder](#roombuilder)
+
+新建并返回一个聊天室构造器。
+
+### GroupBuilder
+-------------------------------------------------
+
+> 群组构造器, 用于生成新的群组。
+
+#### GroupBuilder#attribute(key:string,value:Object):[GroupBuilder](#groupbuilder)
+
+设置群组属性。
+
+#### GroupBuilder#members(first:string,others:string...):[GroupBuilder](#groupbuilder)
+
+设置群组成员。
+
+#### GroupBuilder#ok(callback:(error,groupid)=>void):[Admin](#admin)
+
+结束链式调用, 提交并创建群组并返回起始`Admin`对象。
+
+### RoomBuilder
+-------------------------------------------------
+
+> 聊天室构造器, 用于生成新的聊天室。
+
+#### RoomBuilder#attribute(key:string,value:Object):[RoomBuilder](#roombuilder)
+
+设置聊天室属性。
+
+#### RoomBuilder#members(first:string,others:string...):[RoomBuilder](#roombuilder)
+
+设置聊天室成员。
+
+#### RoomBuilder#ok(callback:(error,roomid)=>void):[Admin](#admin)
+
+结束链式调用, 提交并创建聊天室并返回起始`Admin`对象。
