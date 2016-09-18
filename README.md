@@ -93,7 +93,7 @@ require(['maxleap-im/im'],function(IM){
 
 ## API文档
 
-### IM(opts:Object):MaxIM
+### IM(opts:Object):[MaxIM](#maxim)
 --------------------------------------------------
 
 调用后对于给定的设置项初始化一个`MaxIM`实例, 该实例可以全局用于控制各种内部服务操作。`opts`设置项包含以下配置:
@@ -110,11 +110,11 @@ require(['maxleap-im/im'],function(IM){
 
 > 核心入口类
 
-#### MaxIM#login():Login
+#### MaxIM#login():[Login](#login)
 
 初始化并返回一个登录器。登录器可被用于进一步登录操作。
 
-#### MaxIM#admin():Admin
+#### MaxIM#admin():[Admin](#admin)
 
 初始化并返回一个管理器实例。管理器拥有最高级别的控制权限, 通常被用于一些系统级的控制操作。
 
@@ -123,17 +123,17 @@ require(['maxleap-im/im'],function(IM){
 
 > 登录器, 可进行登录设置并创建会话。
 
-#### Login#simple(userid:string):SessionBuilder
+#### Login#simple(userid:string):[SessionBuilder](#sessionbuilder)
 
 使用简单方式登录并返回一个session构造器实例。该登录方式仅需要一个用户ID唯一标识即可。安全级别低, 建议使用高级别的登录方式。
 
-#### Login#byMaxleapUser(username:string,password:string):SessionBuilder
+#### Login#byMaxleapUser(username:string,password:string):[SessionBuilder](#sessionbuilder)
 
 使用MaxLeap自带的账号系统登录并返回一个session构造器实例。该登录方式比较安全, 推荐使用, 您只需传统的用户名+密码方式即可登录。
 
 如果您对MaxLeap自带账号系统不太熟悉, 这里是[文档传送门](https://maxleap.cn/s/web/zh_cn/guide/usermanual/accountsystem.html)。
 
-#### Login#byPhone(phone:string,verify:string):SessionBuilder
+#### Login#byPhone(phone:string,verify:string):[SessionBuilder](#sessionbuilder)
 
 使用MaxLeap的短信验证方式登录并返回一个session构造器实例。该登录方式比较安全, 推荐使用。关于如何使用MaxLeap短信验证, 请参阅[传送门](https://maxleap.cn/s/web/zh_cn/guide/usermanual/accountsystem.html#账号服务-短信验证码验证)。
 
@@ -143,15 +143,15 @@ require(['maxleap-im/im'],function(IM){
 > session构造器, 用于初始化session设置, 绑定各种事件, 并进行登录调用。
 > 该类中的设置接口使用流畅接口风格, 您可以进行链式设置并最后调用`ok`进行最终提交创建。
 
-#### SessionBuilder#setNotifyAll(enable:boolean):SessionBuilder
+#### SessionBuilder#setNotifyAll(enable:boolean):[SessionBuilder](#sessionbuilder)
 
 启用在线/离线通知给所有人(默认禁用)。启用后该用户的上下线状态对于非好友的应用内用户也会进行状态通知。该特性可以被用于例如客服，专家问答系统等。
 
-#### SessionBuilder#setInstallation(installation:string):SessionBuilder
+#### SessionBuilder#setInstallation(installation:string):[SessionBuilder](#sessionbuilder)
 
 设置应用安装ID。应用安装ID唯一标识一台设备的一次应用安装, 该标识将被用于离线消息推送时确认唯一身份。
 
-#### SessionBuilder#onFriendMessage(callback:(userid,message)=>void):SessionBuilder
+#### SessionBuilder#onFriendMessage(callback:(userid,message)=>void):[SessionBuilder](#sessionbuilder)
 
 绑定好友消息源。绑定该事件后, 所有来自您的好友的消息都会回调。其中回调句柄的参数用法:
 
@@ -160,7 +160,7 @@ require(['maxleap-im/im'],function(IM){
 | 1 | userid | string | 好友的用户ID | |
 | 2 | message | BasicMessage | 消息体 |
 
-#### SessionBuilder#onGroupMessage(callback:(groupid,memberid,message)=>void):SessionBuilder
+#### SessionBuilder#onGroupMessage(callback:(groupid,memberid,message)=>void):[SessionBuilder](#sessionbuilder)
  
 绑定群组消息源。绑定该事件后, 所有来自您当前已加入的群组内消息都会进行回调。其中回调句柄的参数用法:
  
@@ -170,7 +170,7 @@ require(['maxleap-im/im'],function(IM){
 | 2 | memberid | string | 本消息的群组内发言人标识ID | |
 | 3 | message | BasicMessage | 消息体 |
 
-#### SessionBuilder#onRoomMessage(callback:(roomid,memberid,message)=>void):SessionBuilder
+#### SessionBuilder#onRoomMessage(callback:(roomid,memberid,message)=>void):[SessionBuilder](#sessionbuilder)
 
 绑定聊天室消息源。绑定该事件后, 所有来自您当前已加入的聊天室内的消息都会进行回调。其中回调句柄的参数用法为:
 
@@ -180,7 +180,7 @@ require(['maxleap-im/im'],function(IM){
 | 2 | memberid | string | 本消息的聊天室内发言人标识ID | |
 | 3 | message | BasicMessage | 消息体 |
 
-#### SessionBuilder#onPassengerMessage(callback:(passengerid,message)=>void):SessionBuilder
+#### SessionBuilder#onPassengerMessage(callback:(passengerid,message)=>void):[SessionBuilder](#sessionbuilder)
 
 绑定来自访客的消息源。绑定该事件后, 所有来自未注册临时访客发送给您的消息都会进行回调。其中回调句柄的参数用法为:
 
@@ -189,7 +189,7 @@ require(['maxleap-im/im'],function(IM){
 | 1 | passengerid | string | 访客标识ID | |
 | 2 | message | BasicMessage | 消息体 |
 
-#### SessionBuilder#onStrangerMessage(callback:(strangerid,message)=>void):SessionBuilder
+#### SessionBuilder#onStrangerMessage(callback:(strangerid,message)=>void):[SessionBuilder](#sessionbuilder)
 
 绑定来自陌生人的消息源。绑定该事件后, 所有来自陌生人发送给您的消息都会进行回调。其中回调句柄的参数用法:
 
@@ -198,7 +198,7 @@ require(['maxleap-im/im'],function(IM){
 | 1 | strangerid | string | 陌生人用户标识ID | |
 | 2 | message | BasicMessage | 消息体 | |
 
-#### SessionBuilder#onSystemMessage(callback:(message)=>void):SessionBuilder
+#### SessionBuilder#onSystemMessage(callback:(message)=>void):[SessionBuilder](#sessionbuilder)
 
 绑定系统消息源。绑定该事件后, 所有的系统消息都会进行回调。其中回调句柄的参数用法:
 
@@ -206,7 +206,7 @@ require(['maxleap-im/im'],function(IM){
 |----|----|----|----|
 | 1 | message | SystemMessage | 消息体 |
 
-#### SessionBuilder#onYourself(callback:(message)=>void):SessionBuilder
+#### SessionBuilder#onYourself(callback:(message)=>void):[SessionBuilder](#sessionbuilder)
 
 当您在多个终端登录后, 您可以绑定来自其他终端的另一个"你"发送的消息。其中回调句柄的参数用法:
 
@@ -214,7 +214,7 @@ require(['maxleap-im/im'],function(IM){
 |----|----|----|----|
 | 1 | message | YourselfMessage | 消息体 |
 
-#### SessionBuilder#onFriendOnline(callback:(friendid)=>void):SessionBuilder
+#### SessionBuilder#onFriendOnline(callback:(friendid)=>void):[SessionBuilder](#sessionbuilder)
 
 绑定好友上线通知。绑定事件后, 当您的某个好友上线时您会收到通知并回调。其中回调句柄的参数用法:
 
@@ -222,7 +222,7 @@ require(['maxleap-im/im'],function(IM){
 |----|----|----|----|
 | 1 | friendid | string | 好友的用户ID |
 
-#### SessionBuilder#onFriendOffline(callback:(friendid)=>void):SessionBuilder
+#### SessionBuilder#onFriendOffline(callback:(friendid)=>void):[SessionBuilder](#sessionbuilder)
 
 绑定好友离线通知。绑定事件后, 当您的某个好友离线时您会收到通知并回调。其中回调句柄的参数用法:
 
@@ -230,7 +230,7 @@ require(['maxleap-im/im'],function(IM){
 |----|----|----|----|
 | 1 | friendid | string | 好友的用户ID |
 
-#### SessionBuilder#onStrangerOnline(callback:(strangerid)=>void):SessionBuilder
+#### SessionBuilder#onStrangerOnline(callback:(strangerid)=>void):[SessionBuilder](#sessionbuilder)
 
 绑定陌生人上线通知。绑定事件后, 当某个非好友用户上线时您会收到通知并回调, **注意: 仅当对方`setNotifyAll`设置为`true`时才会生效**。其中回调句柄的参数用法:
 
@@ -238,7 +238,7 @@ require(['maxleap-im/im'],function(IM){
 |----|----|----|----|
 | 1 | strangerid | string | 陌生人用户ID |
 
-#### SessionBuilder#onStrangerOffline(callback:(strangerid)=>void):SessionBuilder
+#### SessionBuilder#onStrangerOffline(callback:(strangerid)=>void):[SessionBuilder](#sessionbuilder)
 
 绑定陌生人离线通知。绑定事件后, 当某个非好友用户离线时您会收到通知并回调, **注意: 仅当对方`setNotifyAll`设置为`true`时才会生效**。其中回调句柄的参数用法:
 
@@ -252,9 +252,9 @@ require(['maxleap-im/im'],function(IM){
 
 | # | 参数名 | 类型 | 说明 |
 |----|----|----|----|
-| 1 | error | ParrotError | 异常对象, 仅当session创建失败时非空 |
-| 2 | session | Session | Session对象 |
-| 3 | context | Context | 用户上下文, 用于控制当前登录用户的私有操作 |
+| 1 | error | [ParrotError](#parroterror) | 异常对象, 仅当session创建失败时非空 |
+| 2 | session | [Session](#session) | Session对象 |
+| 3 | context | [Context](#context) | 用户上下文, 用于控制当前登录用户的私有操作 |
 
 ### Session
 --------------------------------------------------
@@ -265,7 +265,7 @@ require(['maxleap-im/im'],function(IM){
 
 返回当前登录用户ID。
 
-#### Session#say(text:string,remark?:string):MessageBuilder
+#### Session#say(text:string,remark?:string):[MessageBuilder](#messagebuilder)
 
 新建一个消息构造器实例。消息构造器可以用于构建设置并最终发送消息。`text`为您的消息文本(必填项), `remark`为本条消息的备注信息(可选项)。
 
@@ -279,63 +279,67 @@ require(['maxleap-im/im'],function(IM){
 
 > 消息构造器, 用于构造并最终发送消息。
 
-#### MessageBuilder#asText():MessageBuilder
+#### MessageBuilder#asText():[MessageBuilder](#messagebuilder)
 
 将本条消息媒体类型设置为纯文本并返回原实例。
 
-#### MessageBuilder#asImage():MessageBuilder
+#### MessageBuilder#asImage():[MessageBuilder](#messagebuilder)
 
 将本条消息媒体类型设置为图片并返回原实例。
 
-#### MessageBuilder#asAudio():MessageBuilder
+#### MessageBuilder#asAudio():[MessageBuilder](#messagebuilder)
 
 将本条消息媒体类型设置为音频并返回原实例。
 
-#### MessageBuilder#asVideo():MessageBuilder
+#### MessageBuilder#asVideo():[MessageBuilder](#messagebuilder)
 
 将本条消息媒体类型设置为视频并返回原实例。
 
-#### MessageBuilder#disablePush():MessageBuilder
+#### MessageBuilder#disablePush():[MessageBuilder](#messagebuilder)
 
 设置本条消息禁用推送功能并返回原实例。
 
-#### MessageBuilder#setPushPrefix(prefix:string):MessageBuilder
+#### MessageBuilder#setPushPrefix(prefix:string):[MessageBuilder](#messagebuilder)
 
 设置本条消息的推送文本前缀并返回原实例。
 
-#### MessageBuilder#setPushSuffix(suffix:string):MessageBuilder
+#### MessageBuilder#setPushSuffix(suffix:string):[MessageBuilder](#messagebuilder)
 
 设置本条消息的推送文本后缀并返回原实例。
 
-#### MessageBuilder#setPushTextOverwrite(overwrite:string):MessageBuilder
+#### MessageBuilder#setPushTextOverwrite(overwrite:string):[MessageBuilder](#messagebuilder)
 
 覆盖设置本条消息的推送消息文本, 设置后原本的消息文本将会被替换。
 
-#### MessageBuilder#setPushSound(sound:string):MessageBuilder
+#### MessageBuilder#setPushSound(sound:string):[MessageBuilder](#messagebuilder)
 
-设置本条消息的推送铃声并返回原实例。**注意: 仅限IOS设备***
+设置本条消息的推送铃声并返回原实例。**注意: 仅限IOS设备**
 
-#### MessageBuilder#setPushContentAvailable(contentAvailable:boolean):MessageBuilder
+#### MessageBuilder#setPushContentAvailable(contentAvailable:boolean):[MessageBuilder](#messagebuilder)
 
-设置本条消息的`content-avaliable`并返回原实例。**注意: 仅限IOS设备***
+设置本条消息的`content-avaliable`并返回原实例。**注意: 仅限IOS设备**
 
-#### MessageBuilder#toFriend(friendid:string):MessageLauncher
+#### MessageBuilder#toAll():[MessageLauncher](#messagelauncher)
+
+设置本条消息的发送对象为所有人并返回消息发射器。`**注意: 仅限Admin使用, 用于向所有人发送系统消息!!!**
+
+#### MessageBuilder#toFriend(friendid:string):[MessageLauncher](#messagelauncher)
 
 设置本条消息的发送对象为好友并返回消息发射器。`friendid`为好友的用户ID。
 
-#### MessageBuilder#toGroup(groupid:string):MessageLauncher
+#### MessageBuilder#toGroup(groupid:string):[MessageLauncher](#messagelauncher)
 
 设置本条消息的发送对象为群组并返回消息发射器。`groupid`为群组ID。
 
-#### MessageBuilder#toRoom(roomid:string):MessageLauncher
+#### MessageBuilder#toRoom(roomid:string):[MessageLauncher](#messagelauncher)
 
 设置本条消息的发送对象为聊天室并返回消息发射器。`roomid`为聊天室ID。
 
-#### MessageBuilder#toPassenger(passengerid:string):MessageLauncher
+#### MessageBuilder#toPassenger(passengerid:string):[MessageLauncher](#messagelauncher)
 
 设置本条消息的发送对象为访客并返回消息发射器。`passengerid`为访客ID。
 
-#### MessageBuilder#toStranger(strangerid:string):MessageLauncher
+#### MessageBuilder#toStranger(strangerid:string):[MessageLauncher](#messagelauncher)
 
 设置本条消息的发送对象为陌生人并返回消息发射器。`strangerid`为陌生人用户ID。
 
@@ -344,15 +348,16 @@ require(['maxleap-im/im'],function(IM){
 
 > 消息发射器, 提交并最后发射消息。
 
-#### MessageLauncher#ok(callback:(error)=>void):Sessiion
+#### MessageLauncher#ok(callback:(error)=>void):[Sessiion](#session)
 
 发射消息并返回用户登录会话。当发射发生错误时, 回调句柄中的`error`对象会包含错误详情。
 
 ### Admin
+----------------------------------------------------
 
 > 管理类, 包含最高权限的一些操作封装。
 
-#### Admin#say(text:string,remark:string):MessageBuilder
+#### Admin#say(text:string,remark:string):[MessageBuilder](#messagebuilder)
 
 新建一个系统消息构造器实例。系统消息构造器可以用于构建设置并最终发送消息。`text`为您的消息文本(必填项), `remark`为本条消息的备注信息(可选项)。
 
@@ -439,3 +444,62 @@ require(['maxleap-im/im'],function(IM){
 #### RoomBuilder#ok(callback:(error,roomid)=>void):[Admin](#admin)
 
 结束链式调用, 提交并创建聊天室并返回起始`Admin`对象。
+
+
+### DestroyCommand
+----------------------------------------------
+
+> 对象销毁命令。用于销毁指定对象。
+
+#### DestroyCommand#group(groupid:string):[GroupDestroy](#groupdestroy)
+
+销毁群组。
+
+#### DestroyCommand#room(roomid:string):[RoomDestroy](#roomdestroy)
+
+销毁聊天室。
+
+
+### GroupDestroy
+-------------------------------------------------
+
+> 群组销毁器。
+
+#### GroupDestroy#ok(callback:(error)=>void):[Admin](#admin)
+
+结束链式调用, 提交销毁群组并返回起始`Admin`对象。
+
+### RoomDestroy
+-------------------------------------------------
+
+> 聊天室销毁器。
+
+#### RoomDestroy#ok(callback:(error)=>void):[Admin](#admin)
+
+结束链式调用, 提交销毁聊天室并返回起始`Admin`对象。
+
+### MemberAppendCommand
+-------------------------------------------------
+
+> 追加成员命令。用于向指定对象追加成员。
+
+#### MemberAppendCommand#intoGroup(groupid:string,callback:(error)=>void):[Admin](#admin)
+
+结束链式调用, 将成员加入至群组并返回原始`Admin`实例。
+
+#### MemberAppendCommand#intoRoom(roomid:string,callback:(error)=>void):[Admin](#admin)
+
+结束链式调用, 将成员加入至聊天室内并返回原始`Admin`实例。
+
+### MemberRemoveCommand
+-------------------------------------------------
+
+> 移除成员命令。用于移除指定对象内的成员。
+
+#### MemberRemoveCommand#fromGroup(groupid:string,callback:(error)=>void):[Admin](#admin)
+
+结束链式调用, 移除群组成员并返回原始`Admin`实例。
+
+#### MemberRemoveCommand#fromRoom(roomid:string,callback:(error)=>void):[Admin](#admin)
+
+结束链式调用, 移除聊天室成员并返回原始`Admin`实例。

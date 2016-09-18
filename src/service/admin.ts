@@ -378,13 +378,13 @@ interface MessageBuilder {
     setPushSuffix(suffix: string): MessageBuilder;
     setPushTextOverwrite(text: string): MessageBuilder;
 
-    toAll(): MessageLanucher;
-    toUser(userid: string): MessageLanucher;
-    toGroup(groupid: string): MessageLanucher;
-    toRoom(roomid: string): MessageLanucher;
+    toAll(): MessageLauncher;
+    toUser(userid: string): MessageLauncher;
+    toGroup(groupid: string): MessageLauncher;
+    toRoom(roomid: string): MessageLauncher;
 }
 
-interface MessageLanucher {
+interface MessageLauncher {
     ok(callback?: Callback<void>): Admin;
 }
 
@@ -472,37 +472,37 @@ class MessageBuilderImpl implements MessageBuilder {
         return undefined;
     }
 
-    toAll(): MessageLanucher {
+    toAll(): MessageLauncher {
         this.receiver = {};
-        return new MessageLanucherImpl(this.admin, this.message, this.receiver);
+        return new MessageLauncherImpl(this.admin, this.message, this.receiver);
     }
 
-    toUser(userid: string): MessageLanucher {
+    toUser(userid: string): MessageLauncher {
         this.receiver = {
             id: userid,
             type: Receiver.ACTOR
         };
-        return new MessageLanucherImpl(this.admin, this.message, this.receiver);
+        return new MessageLauncherImpl(this.admin, this.message, this.receiver);
     }
 
-    toGroup(groupid: string): MessageLanucher {
+    toGroup(groupid: string): MessageLauncher {
         this.receiver = {
             id: groupid,
             type: Receiver.GROUP
         };
-        return new MessageLanucherImpl(this.admin, this.message, this.receiver);
+        return new MessageLauncherImpl(this.admin, this.message, this.receiver);
     }
 
-    toRoom(roomid: string): MessageLanucher {
+    toRoom(roomid: string): MessageLauncher {
         this.receiver = {
             id: roomid,
             type: Receiver.ROOM
         };
-        return new MessageLanucherImpl(this.admin, this.message, this.receiver);
+        return new MessageLauncherImpl(this.admin, this.message, this.receiver);
     }
 }
 
-class MessageLanucherImpl implements MessageLanucher {
+class MessageLauncherImpl implements MessageLauncher {
 
     private admin: AdminImpl;
     private message: SystemMessageTo;
