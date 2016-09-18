@@ -10,8 +10,8 @@
     var messages_1 = require("../model/messages");
     var context_1 = require("./context");
     var io = require('socket.io-client');
-    var MessageBuilder = (function () {
-        function MessageBuilder(session, text, remark) {
+    var MessageBuilderImpl = (function () {
+        function MessageBuilderImpl(session, text, remark) {
             this.session = session;
             this.message = {
                 to: {
@@ -26,82 +26,82 @@
                 this.message.remark = remark;
             }
         }
-        MessageBuilder.prototype.asText = function () {
+        MessageBuilderImpl.prototype.asText = function () {
             this.message.content.media = messages_1.Media.TEXT;
             return this;
         };
-        MessageBuilder.prototype.asImage = function () {
+        MessageBuilderImpl.prototype.asImage = function () {
             this.message.content.media = messages_1.Media.IMAGE;
             return this;
         };
-        MessageBuilder.prototype.asAudio = function () {
+        MessageBuilderImpl.prototype.asAudio = function () {
             this.message.content.media = messages_1.Media.AUDIO;
             return this;
         };
-        MessageBuilder.prototype.asVideo = function () {
+        MessageBuilderImpl.prototype.asVideo = function () {
             this.message.content.media = messages_1.Media.VIDEO;
             return this;
         };
-        MessageBuilder.prototype.createPushIfNotExist = function () {
+        MessageBuilderImpl.prototype.createPushIfNotExist = function () {
             if (!this.message.push) {
                 this.message.push = {};
             }
             return this.message.push;
         };
-        MessageBuilder.prototype.disablePush = function () {
+        MessageBuilderImpl.prototype.disablePush = function () {
             this.createPushIfNotExist().enable = false;
             return this;
         };
-        MessageBuilder.prototype.setPushSound = function (sound) {
+        MessageBuilderImpl.prototype.setPushSound = function (sound) {
             this.createPushIfNotExist().sound = sound;
             return this;
         };
-        MessageBuilder.prototype.setPushBadge = function (badge) {
+        MessageBuilderImpl.prototype.setPushBadge = function (badge) {
             this.createPushIfNotExist().badge = badge;
             return this;
         };
-        MessageBuilder.prototype.setPushContentAvailable = function (contentAvailable) {
+        MessageBuilderImpl.prototype.setPushContentAvailable = function (contentAvailable) {
             this.createPushIfNotExist().contentAvailable = contentAvailable;
             return this;
         };
-        MessageBuilder.prototype.setPushPrefix = function (prefix) {
+        MessageBuilderImpl.prototype.setPushPrefix = function (prefix) {
             this.createPushIfNotExist().prefix = prefix;
             return this;
         };
-        MessageBuilder.prototype.setPushSuffix = function (suffix) {
+        MessageBuilderImpl.prototype.setPushSuffix = function (suffix) {
             this.createPushIfNotExist().suffix = suffix;
             return this;
         };
-        MessageBuilder.prototype.setPushTextOverwrite = function (text) {
+        MessageBuilderImpl.prototype.setPushTextOverwrite = function (text) {
             this.createPushIfNotExist().overwrite = text;
             return this;
         };
-        MessageBuilder.prototype.toFriend = function (friend) {
+        MessageBuilderImpl.prototype.toFriend = function (friend) {
             this.message.to.id = friend;
             this.message.to.type = messages_1.Receiver.ACTOR;
             return new SayBuilder(this.session, this.message);
         };
-        MessageBuilder.prototype.toGroup = function (groupid) {
+        MessageBuilderImpl.prototype.toGroup = function (groupid) {
             this.message.to.id = groupid;
             this.message.to.type = messages_1.Receiver.GROUP;
             return new SayBuilder(this.session, this.message);
         };
-        MessageBuilder.prototype.toRoom = function (roomid) {
+        MessageBuilderImpl.prototype.toRoom = function (roomid) {
             this.message.to.id = roomid;
             this.message.to.type = messages_1.Receiver.ROOM;
             return new SayBuilder(this.session, this.message);
         };
-        MessageBuilder.prototype.toPassenger = function (passengerid) {
+        MessageBuilderImpl.prototype.toPassenger = function (passengerid) {
             this.message.to.id = passengerid;
             this.message.to.type = messages_1.Receiver.PASSENGER;
             return new SayBuilder(this.session, this.message);
         };
-        MessageBuilder.prototype.toStranger = function (strangerid) {
+        MessageBuilderImpl.prototype.toStranger = function (strangerid) {
             this.message.to.id = strangerid;
             this.message.to.type = messages_1.Receiver.STRANGER;
             return new SayBuilder(this.session, this.message);
         };
-        return MessageBuilder;
+        return MessageBuilderImpl;
     }());
     var SayBuilder = (function () {
         function SayBuilder(session, message) {
@@ -313,7 +313,7 @@
             if (this.closed) {
                 throw new Error('session is closed.');
             }
-            return new MessageBuilder(this, text, remark);
+            return new MessageBuilderImpl(this, text, remark);
         };
         SessionImpl.prototype.close = function (callback) {
             if (this.closed) {
