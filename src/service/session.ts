@@ -45,7 +45,7 @@ interface LoginResult {
 }
 
 
-class MessageBuilder implements MessageBuilder {
+class MessageBuilderImpl implements MessageBuilder {
 
     message: MessageTo;
     session: SessionImpl;
@@ -407,7 +407,7 @@ class SessionImpl implements Session {
         if (this.closed) {
             throw new Error('session is closed.');
         }
-        return new MessageBuilder(this, text, remark);
+        return new MessageBuilderImpl(this, text, remark);
     }
 
     close(callback?: Callback<void>): void {
