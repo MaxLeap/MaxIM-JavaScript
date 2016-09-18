@@ -63,7 +63,7 @@ require(['maxleap-im/im'],function(){
 
 ### 入门
 
-以下为入门样例代码, 更高级的功能请参考下文的[API文档](#API文档)。
+以下为入门样例代码, 更高级的功能请参考下文的[API文档](#api文档)。
 
 ``` javascript
     // 通过上文的方式初始化MaxIM实例
