@@ -53,15 +53,21 @@ require('maxleap-im');
 | region | string (optional) | 服务器区域, 目前包含: cn(中国区), us(美国区) | 'cn' |
 | useHttp | boolean (optional) | 当设置为true时, 客户端会使用http进行连接 (默认使用https) | false |
 
-### MaxIM#login():Login
+### MaxIM
+--------------------------------------------------
+
+核心入口类
+
+#### MaxIM#login():Login
 
 初始化并返回一个登录器。登录器可被用于进一步登录操作。
 
-### MaxIM#admin():Admin
+#### MaxIM#admin():Admin
 
 初始化并返回一个管理器实例。管理器拥有最高级别的控制权限, 通常被用于一些系统级的控制操作。
 
 ### Login
+--------------------------------------------------
 
 登录器, 可进行登录设置并创建会话。
 
@@ -80,6 +86,7 @@ require('maxleap-im');
 使用MaxLeap的短信验证方式登录并返回一个session构造器实例。该登录方式比较安全, 推荐使用。关于如何使用MaxLeap短信验证, 请参阅[传送门](https://maxleap.cn/s/web/zh_cn/guide/usermanual/accountsystem.html#账号服务-短信验证码验证)。
 
 ### SessionBuilder
+--------------------------------------------------
 
 session构造器, 用于初始化session设置, 绑定各种事件, 并进行登录调用。该类中的设置接口使用流畅接口风格, 您可以进行链式设置并最后调用`ok`进行最终提交创建。
 
@@ -136,7 +143,7 @@ session构造器, 用于初始化session设置, 绑定各种事件, 并进行登
 | # | 参数名 | 类型 | 说明 |
 |----|----|----|----|
 | 1 | strangerid | string | 陌生人用户标识ID | |
-| 2 | message | BasicMessage | 消息体 |
+| 2 | message | BasicMessage | 消息体 | |
 
 #### SessionBuilder#onSystemMessage(callback:(message)=>void):SessionBuilder
 
@@ -196,6 +203,7 @@ session构造器, 用于初始化session设置, 绑定各种事件, 并进行登
 | 3 | context | Context | 用户上下文, 用于控制当前登录用户的私有操作 |
 
 ### Session
+--------------------------------------------------
 
 用户登录会话, 该会话与服务器维持一个长连接, 您可以通过该类内的API进行核心的消息收发。
 
@@ -213,6 +221,7 @@ session构造器, 用于初始化session设置, 绑定各种事件, 并进行登
 
 
 ### MessageBuilder
+--------------------------------------------------
 
 消息构造器, 用于构造并最终发送消息。
 
@@ -277,10 +286,10 @@ session构造器, 用于初始化session设置, 绑定各种事件, 并进行登
 设置本条消息的发送对象为陌生人并返回消息发射器。`strangerid`为陌生人用户ID。
 
 ### MessageLauncher
+--------------------------------------------------
 
 消息发射器, 提交并最后发射消息。
 
 #### MessageLauncher#ok(callback:(error)=>void):Sessiion
 
 发射消息并返回用户登录会话。当发射发生错误时, 回调句柄中的`error`对象会包含错误详情。
-
