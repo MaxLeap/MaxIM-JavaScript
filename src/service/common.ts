@@ -88,7 +88,7 @@ class AttachmentBuilderImpl implements AttachmentBuilder {
                 header[k] = this.apiOptions.headers[k];
             }
         }
-        header['content-type'] = 'multipart/form-data';
+        // header['content-type'] = 'multipart/form-data';
         let opts = {
             method: 'POST',
             headers: header,
