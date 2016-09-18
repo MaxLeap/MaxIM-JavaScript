@@ -2,3 +2,10 @@ bower_components
 node_modules
 src
 test
+typings
+*.log
+typings.json
+tsconfig.json
+bower.json
+gulpfile.js
+.gitignore
