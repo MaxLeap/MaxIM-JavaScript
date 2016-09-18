@@ -1,6 +1,7 @@
 bower_components
 .idea
 typings/
+*.map
 
 ### Node template
 # Logs

@@ -8,18 +8,18 @@ var __extends = (this && this.__extends) || function (d, b) {
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
     else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "isomorphic-fetch"], factory);
+        define(["require", "exports", "isomorphic-fetch", "../helper/utils"], factory);
     }
 })(function (require, exports) {
     "use strict";
     var fetch = require("isomorphic-fetch");
+    var utils_1 = require("../helper/utils");
     var AttachmentBuilderImpl = (function () {
         function AttachmentBuilderImpl(apiOptions, attachment) {
             this.apiOptions = apiOptions;
             this.attachment = attachment;
         }
         AttachmentBuilderImpl.prototype.ok = function (callback) {
-            //TODO
             var data = new FormData();
             data.append('attachment', this.attachment);
             var url = this.apiOptions.server + "/attachment";
@@ -29,7 +29,7 @@ var __extends = (this && this.__extends) || function (d, b) {
                     header[k] = this.apiOptions.headers[k];
                 }
             }
-            header['content-type'] = 'multipart/form-data;';
+            header['content-type'] = 'multipart/form-data';
             var opts = {
                 method: 'POST',
                 headers: header,
@@ -37,15 +37,15 @@ var __extends = (this && this.__extends) || function (d, b) {
             };
             fetch(url, opts)
                 .then(function (response) {
-                if (successful(response)) {
-                    return response.json();
-                }
-                else {
-                    throw new Error("error: " + response.status);
-                }
+                return response.json().then(function (json) { return [response.ok, json]; });
             })
-                .then(function (results) {
-                callback(null, results);
+                .then(function (res) {
+                if (!res[0]) {
+                    throw new utils_1.ParrotError(res[1]);
+                }
+                else if (callback) {
+                    callback(null, res[1]);
+                }
             })
                 .catch(function (e) {
                 if (callback) {
@@ -55,10 +55,6 @@ var __extends = (this && this.__extends) || function (d, b) {
         };
         return AttachmentBuilderImpl;
     }());
-    function successful(response) {
-        return response.status > 199 && response.status < 300;
-    }
-    exports.successful = successful;
     var GetAttributesBuilderImpl = (function () {
         function GetAttributesBuilderImpl(common, id, attr) {
             this.common = common;
@@ -76,18 +72,20 @@ var __extends = (this && this.__extends) || function (d, b) {
             };
             fetch(url, opts)
                 .then(function (response) {
-                if (successful(response)) {
-                    return response.json();
-                }
-                else {
-                    throw new Error("error: " + response.status);
-                }
+                return response.json().then(function (result) { return [response.ok, result]; });
             })
-                .then(function (result) {
-                callback(null, result);
+                .then(function (res) {
+                if (!res[0]) {
+                    throw new utils_1.ParrotError(res[1]);
+                }
+                else if (callback) {
+                    callback(null, res[1]);
+                }
             })
                 .catch(function (e) {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
         };
         GetAttributesBuilderImpl.prototype.forUser = function (callback) {
@@ -129,18 +127,20 @@ var __extends = (this && this.__extends) || function (d, b) {
             };
             fetch(url, opts)
                 .then(function (response) {
-                if (successful(response)) {
-                    return response.json();
-                }
-                else {
-                    throw new Error("error: " + response.status);
-                }
+                return response.json().then(function (result) { return [response.ok, result]; });
             })
-                .then(function (result) {
-                callback(null, result);
+                .then(function (res) {
+                if (!res[0]) {
+                    throw new utils_1.ParrotError(res[1]);
+                }
+                else if (callback) {
+                    callback(null, res[1]);
+                }
             })
                 .catch(function (e) {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
         };
         LoadBuilderImpl.prototype.forUser = function (callback) {
@@ -179,16 +179,14 @@ var __extends = (this && this.__extends) || function (d, b) {
             };
             fetch(url, opts)
                 .then(function (response) {
-                if (successful(response)) {
-                    return response.json();
-                }
-                else {
-                    throw new Error("err: " + response.status);
-                }
+                return response.json().then(function (result) { return [response.ok, result]; });
             })
-                .then(function (results) {
-                if (callback) {
-                    callback(null, results);
+                .then(function (res) {
+                if (!res[0]) {
+                    throw new utils_1.ParrotError(res[1]);
+                }
+                else if (callback) {
+                    callback(null, res[1]);
                 }
             })
                 .catch(function (e) {

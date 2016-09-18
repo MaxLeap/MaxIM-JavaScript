@@ -1,5 +1,6 @@
 import {UserDetail, GroupInfo, RoomInfo, UserOutline, Passenger, APIOptions, Callback} from "../model/models";
 import * as fetch from "isomorphic-fetch";
+import {ParrotError} from "../helper/utils";
 
 interface SearchBuilder {
     forUsers(callback: Callback<UserOutline[]>);
@@ -49,7 +50,7 @@ interface CommonService {
      * 上传附件
      * @param attachment
      */
-    attachment(attachment: File): AttachmentBuilder;
+    attachment(attachment: File|Blob): AttachmentBuilder;
 }
 
 interface AttachmentBuilder {
@@ -67,19 +68,17 @@ interface SearchOptions {
     sort?: string[];
 }
 
-
 class AttachmentBuilderImpl implements AttachmentBuilder {
 
     private apiOptions: APIOptions;
-    private attachment: File;
+    private attachment: File|Blob;
 
-    constructor(apiOptions: APIOptions, attachment: File) {
+    constructor(apiOptions: APIOptions, attachment: File|Blob) {
         this.apiOptions = apiOptions;
         this.attachment = attachment;
     }
 
     ok(callback?: Callback<string[]>): void {
-        //TODO
         let data: FormData = new FormData();
         data.append('attachment', this.attachment);
         let url = `${this.apiOptions.server}/attachment`;
@@ -89,7 +88,7 @@ class AttachmentBuilderImpl implements AttachmentBuilder {
                 header[k] = this.apiOptions.headers[k];
             }
         }
-        header['content-type'] = 'multipart/form-data;';
+        header['content-type'] = 'multipart/form-data';
         let opts = {
             method: 'POST',
             headers: header,
@@ -97,14 +96,14 @@ class AttachmentBuilderImpl implements AttachmentBuilder {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    return response.json();
-                } else {
-                    throw new Error(`error: ${response.status}`);
-                }
+                return response.json().then(json => [response.ok, json]);
             })
-            .then(results => {
-                callback(null, results as string[]);
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, res[1] as string[]);
+                }
             })
             .catch(e => {
                 if (callback) {
@@ -112,10 +111,6 @@ class AttachmentBuilderImpl implements AttachmentBuilder {
                 }
             });
     }
-}
-
-function successful(response: Response): boolean {
-    return response.status > 199 && response.status < 300;
 }
 
 class GetAttributesBuilderImpl implements GetAttributesBuilder {
@@ -131,7 +126,6 @@ class GetAttributesBuilderImpl implements GetAttributesBuilder {
     }
 
     private forAttr(path: string, callback: Callback<any>) {
-
         let url = `${this.common.options().server}${path}/attributes`;
         if (this.attr) {
             url += `/${this.attr}`;
@@ -142,17 +136,20 @@ class GetAttributesBuilderImpl implements GetAttributesBuilder {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    return response.json();
-                } else {
-                    throw new Error(`error: ${response.status}`);
-                }
+                return response.json().then(result => [response.ok, result]);
             })
-            .then(result => {
-                callback(null, result);
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, res[1]);
+                }
+
             })
             .catch(e => {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
     }
 
@@ -199,17 +196,19 @@ class LoadBuilderImpl extends Builder<LoadOptions> implements LoadBuilder {
 
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    return response.json();
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, res[1] as T);
                 }
             })
-            .then(result => {
-                callback(null, result as T);
-            })
             .catch(e => {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
     }
 
@@ -250,15 +249,13 @@ class SearchBuilderImpl extends Builder<SearchOptions> implements SearchBuilder 
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    return response.json();
-                } else {
-                    throw new Error(`err: ${response.status}`);
-                }
+                return response.json().then(result => [response.ok, result]);
             })
-            .then(results => {
-                if (callback) {
-                    callback(null, results as T);
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, res[1] as T);
                 }
             })
             .catch(e => {
@@ -321,7 +318,6 @@ class CommonServiceImpl implements CommonService {
 }
 
 export {
-    successful,
     CommonService,
     CommonServiceImpl
 }

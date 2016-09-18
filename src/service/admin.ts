@@ -1,7 +1,8 @@
-import {CommonService, CommonServiceImpl, successful} from "./common";
+import {CommonService, CommonServiceImpl} from "./common";
 import {SystemMessageTo, Media, Receiver, PushSettings} from "../model/messages";
 import {Attributes, Callback} from "../model/models";
 import * as fetch from "isomorphic-fetch";
+import {ParrotError} from "../helper/utils";
 
 export interface Admin extends CommonService {
     /**
@@ -73,12 +74,13 @@ class GroupDestroyImpl implements GroupDestroy {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    if (callback) {
-                        callback(null, null);
-                    }
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, null);
                 }
             })
             .catch(e => {
@@ -112,12 +114,13 @@ class RoomDestroyImpl implements RoomDestroy {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    if (callback) {
-                        callback(null, null);
-                    }
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, null);
                 }
             })
             .catch(e => {
@@ -127,7 +130,6 @@ class RoomDestroyImpl implements RoomDestroy {
             });
         return this.admin;
     }
-
 }
 
 class DestroyCommandImpl implements DestroyCommand {
@@ -217,17 +219,23 @@ class GroupBuilderImpl implements GroupBuilder {
 
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    return response.json();
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
                 } else {
-                    throw new Error(`error: ${response.status}`);
+                    return res[1];
                 }
             })
             .then(groupid => {
                 this.admin
                     .setAttributes(this.attributes)
                     .forGroup(groupid, (err) => {
-                        if (err && callback) {
+                        if (!callback) {
+                            return;
+                        }
+                        if (err) {
                             callback(err);
                         } else {
                             callback(null, groupid);
@@ -278,12 +286,13 @@ class MemberAppendCommandImpl implements MemberAppendCommand {
 
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    if (callback) {
-                        callback(null, null);
-                    }
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, null);
                 }
             })
             .catch(e => {
@@ -328,12 +337,13 @@ class MemberRemoveCommandImpl implements MemberRemoveCommand {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    if (callback) {
-                        callback(null, null);
-                    }
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, null);
                 }
             })
             .catch(e => {
@@ -532,12 +542,13 @@ class MessageLanucherImpl implements MessageLanucher {
 
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    if (callback) {
-                        callback(null, null);
-                    }
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, null);
                 }
             })
             .catch(e => {
@@ -577,14 +588,12 @@ class AttributeBuilderImpl implements AttributeBuilder {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    return response.json();
-                } else {
-                    throw new Error(`error: ${response.status}`);
-                }
+                return response.json().then(result => [response.ok, result]);
             })
-            .then(() => {
-                if (callback) {
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
                     callback(null, null);
                 }
             })
@@ -659,10 +668,13 @@ class RoomBuilderImpl implements RoomBuilder {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    return response.json();
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
                 } else {
-                    throw new Error(`error: ${response.status}`);
+                    return res[1];
                 }
             })
             .then(roomid => {
@@ -672,18 +684,19 @@ class RoomBuilderImpl implements RoomBuilder {
                     body: JSON.stringify(this.attributes),
                     headers: op.headers
                 };
-                return fetch(url, opts)
-                    .then(response => {
-                        if (successful(response)) {
-                            return roomid;
-                        } else {
-                            throw new Error(`error : ${response.status}`);
-                        }
-                    });
+                return fetch(url, opts).then(response => {
+                    if (response.ok) {
+                        return [true, roomid];
+                    } else {
+                        return response.json().then(result => [false, result]);
+                    }
+                });
             })
-            .then(roomid => {
-                if (callback) {
-                    callback(null, roomid);
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, res[1]);
                 }
             })
             .catch(e => {

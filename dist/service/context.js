@@ -8,12 +8,13 @@ var __extends = (this && this.__extends) || function (d, b) {
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
     else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "./common", "isomorphic-fetch"], factory);
+        define(["require", "exports", "./common", "isomorphic-fetch", "../helper/utils"], factory);
     }
 })(function (require, exports) {
     "use strict";
     var common_1 = require("./common");
     var fetch = require("isomorphic-fetch");
+    var utils_1 = require("../helper/utils");
     /**
      * TalkingBuilder实现类
      */
@@ -42,18 +43,20 @@ var __extends = (this && this.__extends) || function (d, b) {
             };
             fetch(url, opts)
                 .then(function (response) {
-                if (common_1.successful(response)) {
-                    return response.json();
-                }
-                else {
-                    throw new Error("error: " + response.status);
-                }
+                return response.json().then(function (result) { return [response.ok, result]; });
             })
-                .then(function (result) {
-                callback(null, result);
+                .then(function (res) {
+                if (!res[0]) {
+                    throw new utils_1.ParrotError(res[1]);
+                }
+                else if (callback) {
+                    callback(null, res[1]);
+                }
             })
                 .catch(function (e) {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
             return this.context;
         };
@@ -103,18 +106,20 @@ var __extends = (this && this.__extends) || function (d, b) {
             };
             fetch(url, opts)
                 .then(function (response) {
-                if (common_1.successful(response)) {
-                    return response.json();
-                }
-                else {
-                    throw new Error("error: " + response.status);
-                }
+                return response.json().then(function (result) { return [response.ok, result]; });
             })
-                .then(function (result) {
-                callback(null, result);
+                .then(function (res) {
+                if (!res[0]) {
+                    throw new utils_1.ParrotError(res[1]);
+                }
+                else if (callback) {
+                    callback(null, res[1]);
+                }
             })
                 .catch(function (e) {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
             return this;
         };
@@ -147,13 +152,14 @@ var __extends = (this && this.__extends) || function (d, b) {
             };
             fetch(url, opts)
                 .then(function (response) {
-                if (common_1.successful(response)) {
-                    if (callback) {
-                        callback(null, true);
-                    }
+                return response.json().then(function (result) { return [response.ok, result]; });
+            })
+                .then(function (res) {
+                if (!res[0]) {
+                    throw new utils_1.ParrotError(res[1]);
                 }
-                else {
-                    throw new Error("error: " + response.status);
+                else if (callback) {
+                    callback(null, null);
                 }
             })
                 .catch(function (e) {
@@ -171,13 +177,14 @@ var __extends = (this && this.__extends) || function (d, b) {
             };
             fetch(url, opts)
                 .then(function (response) {
-                if (common_1.successful(response)) {
-                    if (callback) {
-                        callback(null, true);
-                    }
+                return response.json().then(function (result) { return [response.ok, result]; });
+            })
+                .then(function (res) {
+                if (!res[0]) {
+                    throw new utils_1.ParrotError(res[1]);
                 }
-                else {
-                    throw new Error("error: " + response.status);
+                else if (callback) {
+                    callback(null, null);
                 }
             })
                 .catch(function (e) {
@@ -195,13 +202,14 @@ var __extends = (this && this.__extends) || function (d, b) {
             };
             fetch(url, opts)
                 .then(function (response) {
-                if (common_1.successful(response)) {
-                    if (callback) {
-                        callback(null, true);
-                    }
+                return response.json().then(function (result) { return [response.ok, result]; });
+            })
+                .then(function (res) {
+                if (!res[0]) {
+                    throw new utils_1.ParrotError(res[1]);
                 }
-                else {
-                    throw new Error("error: " + response.status);
+                else if (callback) {
+                    callback(null, null);
                 }
             })
                 .catch(function (e) {
@@ -222,16 +230,14 @@ var __extends = (this && this.__extends) || function (d, b) {
             };
             fetch(url, opts)
                 .then(function (response) {
-                if (common_1.successful(response)) {
-                    return true;
-                }
-                else {
-                    throw new Error("error: " + response.status);
-                }
+                return response.json().then(function (result) { return [response.ok, result]; });
             })
-                .then(function (result) {
-                if (callback) {
-                    callback(null, result);
+                .then(function (res) {
+                if (!res[0]) {
+                    throw new utils_1.ParrotError(res[1]);
+                }
+                else if (callback) {
+                    callback(null, null);
                 }
             })
                 .catch(function (e) {
@@ -262,13 +268,14 @@ var __extends = (this && this.__extends) || function (d, b) {
             };
             fetch(url, opts)
                 .then(function (response) {
-                if (common_1.successful(response)) {
-                    if (callback) {
-                        callback(null, null);
-                    }
+                return response.json().then(function (result) { return [response.ok, result]; });
+            })
+                .then(function (res) {
+                if (!res[0]) {
+                    throw new utils_1.ParrotError(res[1]);
                 }
-                else {
-                    throw new Error("error: " + response.status);
+                else if (callback) {
+                    callback(null, null);
                 }
             })
                 .catch(function (e) {

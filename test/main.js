@@ -12,7 +12,7 @@ require(['maxim/im'], function () {
     var config = {
         app: '56a86320e9db7300015438f7',
         key: 'bWU4SS1uUEx6Z3lqeGwzMVdhRXVrZw',
-        region: 'uat',
+        region: 'test',
         useHttp: true
     };
     var im = ML.im(config);
@@ -22,9 +22,20 @@ require(['maxim/im'], function () {
             console.error('login failed: %s', err);
         } else {
             document.getElementById('upload').addEventListener('click', function (e) {
-                let file = document.getElementById('attachment').files[0];
-                context.attachment(file).ok(function (urls) {
+                var file = document.getElementById('attachment').files[0];
+                context.attachment(file).ok(function (err, urls) {
                     console.log('upload success: %s', urls);
+                });
+            });
+
+            document.getElementById('blobUpload').addEventListener('click', function (e) {
+                var testblob = new Blob(['hello world!'], {type: 'text/plain'});
+                context.attachment(testblob).ok(function (err, urls) {
+                    if(err){
+                        console.error('upload by blob failed: %s',err.message);
+                    }else{
+                        console.log('upload by blob success: %s', urls);
+                    }
                 });
             });
 

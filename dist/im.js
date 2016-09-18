@@ -23,7 +23,7 @@
                 case 'cn':
                     server = 'im.maxleap.cn';
                     break;
-                case 'uat':
+                case 'test':
                     server = 'imuat.maxleap.cn';
                     break;
                 default:

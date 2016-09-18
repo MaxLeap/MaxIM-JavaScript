@@ -1,6 +1,7 @@
-import {CommonServiceImpl, successful} from "./common";
+import {CommonServiceImpl} from "./common";
 import {Friend, MyGroup, RoomInfo, ChatRecord, Attributes, APIOptions, Callback} from "../model/models";
 import * as fetch from "isomorphic-fetch";
+import {ParrotError} from "../helper/utils";
 
 interface TalkingBuilder {
     ofFriend(friendid: string, callback?: Callback<ChatRecord[]>): Context;
@@ -41,37 +42,37 @@ export interface Context {
      * @param userid 好友用户ID
      * @param callback
      */
-    joinFriend(userid: string, callback?: Callback<boolean>): Context;
+    joinFriend(userid: string, callback?: Callback<void>): Context;
     /**
      * 加入某个群组
      * @param groupid 群组ID
      * @param callback
      */
-    joinGroup(groupid: string, callback?: Callback<boolean>): Context;
+    joinGroup(groupid: string, callback?: Callback<void>): Context;
     /**
      * 加入某个聊天室
      * @param roomid 聊天室ID
      * @param callback
      */
-    joinRoom(roomid: string, callback?: Callback<boolean>): Context;
+    joinRoom(roomid: string, callback?: Callback<void>): Context;
     /**
      * 解除某个好友
      * @param userid 好友ID
      * @param callback
      */
-    leaveFriend(userid: string, callback?: Callback<boolean>): Context;
+    leaveFriend(userid: string, callback?: Callback<void>): Context;
     /**
      * 离开某个群组
      * @param groupid 群组ID
      * @param callback
      */
-    leaveGroup(groupid: string, callback?: Callback<boolean>): Context;
+    leaveGroup(groupid: string, callback?: Callback<void>): Context;
     /**
      * 离开某个聊天室
      * @param roomid 聊天室ID
      * @param callback
      */
-    leaveRoom(roomid: string, callback?: Callback<boolean>): Context;
+    leaveRoom(roomid: string, callback?: Callback<void>): Context;
 
     /**
      * 设置当前上下文用户的属性
@@ -141,17 +142,19 @@ class TalkingBuilderImpl implements TalkingBuilder {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    return response.json();
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, res[1] as ChatRecord[]);
                 }
             })
-            .then(result => {
-                callback(null, result as ChatRecord[]);
-            })
             .catch(e => {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
         return this.context;
     }
@@ -208,17 +211,19 @@ export class ContextImpl extends CommonServiceImpl implements Context {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    return response.json();
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, res[1] as T);
                 }
             })
-            .then(result => {
-                callback(null, result as T);
-            })
             .catch(e => {
-                callback(e);
+                if (callback) {
+                    callback(e);
+                }
             });
         return this;
     }
@@ -247,7 +252,7 @@ export class ContextImpl extends CommonServiceImpl implements Context {
         return this.listSomething(path, callback);
     }
 
-    public joinFriend(userid: string, callback?: Callback<boolean>): Context {
+    public joinFriend(userid: string, callback?: Callback<void>): Context {
         let url = `${super.options().server}/ctx/${this.you}/friends/${userid}`;
         let opts = {
             method: 'POST',
@@ -255,12 +260,13 @@ export class ContextImpl extends CommonServiceImpl implements Context {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    if (callback) {
-                        callback(null, true);
-                    }
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, null);
                 }
             })
             .catch(e => {
@@ -271,7 +277,7 @@ export class ContextImpl extends CommonServiceImpl implements Context {
         return this;
     }
 
-    public joinGroup(groupid: string, callback?: Callback<boolean>): Context {
+    public joinGroup(groupid: string, callback?: Callback<void>): Context {
         let url = `${super.options().server}/groups/${groupid}/members/${this.you}`;
 
         let opts = {
@@ -281,12 +287,13 @@ export class ContextImpl extends CommonServiceImpl implements Context {
 
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    if (callback) {
-                        callback(null, true);
-                    }
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, null);
                 }
             })
             .catch(e=> {
@@ -297,7 +304,7 @@ export class ContextImpl extends CommonServiceImpl implements Context {
         return this;
     }
 
-    public joinRoom(roomid: string, callback?: Callback<boolean>): Context {
+    public joinRoom(roomid: string, callback?: Callback<void>): Context {
         let url = `${super.options().server}/rooms/${roomid}/members/${this.you}`;
 
         let opts = {
@@ -307,12 +314,13 @@ export class ContextImpl extends CommonServiceImpl implements Context {
 
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    if (callback) {
-                        callback(null, true);
-                    }
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, null);
                 }
             })
             .catch(e => {
@@ -327,7 +335,7 @@ export class ContextImpl extends CommonServiceImpl implements Context {
         return new TalkingBuilderImpl(this, endTimestamp || 0, size || 0, this.you, super.options());
     }
 
-    private deleteSomething(path: string, callback: Callback<boolean>): Context {
+    private deleteSomething(path: string, callback: Callback<void>): Context {
         let url = `${super.options().server}${path}`;
         let opts = {
             method: 'DELETE',
@@ -335,15 +343,13 @@ export class ContextImpl extends CommonServiceImpl implements Context {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    return true;
-                } else {
-                    throw new Error(`error: ${response.status}`);
-                }
+                return response.json().then(result => [response.ok, result]);
             })
-            .then(result => {
-                if (callback) {
-                    callback(null, result);
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, null);
                 }
             })
             .catch(e=> {
@@ -354,17 +360,17 @@ export class ContextImpl extends CommonServiceImpl implements Context {
         return this;
     }
 
-    public leaveFriend(userid: string, callback?: Callback<boolean>): Context {
+    public leaveFriend(userid: string, callback?: Callback<void>): Context {
         let path = `/ctx/${this.you}/friends/${userid}`;
         return this.deleteSomething(path, callback);
     }
 
-    public leaveGroup(groupid: string, callback?: Callback<boolean>): Context {
+    public leaveGroup(groupid: string, callback?: Callback<void>): Context {
         let path = `/groups/${groupid}/members/${this.you}`;
         return this.deleteSomething(path, callback);
     }
 
-    public leaveRoom(roomid: string, callback?: Callback<boolean>): Context {
+    public leaveRoom(roomid: string, callback?: Callback<void>): Context {
         let path = `/rooms/${roomid}/members/${this.you}`;
         return this.deleteSomething(path, callback);
     }
@@ -378,12 +384,13 @@ export class ContextImpl extends CommonServiceImpl implements Context {
         };
         fetch(url, opts)
             .then(response => {
-                if (successful(response)) {
-                    if (callback) {
-                        callback(null, null);
-                    }
-                } else {
-                    throw new Error(`error: ${response.status}`);
+                return response.json().then(result => [response.ok, result]);
+            })
+            .then(res => {
+                if (!res[0]) {
+                    throw new ParrotError(res[1]);
+                } else if (callback) {
+                    callback(null, null);
                 }
             })
             .catch(e=> {
