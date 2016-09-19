@@ -9,7 +9,8 @@ import {
     BasicMessageFrom
 } from "../model/messages";
 import {Context, ContextImpl} from "./context";
-import {APIOptions, Handler2, Handler3, Handler1, Callback, Callback2} from "../model/models";
+import {APIOptions, Handler2, Handler3, Handler1, Callback, Callback2, LoginResult} from "../model/models";
+import {convert2basic} from "../helper/utils";
 import io = require('socket.io-client');
 import Socket = SocketIOClient.Socket;
 
@@ -37,13 +38,6 @@ interface MessageBuilder {
 interface MessageLauncher {
     ok(callback?: Callback<void>): Session;
 }
-
-interface LoginResult {
-    success: boolean;
-    id?: string;
-    error?: number;
-}
-
 
 class MessageBuilderImpl implements MessageBuilder {
 
@@ -131,36 +125,36 @@ class MessageBuilderImpl implements MessageBuilder {
     toFriend(friend: string): MessageLauncher {
         this.message.to.id = friend;
         this.message.to.type = Receiver.ACTOR;
-        return new SayBuilder(this.session, this.message);
+        return new MessageLauncherImpl(this.session, this.message);
     }
 
     toGroup(groupid: string): MessageLauncher {
         this.message.to.id = groupid;
         this.message.to.type = Receiver.GROUP;
-        return new SayBuilder(this.session, this.message);
+        return new MessageLauncherImpl(this.session, this.message);
     }
 
     toRoom(roomid: string): MessageLauncher {
         this.message.to.id = roomid;
         this.message.to.type = Receiver.ROOM;
-        return new SayBuilder(this.session, this.message);
+        return new MessageLauncherImpl(this.session, this.message);
     }
 
     toPassenger(passengerid: string): MessageLauncher {
         this.message.to.id = passengerid;
         this.message.to.type = Receiver.PASSENGER;
-        return new SayBuilder(this.session, this.message);
+        return new MessageLauncherImpl(this.session, this.message);
     }
 
     toStranger(strangerid: string): MessageLauncher {
         this.message.to.id = strangerid;
         this.message.to.type = Receiver.STRANGER;
-        return new SayBuilder(this.session, this.message);
+        return new MessageLauncherImpl(this.session, this.message);
     }
 
 }
 
-class SayBuilder implements MessageLauncher {
+class MessageLauncherImpl implements MessageLauncher {
 
     session: SessionImpl;
     message: MessageTo;
@@ -285,16 +279,6 @@ export class SessionBuilderImpl implements SessionBuilder {
         return this;
     }
 
-    private static convert(origin: MessageFrom): BasicMessageFrom {
-        let ret: BasicMessageFrom = {
-            content: origin.content,
-            ts: origin.ts
-        };
-        if (origin.remark != null) {
-            ret.remark = origin.remark;
-        }
-        return ret;
-    }
 
     ok(callback: Callback2<Session,Context>) {
         let url = `${this.apiOptions.server}/chat`;
@@ -315,7 +299,7 @@ export class SessionBuilderImpl implements SessionBuilder {
 
         socket.on('message', income => {
             let msg = income as MessageFrom;
-            let basicmsg = SessionBuilderImpl.convert(msg);
+            let basicmsg = convert2basic(msg);
             switch (msg.from.type) {
                 case Receiver.ACTOR:
                     for (let handler of this.friends) {
@@ -372,7 +356,7 @@ export class SessionBuilderImpl implements SessionBuilder {
         });
 
         socket.on('sys', income => {
-            let msg = income as SystemMessageFrom;
+            let msg = income as BasicMessageFrom;
             for (let handler of this.systems) {
                 handler(msg);
             }

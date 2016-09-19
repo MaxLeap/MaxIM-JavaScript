@@ -1,4 +1,3 @@
-// Define all message struct.
 (function (factory) {
     if (typeof module === 'object' && typeof module.exports === 'object') {
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
@@ -8,7 +7,6 @@
     }
 })(function (require, exports) {
     "use strict";
-    // Message media type:  0=text,1=image,2=audio,3=video
     (function (Media) {
         Media[Media["TEXT"] = 0] = "TEXT";
         Media[Media["IMAGE"] = 1] = "IMAGE";

@@ -1,5 +1,5 @@
 import {CommonServiceImpl, CommonService} from "./common";
-import {Friend, MyGroup, RoomInfo, ChatRecord, Attributes, APIOptions, Callback} from "../model/models";
+import {Friend, MyGroup, RoomInfo, ChatRecord, Attributes, APIOptions, Callback, UserOutline} from "../model/models";
 import * as fetch from "isomorphic-fetch";
 import {ParrotError} from "../helper/utils";
 
@@ -10,7 +10,7 @@ interface TalkingBuilder {
     ofPassenger(passengerid: string, callback?: Callback<ChatRecord[]>): Context;
 }
 
-export interface Context extends CommonService{
+export interface Context extends CommonService {
 
     /**
      * 列出好友详情
@@ -29,6 +29,14 @@ export interface Context extends CommonService{
      * @param callback
      */
     listRooms(callback?: Callback<RoomInfo[]>): Context;
+
+    /**
+     * 列出关联的陌生人列表, 分页查询
+     * @param callback
+     * @param skip
+     * @param limit
+     */
+    listStrangers(callback: Callback<UserOutline[]>, skip?: number, limit?: number): Context;
 
     /**
      * 查询聊天记录
@@ -249,6 +257,21 @@ export class ContextImpl extends CommonServiceImpl implements Context {
             return this;
         }
         let path = `/ctx/${this.you}/rooms?detail`;
+        return this.listSomething(path, callback);
+    }
+
+    public listStrangers(callback: Callback<UserOutline[]>, skip?: number, limit?: number): Context {
+        if (!callback) {
+            return this;
+        }
+        let path = `/ctx/${this.you}/strangers?detail`;
+
+        if (skip) {
+            path += `&skip=${skip}`;
+        }
+        if (limit) {
+            path += `&limit=${limit}`;
+        }
         return this.listSomething(path, callback);
     }
 

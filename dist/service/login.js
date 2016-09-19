@@ -9,9 +9,6 @@
     "use strict";
     var session_1 = require("./session");
     var md5_1 = require("../helper/md5");
-    /**
-     * 登录器实现类
-     */
     var LoginImpl = (function () {
         function LoginImpl(apiOptions) {
             this._options = apiOptions;

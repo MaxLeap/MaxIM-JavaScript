@@ -3,12 +3,13 @@
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
     else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "../model/messages", "./context", 'socket.io-client'], factory);
+        define(["require", "exports", "../model/messages", "./context", "../helper/utils", 'socket.io-client'], factory);
     }
 })(function (require, exports) {
     "use strict";
     var messages_1 = require("../model/messages");
     var context_1 = require("./context");
+    var utils_1 = require("../helper/utils");
     var io = require('socket.io-client');
     var MessageBuilderImpl = (function () {
         function MessageBuilderImpl(session, text, remark) {
@@ -79,36 +80,36 @@
         MessageBuilderImpl.prototype.toFriend = function (friend) {
             this.message.to.id = friend;
             this.message.to.type = messages_1.Receiver.ACTOR;
-            return new SayBuilder(this.session, this.message);
+            return new MessageLauncherImpl(this.session, this.message);
         };
         MessageBuilderImpl.prototype.toGroup = function (groupid) {
             this.message.to.id = groupid;
             this.message.to.type = messages_1.Receiver.GROUP;
-            return new SayBuilder(this.session, this.message);
+            return new MessageLauncherImpl(this.session, this.message);
         };
         MessageBuilderImpl.prototype.toRoom = function (roomid) {
             this.message.to.id = roomid;
             this.message.to.type = messages_1.Receiver.ROOM;
-            return new SayBuilder(this.session, this.message);
+            return new MessageLauncherImpl(this.session, this.message);
         };
         MessageBuilderImpl.prototype.toPassenger = function (passengerid) {
             this.message.to.id = passengerid;
             this.message.to.type = messages_1.Receiver.PASSENGER;
-            return new SayBuilder(this.session, this.message);
+            return new MessageLauncherImpl(this.session, this.message);
         };
         MessageBuilderImpl.prototype.toStranger = function (strangerid) {
             this.message.to.id = strangerid;
             this.message.to.type = messages_1.Receiver.STRANGER;
-            return new SayBuilder(this.session, this.message);
+            return new MessageLauncherImpl(this.session, this.message);
         };
         return MessageBuilderImpl;
     }());
-    var SayBuilder = (function () {
-        function SayBuilder(session, message) {
+    var MessageLauncherImpl = (function () {
+        function MessageLauncherImpl(session, message) {
             this.session = session;
             this.message = message;
         }
-        SayBuilder.prototype.ok = function (callback) {
+        MessageLauncherImpl.prototype.ok = function (callback) {
             try {
                 this.session.socket.emit('say', this.message);
                 if (callback) {
@@ -122,7 +123,7 @@
             }
             return this.session;
         };
-        return SayBuilder;
+        return MessageLauncherImpl;
     }());
     var SessionBuilderImpl = (function () {
         function SessionBuilderImpl(apiOptions, authdata) {
@@ -192,16 +193,6 @@
             this.yourselfs.push(handler);
             return this;
         };
-        SessionBuilderImpl.convert = function (origin) {
-            var ret = {
-                content: origin.content,
-                ts: origin.ts
-            };
-            if (origin.remark != null) {
-                ret.remark = origin.remark;
-            }
-            return ret;
-        };
         SessionBuilderImpl.prototype.ok = function (callback) {
             var _this = this;
             var url = this.apiOptions.server + "/chat";
@@ -222,7 +213,7 @@
             });
             socket.on('message', function (income) {
                 var msg = income;
-                var basicmsg = SessionBuilderImpl.convert(msg);
+                var basicmsg = utils_1.convert2basic(msg);
                 switch (msg.from.type) {
                     case messages_1.Receiver.ACTOR:
                         for (var _i = 0, _a = _this.friends; _i < _a.length; _i++) {

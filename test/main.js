@@ -17,6 +17,25 @@ require(['maxim/im'], function (IM) {
     };
     var im = IM(config);
 
+    /*
+     im.passenger('ea55b1b3dd9b47ceaf63ab68a7c89fe3')
+     .onUserMessage(function (userid, msg) {
+     console.log('from user %s: %s', userid, msg.content.body);
+     })
+     .onSystemMessage(function (msg) {
+     console.log('from system message: %s', msg.content.body);
+     })
+     .attribute('name', 'firedog')
+     .ok(function (err, session, context) {
+     if (err) {
+     console.error('login as passenger failed: %s', err.message);
+     return;
+     }
+     session.say('hello wahahah~').toUser('bar').ok();
+     });
+
+     */
+
     im.login().simple('foo').ok(function (err, session, context) {
         if (err) {
             console.error('login failed: %s', err);
@@ -53,4 +72,5 @@ require(['maxim/im'], function (IM) {
         console.log('welcome %s!', session.current());
 
     });
+
 });

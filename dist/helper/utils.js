@@ -29,4 +29,15 @@ var __extends = (this && this.__extends) || function (d, b) {
         return ParrotError;
     }(Error));
     exports.ParrotError = ParrotError;
+    function convert2basic(origin) {
+        var ret = {
+            content: origin.content,
+            ts: origin.ts
+        };
+        if (origin.remark != null) {
+            ret.remark = origin.remark;
+        }
+        return ret;
+    }
+    exports.convert2basic = convert2basic;
 });

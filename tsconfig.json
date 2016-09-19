@@ -3,6 +3,7 @@
     "module": "umd",
     "target": "es5",
     "sourceMap": true,
+    "removeComments": true,
     "outDir": "./dist"
   },
   "include": [

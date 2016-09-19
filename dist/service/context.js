@@ -15,9 +15,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     var common_1 = require("./common");
     var fetch = require("isomorphic-fetch");
     var utils_1 = require("../helper/utils");
-    /**
-     * TalkingBuilder实现类
-     */
     var TalkingBuilderImpl = (function () {
         function TalkingBuilderImpl(context, ts, size, you, apiOptions) {
             this.ts = ts;
@@ -90,9 +87,6 @@ var __extends = (this && this.__extends) || function (d, b) {
         };
         return TalkingBuilderImpl;
     }());
-    /**
-     * 用户上下文实现类
-     */
     var ContextImpl = (function (_super) {
         __extends(ContextImpl, _super);
         function ContextImpl(apiOptions, you) {
@@ -142,6 +136,19 @@ var __extends = (this && this.__extends) || function (d, b) {
                 return this;
             }
             var path = "/ctx/" + this.you + "/rooms?detail";
+            return this.listSomething(path, callback);
+        };
+        ContextImpl.prototype.listStrangers = function (callback, skip, limit) {
+            if (!callback) {
+                return this;
+            }
+            var path = "/ctx/" + this.you + "/strangers?detail";
+            if (skip) {
+                path += "&skip=" + skip;
+            }
+            if (limit) {
+                path += "&limit=" + limit;
+            }
             return this.listSomething(path, callback);
         };
         ContextImpl.prototype.joinFriend = function (userid, callback) {

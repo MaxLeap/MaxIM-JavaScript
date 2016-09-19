@@ -29,7 +29,6 @@ var __extends = (this && this.__extends) || function (d, b) {
                     header[k] = this.apiOptions.headers[k];
                 }
             }
-            // header['content-type'] = 'multipart/form-data';
             var opts = {
                 method: 'POST',
                 headers: header,

@@ -91,3 +91,11 @@ export interface Callback<T> extends Handler2<Error,T> {
 export interface Callback2<T,U> extends Handler3<Error,T,U> {
 
 }
+
+export interface LoginResult {
+    success: boolean;
+    id?: string;
+    error?: number;
+}
+
+
