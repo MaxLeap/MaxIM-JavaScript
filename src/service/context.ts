@@ -1,4 +1,4 @@
-import {CommonServiceImpl} from "./common";
+import {CommonServiceImpl, CommonService} from "./common";
 import {Friend, MyGroup, RoomInfo, ChatRecord, Attributes, APIOptions, Callback} from "../model/models";
 import * as fetch from "isomorphic-fetch";
 import {ParrotError} from "../helper/utils";
@@ -10,7 +10,7 @@ interface TalkingBuilder {
     ofPassenger(passengerid: string, callback?: Callback<ChatRecord[]>): Context;
 }
 
-export interface Context {
+export interface Context extends CommonService{
 
     /**
      * 列出好友详情

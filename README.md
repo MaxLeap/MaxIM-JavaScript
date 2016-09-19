@@ -157,7 +157,7 @@ require(['maxleap-im/im'],function(IM){
 
 | # | 参数名 | 类型 | 说明 |
 |----|----|----|----|
-| 1 | userid | string | 好友的用户ID | |
+| 1 | userid | string | 好友的用户ID |
 | 2 | message | [BasicMessage](#basicmessage) | 消息体 |
 
 #### SessionBuilder#onGroupMessage(callback:(groupid,memberid,message)=>void):[SessionBuilder](#sessionbuilder)
@@ -352,6 +352,205 @@ require(['maxleap-im/im'],function(IM){
 
 发射消息并返回用户登录会话。当发射发生错误时, 回调句柄中的`error`对象会包含错误详情。
 
+
+### Context
+--------------------------------------------------
+
+> 用户上下文对象, 封装了针对当前登录用户的一些通用操作。
+
+#### Context#listFriends(callback:(error,friends)=>void):[Context](#context)
+
+列出当前用户的好友列表。回调函数的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空 |
+| 2 | friends | [Friend](#friend)[] | 好友列表(数组) |
+
+#### Context#listGroups(callback:(error,groups)=>void):[Context](#context)
+
+列出当前已加入的群组列表。回调函数的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空。 |
+| 2 | groups | [Group](#group)[] | 群组列表(数组) |
+
+#### Context#listRooms(callback:(error,rooms)=>void):[Context](#context)
+
+列出当前已加入的聊天室列表。回调函数的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空。 |
+| 2 | rooms | [Room](#room)[] | 聊天室列表(数组) |
+
+#### Context#listTalkings(endTimestamp:number,size:number):[TalkingBuilder](#talkingbuilder)
+
+返回一个聊天记录查询器实例。该查询器可以被用于进一步的调用并最终获取聊天记录。方法参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | endTimestamp | number | 截止时间戳(毫秒), 可选项, 默认为当前时间戳 |
+| 2 | size | number | 返回记录数, 可选项, 默认为20 |
+
+
+#### Context#joinFriend(userid:string,callback:(error)=>void):[Context](#context)
+
+添加好友。`userid`为被添加好友的用户ID。 回调方法参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当操作发生异常时非空。 |
+
+#### Context#joinGroup(groupid:string,callback:(error)=>void):[Context](#context)
+
+加入指定群组。`groupid`为要加入的群组ID。 回调方法参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当操作发生异常时非空。 |
+
+#### Context#joinRoom(roomid:string,callback:(error)=>void):[Context](#context)
+
+加入指定聊天室。`roomid`为要加入的聊天室ID。 回调方法参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当操作发生异常时非空。 |
+
+#### Context#leaveFriend(userid:string,callback:(error)=>void):[Context](#context)
+
+解除好友关系。`userid`为被解除好友的用户ID。 回调方法参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当操作发生异常时非空。 |
+
+#### Context#leaveGroup(groupid:string,callback:(error)=>void):[Context](#context)
+
+离开指定群组。`groupid`为要离开的群组ID。 回调方法参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当操作发生异常时非空。 |
+
+#### Context#leaveRoom(roomid:string,callback:(error)=>void):[Context](#context)
+
+离开指定聊天室。`roomid`为要离开的聊天室ID。 回调方法参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当操作发生异常时非空。 |
+
+#### Context#setMyAttributes(attributes:object,overwrite:boolean,callback:(error)=>void):[Context](#context)
+
+设置我的自定义属性。参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | attributes | object | 自定义属性表 |
+| 2 | overwrite | boolean | 是否完全覆盖写入, 可选项, 默认为false |
+| 3 | callback | function | 回调方法 |
+ 
+回调方法`callback`的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当操作发生异常时非空。 |
+
+#### Context#setMyAttribute(name:string,value:object,callback:(error)=>void):[Context](#context)
+
+设置我的单个自定义属性。参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | name | string | 属性名 |
+| 2 | value | object | 属性值, 建议使用基本类型 |
+| 3 | callback | function | 回调方法 |
+ 
+回调方法`callback`的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当操作发生异常时非空。 |
+
+#### Context#getMyAttributes(callback:(error,attributes)=>void):[Context](#context)
+
+获取我的自定义属性表。其中回调方法的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当操作发生异常时非空。 |
+| 2 | attributes | object | 属性表 |
+
+#### Context#getMyAttribute(name:string,callback:(error,attribute)=>void):[Context](#context)
+
+获取我的单个自定义属性。参数`name`为属性名, 回调方法`callback`的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当操作发生异常时非空。 |
+| 2 | attribute | object | 属性值 |
+
+#### Context#search(query:object,skip:number,limit:number,sort:string[]):[SearchBuilder](#searchbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
+
+#### Context#load(id:string):[LoadBuilder])(#loadbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
+
+#### Context#getAttributes(id:string,atttibuteName:string):[GetAttributesBuilder](#getattributesbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
+
+#### Context#attachment(attachment:File|Blob):[AttachmentBuilder](#attachmentbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
+
+
+### TalkingBuilder
+-----------------------------------------------
+
+> 聊天记录查询构造器。
+
+#### TalkingBuilder#ofFriend(friendid:string,callback:(error,records)=>void):[Context](#context)
+
+查询与指定好友的聊天记录, 并返回起始用户上下文。其中参数`friendid`指定好友的用户ID, 回调方法`callback`的参数定义如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空 |
+| 2 | records | [ChatRecord](#chatrecord)[] | 聊天记录数组 |
+
+#### TalkingBuilder#ofGroup(groupid:string,callback:(error,records)=>void):[Context](#context)
+
+查询与群组聊天记录, 并返回起始用户上下文。其中参数`groupid`指定群组ID, 回调方法`callback`的参数定义如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空 |
+| 2 | records | [ChatRecord](#chatrecord)[] | 聊天记录数组 |
+
+#### TalkingBuilder#ofStranger(strangerid:string,callback:(error,records)=>void):[Context](#context)
+
+查询与指定陌生人的聊天记录, 并返回起始用户上下文。其中参数`strangerid`指定陌生人的用户ID, 回调方法`callback`的参数定义如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空 |
+| 2 | records | [ChatRecord](#chatrecord)[] | 聊天记录数组 |
+
+#### TalkingBuilder#ofPassenger(passengerid:string,callback:(error,records)=>void):[Context](#context)
+
+查询与指定访客的聊天记录, 并返回起始用户上下文。其中参数`passengerid`为访客ID, 回调方法`callback`的参数定义如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空 |
+| 2 | records | [ChatRecord](#chatrecord)[] | 聊天记录数组 |
+
 ### Admin
 ----------------------------------------------------
 
@@ -380,6 +579,22 @@ require(['maxleap-im/im'],function(IM){
 #### Admin#removeMembers(first:string,others:string...):[MemberRemoveCommand](#memberremovecommand)
 
 新建一个成员移除命令。
+
+#### Admin#search(query:object,skip:number,limit:number,sort:string[]):[SearchBuilder](#searchbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
+
+#### Admin#load(id:string):[LoadBuilder])(#loadbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
+
+#### Admin#getAttributes(id:string,atttibuteName:string):[GetAttributesBuilder](#getattributesbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
+
+#### Admin#attachment(attachment:File|Blob):[AttachmentBuilder](#attachmentbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
 
 ### AttributeBuilder
 ----------------------------------------
@@ -504,9 +719,164 @@ require(['maxleap-im/im'],function(IM){
 
 结束链式调用, 移除聊天室成员并返回原始`Admin`实例。
 
+
+### Common
+----------------------------------------------
+
+> 通用操作抽象类, 仅作为[Context](#context)和[Admin](#admin)的父类。用于封装最基础的只读业务操作。
+
+#### Common#search(query:object,skip:number,limit:number:sort:string[]):[SearchBuilder](#searchbuilder)
+
+创建一个搜索器实例。搜索器可以被用来返回搜索结果。参数定义如下:
+
+| # | 参数名 | 类型 | 说明 |
+|----|----|----|----|
+| 1 | query | object | 查询条件, 可选项, 如: `{age:20,gender:'male'}` |
+| 2 | skip | number | 跳过记录数, 可选项 |
+| 3 | limit | number | 返回记录条数, 可选项, 默认20 |
+| 4 | sort | string[] | 排序字段名列表, 可选项, 默认正序, 倒序请添加`-`前缀。如: ['age','-score'] |
+
+#### Common#load(id:string):[LoadBuilder](#loadbuilder)
+
+创建一个载入器实例。载入器可以被用于载入特定对象。参数`id`表示被载入对象的标识ID。
+
+#### Common#getAttributes(id:string,attributeName:string):[GetAttributesBuilder](#getattributesbuilder)
+
+返回一个属性查询器。属性查询器可以被用来返回属性对象。参数用法如下:
+
+| # | 参数名 | 类型 | 说明 |
+|----|----|----|----|
+| 1 | id | string | 对象ID |
+| 2 | attributeName | string | 指定属性名, 可选项, 如果指定则仅返回对应属性值 |
+
+#### Common#attachment(attachment:File|Blob):[AttachmentBuilder](#attachmentbuilder)
+
+创建并返回一个附件上传器。`attachment`可以是一个文件或者二进制块对象。
+
+### GetAttributesBuilder
+----------------------------------------------
+
+> 属性查询器。
+
+### GetAttributesBuilder#forUser(callback:(error,result)=>void)
+
+返回用户的自定义属性。回调方法参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空 |
+| 2 | result | object | 属性查询结果 |
+
+### GetAttributesBuilder#forGroup(callback:(error,result)=>void)
+
+返回群组的自定义属性。回调方法参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空 |
+| 2 | result | object | 属性查询结果 |
+
+### GetAttributesBuilder#forRoom(callback:(error,result)=>void)
+
+返回聊天室的自定义属性。回调方法参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空 |
+| 2 | result | object | 属性查询结果 |
+
+### AttachmentBuilder
+------------------------------------------------
+
+> 附件上传器。当调用ok方法时会进行上传操作。
+
+#### AttachmentBuilder#ok(callback:(error,uris)=>void)
+
+提交执行上传。回调方法的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空。 |
+| 2 | uris | string[] | 上传后附件URI列表, 当您上传的附件为可裁剪的图片时, 系统将会返回2个URI, 其中第一个为原始图片地址, 第二个为缩略图地址。 |
+
+### LoadBuilder
+-------------------------------------------------
+
+> 对象载入器。
+
+#### LoadBuilder#forUser(callback:(error,user)=>void)
+
+载入指定用户。回调函数的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|----|----|----|----|
+| 1 | error | [ParrotError](#parroterror) | 错误异常, 仅当查询操作失败时非空 |
+| 2 | user | [UserDetail](#userdetail) | 用户详情 |
+
+#### LoadBuilder#forGroup(callback:(error,group)=>void)
+
+载入指定群组。回调函数的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|----|----|----|----|
+| 1 | error | [ParrotError](#parroterror) | 错误异常, 仅当查询操作失败时非空 |
+| 2 | group | [Group](#group) | 群组详情 |
+
+#### LoadBuilder#forRoom(callback:(error,room)=>void)
+
+载入指定聊天室。回调函数的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|----|----|----|----|
+| 1 | error | [ParrotError](#parroterror) | 错误异常, 仅当查询操作失败时非空 |
+| 2 | room | [Room](#room) | 聊天室详情 |
+
+#### LoadBuilder#forPassenger(callback:(error,passenger)=>void)
+
+载入指定访客。回调函数的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|----|----|----|----|
+| 1 | error | [ParrotError](#parroterror) | 错误异常, 仅当查询操作失败时非空 |
+| 2 | passenger | [Passenger](#passenger) | 访客详情 |
+
+### SearchBuilder
+----------------------------------------------
+
+> 搜索器
+
+#### SearchBuilder#forUsers(callback:(error,users)=>void)
+
+搜索用户。回调函数参数如下:
+
+| # | 参数名 | 类型 | 说明 |
+|----|----|----|----|
+| 1 | error | [ParrotError](#parroterror) | 错误异常, 仅当查询操作失败时非空 |
+| 2 | users | [User](#user)[] | 用户列表 |
+
+#### SearchBuilder#forGroups(callback:(error,groups)=>void)
+
+搜索群组。回调函数参数如下:
+
+| # | 参数名 | 类型 | 说明 |
+|----|----|----|----|
+| 1 | error | [ParrotError](#parroterror) | 错误异常, 仅当查询操作失败时非空 |
+| 2 | groups | [Group](#group)[] | 群组列表 |
+
+#### SearchBuilder#forRooms(callback:(error,rooms)=>void)
+
+搜索聊天室。回调函数参数如下:
+
+| # | 参数名 | 类型 | 说明 |
+|----|----|----|----|
+| 1 | error | [ParrotError](#parroterror) | 错误异常, 仅当查询操作失败时非空 |
+| 2 | rooms | [Room](#room)[] | 聊天室列表 |
+
+
 ### BasicMessage
 ---------------------------
-基础消息结构体。属性说明如下:
+
+> 基础消息结构体。属性说明如下:
 
 | 属性名 | 类型 | 说明 |
 |------|------|------|
@@ -516,9 +886,81 @@ require(['maxleap-im/im'],function(IM){
 
 ### Content
 ------------------------------
-消息正文结构体。属性说明如下:
+
+> 消息正文结构体。属性说明如下:
 
 | 属性名 | 类型 | 说明 |
 |------|------|------|
 | media | number | 媒体类型: 0=纯文本, 1=图片, 2=音频, 3=视频 |
 | body | string | 正文文本 |
+
+### ParrotError
+------------------------------
+
+> 错误异常通用类, 继承自Error对象。
+
+| 属性名 | 类型 | 说明 |
+|------|------|------|
+| errorCode | number | 错误码 |
+| errorMessage | string | 错误消息 |
+
+### Friend
+------------------------------
+
+> 好友详情结构体。属性说明如下:
+
+| 属性名 | 类型 | 说明 |
+|------|------|------|
+| id | string | 好友的用户ID |
+| online | boolean | 当前是否在线 |
+| recent | [ChatRecord](#chatrecord) | 最近一条聊天记录, 可选项 |
+
+### ChatRecord
+-------------------------------------
+
+> 通用聊天记录结构体。属性说明如下:
+
+| 属性名 | 类型 | 说明 |
+|------|------|------|
+| speaker | string | 发言人的用户ID |
+| content | [Content](#content) | 聊天消息记录正文 |
+| remark | string | 消息备注, 可选项 |
+| ts | number | 消息发送时间戳 |
+
+### Group
+-----------------------------------
+
+> 群组详情结构体。属性说明如下:
+
+| 属性名 | 类型 | 说明 |
+|------|------|------|
+| id | string | 群组ID |
+| owner | string | 群组管理员 |
+| members | string[] | 群组成员的用户ID列表  |
+| attributes | object | 群组自定义属性 |
+| ts | number | 群组创建时间 |
+| recent | [ChatRecord](#chatrecord) | 最近一条群组聊天记录, 可选项 |
+
+### Room
+--------------------------------------
+
+> 聊天室详情结构体。属性说明如下:
+
+| 属性名 | 类型 | 说明 |
+|------|------|------|
+| id | string | 聊天室ID |
+| members | string[] | 聊天室成员的用户ID列表  |
+| attributes | object | 聊天室自定义属性 |
+| ts | number | 聊天室创建时间 |
+
+### User
+--------------------------------------
+
+> 用户信息结构体。属性说明如下:
+
+| 属性名 | 类型 | 说明 |
+|------|------|------|
+| id | string | 用户ID |
+| online | boolean | 是否在线 |
+| attributes | object | 用户属性表 |
+| ts | number | 用户创建时间戳 |

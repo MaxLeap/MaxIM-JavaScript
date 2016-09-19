@@ -54,7 +54,7 @@ interface CommonService {
 }
 
 interface AttachmentBuilder {
-    ok(callback?: Callback<string[]>): void;
+    ok(callback?: Callback<string[]>);
 }
 
 interface LoadOptions {
