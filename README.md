@@ -52,7 +52,7 @@ require.config({
 require(['maxleap-im/im'],function(IM){
   var opts = {
     app: 'YOUR_APP_ID',
-      key: 'YOUR_APP_KEY'
+    key: 'YOUR_APP_KEY'
   };
     
   var im = IM(opts); // 或者 ML.im(opts)
@@ -69,6 +69,9 @@ require(['maxleap-im/im'],function(IM){
     // 通过上文的方式初始化MaxIM实例
     im.login()
       .simple('12345678')
+      .onFriendMessage(function(friendid,message){
+        console.log('message from friend %s: %s',friendid,message.content.body);
+      })
       .ok(function(error,session,context){
         if(error){
           console.error('login failed: %s',error.message);
@@ -78,17 +81,50 @@ require(['maxleap-im/im'],function(IM){
         context.listFriends(function(err,friends){
             // process response
         });
-        
+
+        // send text message.
         session
-          .say('hello world!').toFriend('87654321') // first message
-          .ok()
-          .say('http://www.xxxxx.com/xxxx.jpg').asImage().toGroup('group1234') // second message
-          .ok(function(error){
-            session.close(function(error){
-              console.log('goodbye!');
-            });
+          .say('hello world!').toFriend('87654321')
+          .ok();
+          
+        // upload image attachment and send it as image message.
+        context.attachment(YOUR_IMG_FILE)
+          .ok(function(err,urls){
+              if(err){
+                  console.error('upload file failed: %s',err.message);
+                  return;
+              }
+              
+              var origin= urls[0], thumb = urls[1];
+              session.say(origin,thumb).asImage().toGroup('group1234')
+                .ok(function(error){
+                  session.close(function(error){
+                    if(error){
+                      console.error('logout failed: %s',error.message);
+                      return;
+                    }
+                    console.log('goodbye!');
+                  });
+                });
           });
+          
     });
+    
+    im.admin().create()
+      .room()
+      .attribute('name','OP fans')
+      .attribute('location','Shanghai')
+      .attribute('star',5)
+      .members('cat','dog','fish')
+      .ok(function(err,roomid){
+          if(err){
+            console.error('create room failed: %s',err.message);
+            return;
+          }
+          console.log('create room success: %s',roomid);
+      });
+      
+    
 ```
 
 ## API文档
