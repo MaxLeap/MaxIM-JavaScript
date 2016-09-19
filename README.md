@@ -150,6 +150,10 @@ require(['maxleap-im/im'],function(IM){
 
 初始化并返回一个登录器。登录器可被用于进一步登录操作。
 
+#### MaxIM#passenger(passengerid:string):[PassengerBuilder](#passengerbuilder)
+
+初始化并返回一个访客构造器。该构造器可以用于进一步访客模式登录操作。
+
 #### MaxIM#admin():[Admin](#admin)
 
 初始化并返回一个管理器实例。管理器拥有最高级别的控制权限, 通常被用于一些系统级的控制操作。
@@ -357,34 +361,38 @@ require(['maxleap-im/im'],function(IM){
 
 #### MessageBuilder#toAll():[MessageLauncher](#messagelauncher)
 
-设置本条消息的发送对象为所有人并返回消息发射器。`**注意: 仅限Admin使用, 用于向所有人发送系统消息!!!**
+设置本条消息的发送对象为所有人并返回消息发射器。**注意: 仅限Admin使用, 用于向所有人发送系统消息!!!**
+
+#### MessageBuilder#toUser(userid:string):[MessageLauncher](#messagelauncher)
+
+设置本条消息的发送对象为单个普通用户并返回消息发射器。**注意: 仅限Admin和访客模式使用!!!**
 
 #### MessageBuilder#toFriend(friendid:string):[MessageLauncher](#messagelauncher)
 
-设置本条消息的发送对象为好友并返回消息发射器。`friendid`为好友的用户ID。
+设置本条消息的发送对象为好友并返回消息发射器。`friendid`为好友的用户ID。**注意: 仅限普通用户登录模式使用!!!**
 
 #### MessageBuilder#toGroup(groupid:string):[MessageLauncher](#messagelauncher)
 
-设置本条消息的发送对象为群组并返回消息发射器。`groupid`为群组ID。
+设置本条消息的发送对象为群组并返回消息发射器。`groupid`为群组ID。**注意: 仅限Admin和普通用户登录模式使用!!!**
 
 #### MessageBuilder#toRoom(roomid:string):[MessageLauncher](#messagelauncher)
 
-设置本条消息的发送对象为聊天室并返回消息发射器。`roomid`为聊天室ID。
+设置本条消息的发送对象为聊天室并返回消息发射器。`roomid`为聊天室ID。**注意: 仅限Admin和普通用户登录模式使用!!!**
 
 #### MessageBuilder#toPassenger(passengerid:string):[MessageLauncher](#messagelauncher)
 
-设置本条消息的发送对象为访客并返回消息发射器。`passengerid`为访客ID。
+设置本条消息的发送对象为访客并返回消息发射器。`passengerid`为访客ID。**注意: 仅限普通用户登录模式使用!!!**
 
 #### MessageBuilder#toStranger(strangerid:string):[MessageLauncher](#messagelauncher)
 
-设置本条消息的发送对象为陌生人并返回消息发射器。`strangerid`为陌生人用户ID。
+设置本条消息的发送对象为陌生人并返回消息发射器。`strangerid`为陌生人用户ID。**注意: 仅限普通用户登录模式使用!!!**
 
 ### MessageLauncher
 --------------------------------------------------
 
 > 消息发射器, 提交并最后发射消息。
 
-#### MessageLauncher#ok(callback:(error)=>void):[Sessiion](#session)
+#### MessageLauncher#ok(callback:(error)=>void):[Session](#session)|[PassengerSession](#passengersession)
 
 发射消息并返回用户登录会话。当发射发生错误时, 回调句柄中的`error`对象会包含错误详情。
 
@@ -420,6 +428,17 @@ require(['maxleap-im/im'],function(IM){
 |-----|-----|-----|-----|
 | 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空。 |
 | 2 | rooms | [Room](#room)[] | 聊天室列表(数组) |
+
+#### Context#listStrangers(callback:(error,strangers)=>void,skip:number,limit:number):[Context](#context)
+
+列出当前有关联的陌生人列表。`skip`和`limit`为可选项, 用于控制分页, 分别表示跳过记录数和返回记录条数。
+
+回调函数`callback`的参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空。 |
+| 2 | strangers | [Stranger](#stranger)[] | 陌生人列表(数组) |
 
 #### Context#listTalkings(endTimestamp:number,size:number):[TalkingBuilder](#talkingbuilder)
 
@@ -586,6 +605,99 @@ require(['maxleap-im/im'],function(IM){
 |-----|-----|-----|-----|
 | 1 | error | [ParrotError](#parroterror) | 异常错误, 仅当查询操作发生异常时非空 |
 | 2 | records | [ChatRecord](#chatrecord)[] | 聊天记录数组 |
+
+
+### PassengerBuilder
+--------------------------------------------
+
+> 访客构造器。
+
+#### PassengerBuilder#attribute(name:string,value:object):[PassengerBuilder](#passengerbuilder)
+
+设置访客属性。
+
+#### PassengerBuilder#onUserMessage(callback:(userid,message)=>void):[PassengerBuilder](#passengerbuilder)
+
+绑定来自某个用户发送给您的消息。回调函数参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | userid | string | 用户ID |
+| 2 | message | [BasicMessage](#basicmessage) | 消息体 |
+
+#### PassengerBuilder#onSystemMessage(callback:(message)=>void):[PassengerBuilder](#passengerbuilder)
+
+绑定来自管理员发送给您的系统消息。回调函数参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | message | [BasicMessage](#basicmessage) | 消息体 |
+
+#### PassengerBuilder#onStrangerOnline(callback:(strangerid)=>void):[PassengerBuilder](#passengerbuilder)
+
+绑定来自陌生人上线通知。回调函数参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | strangerid | string | 上线的陌生人用户ID |
+
+
+#### PassengerBuilder#onStrangerOffline(callback:(strangerid)=>void):[PassengerBuilder](#passengerbuilder)
+
+绑定来自陌生人下线通知。回调函数参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | strangerid | string | 下线的陌生人用户ID |
+
+#### PassengerBuilder#ok(callback:(error,session,context)=>void)
+
+结束链式调用提交并登录。回调函数参数说明如下:
+
+| # | 参数名 | 类型 | 说明 |
+|-----|-----|-----|-----|
+| 1 | error | [ParrotError](#parroterror) | 异常对象, 仅当session创建失败时非空 |
+| 2 | session | [PassengerSession](#passengersession) | 访客登录会话 |
+| 3 | context | [PassengerContext](#passengercontext) | 访客上下文 |
+
+### PassengerSession
+--------------------------------------------------
+
+> 访客登录会话。维持一次访客登录连接。提供核心的消息收发功能。
+
+#### PassengerSession#say(text:string,remark:string):[MessageBuilder](#messagebuilder)
+
+返回一个消息构建器实例。
+
+#### PassengerSession#close(callback:(error)=>void)
+
+退出并关闭访客会话。
+
+### PassengerContext
+---------------------------------------------------
+
+> 访客用户上下文。封装了针对当前登录访客的常用操作。
+
+#### PassengerContext#current():string
+
+返回当前登录的访客ID。
+
+#### PassengerContext#search(query:object,skip:number,limit:number,sort:string[]):[SearchBuilder](#searchbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
+
+#### PassengerContext#load(id:string):[LoadBuilder])(#loadbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
+
+#### PassengerContext#getAttributes(id:string,atttibuteName:string):[GetAttributesBuilder](#getattributesbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
+
+#### PassengerContext#attachment(attachment:File|Blob):[AttachmentBuilder](#attachmentbuilder)
+
+本方法继承自父类, 参见[Common](#common)中对应的方法。
+
 
 ### Admin
 ----------------------------------------------------
@@ -989,6 +1101,7 @@ require(['maxleap-im/im'],function(IM){
 | attributes | object | 聊天室自定义属性 |
 | ts | number | 聊天室创建时间 |
 
+
 ### User
 --------------------------------------
 
@@ -1000,3 +1113,14 @@ require(['maxleap-im/im'],function(IM){
 | online | boolean | 是否在线 |
 | attributes | object | 用户属性表 |
 | ts | number | 用户创建时间戳 |
+
+### Stranger
+-----------------------------------------
+
+> 陌生人信息结构体。属性说明如下：
+
+| 属性名 | 类型 | 说明 |
+|------|------|------|
+| id | string | 陌生人的用户ID |
+| online | boolean | 当前是否在线 |
+| recent | [ChatRecord](#chatrecord) | 最近一条聊天记录, 可选项 |
