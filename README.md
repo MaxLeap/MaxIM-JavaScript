@@ -244,7 +244,7 @@ require(['maxleap-im/im'],function(IM){
 
 | # | 参数名 | 类型 | 说明 |
 |----|----|----|----|
-| 1 | message | SystemMessage | 消息体 |
+| 1 | message | [BasicMessage](#basicmessage) | 消息体 |
 
 #### SessionBuilder#onYourself(callback:(message)=>void):[SessionBuilder](#sessionbuilder)
 
@@ -252,7 +252,7 @@ require(['maxleap-im/im'],function(IM){
 
 | # | 参数名 | 类型 | 说明 |
 |----|----|----|----|
-| 1 | message | YourselfMessage | 消息体 |
+| 1 | message | [YourselfMessage](#yourselfmessage) | 消息体 |
 
 #### SessionBuilder#onFriendOnline(callback:(friendid)=>void):[SessionBuilder](#sessionbuilder)
 
@@ -1117,10 +1117,18 @@ require(['maxleap-im/im'],function(IM){
 ### Stranger
 -----------------------------------------
 
-> 陌生人信息结构体。属性说明如下：
+> 陌生人信息结构体。属性说明如下:
 
 | 属性名 | 类型 | 说明 |
 |------|------|------|
 | id | string | 陌生人的用户ID |
 | online | boolean | 当前是否在线 |
 | recent | [ChatRecord](#chatrecord) | 最近一条聊天记录, 可选项 |
+
+
+### YourselfMessage
+------------------------------------
+
+> 来自你本人的消息结构体。属性说明如下:
+
+// 施工中
