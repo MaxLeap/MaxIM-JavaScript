@@ -1,6 +1,6 @@
 {
   "name": "maxleap-im",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "MaxLeap JavaScript SDK for IM.",
   "main": "dist/im.js",
   "directories": {
@@ -22,7 +22,7 @@
   "homepage": "https://www.maxleap.cn",
   "dependencies": {
     "isomorphic-fetch": "^2.2.1",
-    "socket.io-client": "^1.4.8"
+    "socket.io-client": "~1.4.8"
   },
   "devDependencies": {
     "del": "^2.2.2",
