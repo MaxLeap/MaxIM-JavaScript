@@ -103,31 +103,6 @@ class AttachmentBuilderImpl implements AttachmentBuilder {
                     callback(e);
                 }
             });
-
-        // // header['content-type'] = 'multipart/form-data';
-        // let opts = {
-        //     method: 'POST',
-        //     headers: header,
-        //     body: data
-        // };
-
-        // fetch(url, opts)
-        //     .then(response => {
-        //         return response.json().then(json => [response.ok, json]);
-        //     })
-        //     .then(res => {
-        //         if (!res[0]) {
-        //             throw new ParrotError(res[1]);
-        //         } else if (callback) {
-        //             callback(null, res[1] as string[]);
-        //         }
-        //     })
-        //     .catch(e => {
-        //         if (callback) {
-        //             callback(e);
-        //         }
-        //     });
-
     }
 }
 
@@ -163,28 +138,6 @@ class GetAttributesBuilderImpl implements GetAttributesBuilder {
                     callback(e);
                 }
             });
-
-        // let opts = {
-        //     method: 'GET',
-        //     headers: this.common.options().headers
-        // };
-        // fetch(url, opts)
-        //     .then(response => {
-        //         return response.json().then(result => [response.ok, result]);
-        //     })
-        //     .then(res => {
-        //         if (!res[0]) {
-        //             throw new ParrotError(res[1]);
-        //         } else if (callback) {
-        //             callback(null, res[1]);
-        //         }
-        //
-        //     })
-        //     .catch(e => {
-        //         if (callback) {
-        //             callback(e);
-        //         }
-        //     });
     }
 
     forUser(callback?: Callback<any>) {
@@ -238,27 +191,6 @@ class LoadBuilderImpl extends Builder<LoadOptions> implements LoadBuilder {
                     callback(e);
                 }
             });
-
-        // let opts = {
-        //     headers: this.apiOptions.headers
-        // };
-        //
-        // fetch(url, opts)
-        //     .then(response => {
-        //         return response.json().then(result => [response.ok, result]);
-        //     })
-        //     .then(res => {
-        //         if (!res[0]) {
-        //             throw new ParrotError(res[1]);
-        //         } else if (callback) {
-        //             callback(null, res[1] as T);
-        //         }
-        //     })
-        //     .catch(e => {
-        //         if (callback) {
-        //             callback(e);
-        //         }
-        //     });
     }
 
     forUser(callback: Callback<UserDetail>) {
