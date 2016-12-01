@@ -3,14 +3,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports"], function (require, exports) {
     "use strict";
     var ParrotError = (function (_super) {
         __extends(ParrotError, _super);
@@ -41,3 +34,5 @@ var __extends = (this && this.__extends) || function (d, b) {
     }
     exports.convert2basic = convert2basic;
 });
+
+//# sourceMappingURL=utils.js.map

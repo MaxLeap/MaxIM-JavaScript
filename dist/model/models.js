@@ -1,11 +1,4 @@
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports"], function (require, exports) {
     "use strict";
     var APIOptions = (function () {
         function APIOptions(server, app, sign) {
@@ -22,3 +15,5 @@
     }());
     exports.APIOptions = APIOptions;
 });
+
+//# sourceMappingURL=models.js.map

@@ -3,18 +3,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "./common", "../model/messages", "axios"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "./common", "../model/messages", "axios"], function (require, exports, common_1, messages_1, axios) {
     "use strict";
-    var common_1 = require("./common");
-    var messages_1 = require("../model/messages");
-    var axios = require("axios");
     var GroupDestroyImpl = (function () {
         function GroupDestroyImpl(admin, groupid) {
             this.admin = admin;
@@ -478,3 +468,5 @@ var __extends = (this && this.__extends) || function (d, b) {
     }(common_1.CommonServiceImpl));
     exports.AdminImpl = AdminImpl;
 });
+
+//# sourceMappingURL=admin.js.map

@@ -1,3 +1,4 @@
+dist
 bower_components
 node_modules
 src
@@ -9,5 +10,5 @@ tsconfig.json
 bower.json
 gulpfile.js
 .gitignore
-/.yarnclean
-/yarn.lock
+.yarnclean
+yarn.lock

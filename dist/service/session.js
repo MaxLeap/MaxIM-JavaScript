@@ -1,16 +1,5 @@
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "../model/messages", "./context", "../helper/utils", 'socket.io-client'], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "../model/messages", "./context", "../helper/utils", 'socket.io-client'], function (require, exports, messages_1, context_1, utils_1, io) {
     "use strict";
-    var messages_1 = require("../model/messages");
-    var context_1 = require("./context");
-    var utils_1 = require("../helper/utils");
-    var io = require('socket.io-client');
     var MessageBuilderImpl = (function () {
         function MessageBuilderImpl(session, text, remark) {
             this.session = session;
@@ -316,3 +305,5 @@
         return SessionImpl;
     }());
 });
+
+//# sourceMappingURL=session.js.map

@@ -3,17 +3,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "./common", 'axios'], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "./common", 'axios'], function (require, exports, common_1, axios) {
     "use strict";
-    var common_1 = require("./common");
-    var axios = require('axios');
     var TalkingBuilderImpl = (function () {
         function TalkingBuilderImpl(context, ts, size, you, apiOptions) {
             this.ts = ts;
@@ -249,3 +240,5 @@ var __extends = (this && this.__extends) || function (d, b) {
     }(common_1.CommonServiceImpl));
     exports.ContextImpl = ContextImpl;
 });
+
+//# sourceMappingURL=context.js.map

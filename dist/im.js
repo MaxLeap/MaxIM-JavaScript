@@ -1,16 +1,5 @@
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "./service/admin", "./service/login", "./model/models", "./service/passenger"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "./service/admin", "./service/login", "./model/models", "./service/passenger"], function (require, exports, admin_1, login_1, models_1, passenger_1) {
     "use strict";
-    var admin_1 = require("./service/admin");
-    var login_1 = require("./service/login");
-    var models_1 = require("./model/models");
-    var passenger_1 = require("./service/passenger");
     var MaxIMImpl = (function () {
         function MaxIMImpl(options) {
             if (!options || !options.app || !options.key) {
@@ -55,3 +44,5 @@
     }
     return function (options) { return new MaxIMImpl(options); };
 });
+
+//# sourceMappingURL=im.js.map

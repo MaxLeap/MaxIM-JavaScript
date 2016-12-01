@@ -1,14 +1,18 @@
 # MaxIM-Javascript V4
+-----------------------------------------------------------------------
 
 ## 如何使用
-
-V4版SDK遵循UMD规范, 兼容NodeJS和浏览器端。
+---------------------------------------------------------
 
 **旧版SDK仍可使用, 但已经不再维护, 如需使用最新功能, 请尽快迁移到V4版**
 
 您可以使用如下方式集成SDK:
 
-### 使用NPM (NodeJS)
+### 使用NPM
+
+加载方式为CMD, 适用于NodeJS, 或者webpack等。使用范例如下。
+
+首先用npm安装模块:
 
 ```shell
 $ npm install maxleap-im --save
@@ -19,14 +23,16 @@ $ npm install maxleap-im --save
 ``` javascript
 var IM = require('maxleap-im');
 var options = {
-  app: 'YOUR_APP_ID', // 应用ID
-  key: 'YOUR_API_KEY'  // 应用密钥
+  app: 'YOUR_APP_ID', // 应用ID, 参见应用设置的ApplicationID.
+  key: 'YOUR_API_KEY'  // 应用密钥, 参见应用设置的ClientKey.
 };
 var im = IM(options);
 // ......
 ```
 
-### 使用bower (浏览器)
+### 使用Bower
+
+加载方式为AMD, 浏览器端推荐。使用范例如下。
 
 首先通过bower来安装依赖:
 
@@ -53,7 +59,7 @@ require(['maxleap-im/im'],function(IM){
     app: 'YOUR_APP_ID',
     key: 'YOUR_APP_KEY'
   };
-    
+
   var im = IM(opts); // 或者 ML.im(opts)
    // ......
 });
@@ -76,7 +82,7 @@ require(['maxleap-im/im'],function(IM){
           console.error('login failed: %s',error.message);
           return;
         }
-        
+
         context.listFriends(function(err,friends){
             // process response
         });
@@ -85,7 +91,7 @@ require(['maxleap-im/im'],function(IM){
         session
           .say('hello world!').toFriend('87654321')
           .ok();
-          
+
         // upload image attachment and send it as image message.
         context.attachment(YOUR_IMG_FILE)
           .ok(function(err,urls){
@@ -93,7 +99,7 @@ require(['maxleap-im/im'],function(IM){
                   console.error('upload file failed: %s',err.message);
                   return;
               }
-              
+
               var origin= urls[0], thumb = urls[1];
               session.say(origin,thumb).asImage().toGroup('group1234')
                 .ok(function(error){
@@ -106,9 +112,9 @@ require(['maxleap-im/im'],function(IM){
                   });
                 });
           });
-          
+
     });
-    
+
     im.admin().create()
       .room()
       .attribute('name','OP fans')
@@ -122,8 +128,8 @@ require(['maxleap-im/im'],function(IM){
           }
           console.log('create room success: %s',roomid);
       });
-      
-    
+
+
 ```
 
 ## API文档
@@ -200,9 +206,9 @@ require(['maxleap-im/im'],function(IM){
 | 2 | message | [BasicMessage](#basicmessage) | 消息体 |
 
 #### SessionBuilder#onGroupMessage(callback:(groupid,memberid,message)=>void):[SessionBuilder](#sessionbuilder)
- 
+
 绑定群组消息源。绑定该事件后, 所有来自您当前已加入的群组内消息都会进行回调。其中回调句柄的参数用法:
- 
+
 | # | 参数名 | 类型 | 说明 |
 |----|----|----|----|
 | 1 | groupid | string | 群组标识ID | |
@@ -506,7 +512,7 @@ require(['maxleap-im/im'],function(IM){
 | 1 | attributes | object | 自定义属性表 |
 | 2 | overwrite | boolean | 是否完全覆盖写入, 可选项, 默认为false |
 | 3 | callback | function | 回调方法 |
- 
+
 回调方法`callback`的参数说明如下:
 
 | # | 参数名 | 类型 | 说明 |
@@ -522,7 +528,7 @@ require(['maxleap-im/im'],function(IM){
 | 1 | name | string | 属性名 |
 | 2 | value | object | 属性值, 建议使用基本类型 |
 | 3 | callback | function | 回调方法 |
- 
+
 回调方法`callback`的参数说明如下:
 
 | # | 参数名 | 类型 | 说明 |

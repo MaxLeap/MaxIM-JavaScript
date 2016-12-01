@@ -1,11 +1,4 @@
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports"], function (require, exports) {
     "use strict";
     function md5cycle(x, k) {
         var a = x[0], b = x[1], c = x[2], d = x[3];
@@ -146,3 +139,5 @@
     }
     exports.md5 = md5;
 });
+
+//# sourceMappingURL=md5.js.map

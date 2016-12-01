@@ -1,14 +1,5 @@
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "./session", "../helper/md5"], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "./session", "../helper/md5"], function (require, exports, session_1, md5_1) {
     "use strict";
-    var session_1 = require("./session");
-    var md5_1 = require("../helper/md5");
     var LoginImpl = (function () {
         function LoginImpl(apiOptions) {
             this._options = apiOptions;
@@ -51,3 +42,5 @@
     }());
     exports.LoginImpl = LoginImpl;
 });
+
+//# sourceMappingURL=login.js.map

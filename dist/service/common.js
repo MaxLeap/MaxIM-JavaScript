@@ -3,16 +3,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", 'axios'], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", 'axios'], function (require, exports, axios) {
     "use strict";
-    var axios = require('axios');
     var AttachmentBuilderImpl = (function () {
         function AttachmentBuilderImpl(apiOptions, attachment) {
             this.apiOptions = apiOptions;
@@ -209,3 +201,5 @@ var __extends = (this && this.__extends) || function (d, b) {
     }());
     exports.CommonServiceImpl = CommonServiceImpl;
 });
+
+//# sourceMappingURL=common.js.map

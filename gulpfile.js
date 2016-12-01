@@ -1,36 +1,42 @@
 'use strict';
-
 const gulp = require('gulp');
 const serve = require('gulp-serve');
 const ts = require('gulp-typescript');
-const tsProject = ts.createProject('tsconfig.json');
 const sourcemaps = require('gulp-sourcemaps');
 const del = require('del');
 
-const OUTPUT = 'dist';
+const outputOfAMD = 'dist';
+const outputOfCMD = 'lib';
 
-gulp.task('clean', cb => {
-    del(OUTPUT, cb)
+gulp.task('clean-amd', cb => {
+    del(outputOfAMD, cb);
 });
 
-gulp.task('build-with-sourcemaps', () => {
+gulp.task('clean-cmd', cb => {
+    del(outputOfCMD, cb);
+});
+
+gulp.task('build-amd', () => {
+    let tsProject = ts.createProject('tsconfig.json', {module: 'amd'});
     return tsProject
         .src()
         .pipe(sourcemaps.init())
         .pipe(tsProject())
         .js
-        .pipe(sourcemaps.write())
-        .pipe(gulp.dest(OUTPUT));
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest(outputOfAMD));
 });
 
-gulp.task('build', () => {
+gulp.task('build-cmd', () => {
+    let tsProject = ts.createProject('tsconfig.json', {module: 'commonjs'});
     return tsProject
         .src()
+        .pipe(sourcemaps.init())
         .pipe(tsProject())
         .js
-        .pipe(gulp.dest(OUTPUT));
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest(outputOfCMD));
 });
 
 gulp.task('serve', serve('.'));
-gulp.task('default', ['clean', 'build']);
-gulp.task('build-dev', ['clean', 'build-with-sourcemaps']);
+gulp.task('default', ['clean-cmd', 'build-cmd', 'clean-amd', 'build-amd']);

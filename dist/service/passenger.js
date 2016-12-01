@@ -3,20 +3,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-(function (factory) {
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        var v = factory(require, exports); if (v !== undefined) module.exports = v;
-    }
-    else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", "../model/messages", "../helper/md5", "./common", "../helper/utils", 'socket.io-client'], factory);
-    }
-})(function (require, exports) {
+define(["require", "exports", "../model/messages", "../helper/md5", "./common", "../helper/utils", 'socket.io-client'], function (require, exports, messages_1, md5_1, common_1, utils_1, io) {
     "use strict";
-    var messages_1 = require("../model/messages");
-    var md5_1 = require("../helper/md5");
-    var common_1 = require("./common");
-    var utils_1 = require("../helper/utils");
-    var io = require('socket.io-client');
     var MessageBuilderImpl = (function () {
         function MessageBuilderImpl(session, text, remark) {
             this.session = session;
@@ -241,3 +229,5 @@ var __extends = (this && this.__extends) || function (d, b) {
     }());
     exports.PassengerBuilderImpl = PassengerBuilderImpl;
 });
+
+//# sourceMappingURL=passenger.js.map
