@@ -1,8 +1,7 @@
 require.config({
     paths: {
         'socket.io-client': '../bower_components/socket.io-client/socket.io',
-        'fetch': '../bower_components/fetch/fetch',
-        'isomorphic-fetch': '../bower_components/isomorphic-fetch/fetch-bower',
+        'axios': '../bower_components/axios/dist/axios',
         'maxim': '../dist'
     }
 });
@@ -44,7 +43,7 @@ require(['maxim/im'], function (IM) {
         document.getElementById('upload').addEventListener('click', function (e) {
             var file = document.getElementById('attachment').files[0];
             context.attachment(file).ok(function (err, urls) {
-                console.log('upload success: %s', urls);
+                console.log('upload success: %s', JSON.stringify(urls));
             });
         });
 
@@ -54,7 +53,7 @@ require(['maxim/im'], function (IM) {
                 if (err) {
                     console.error('upload by blob failed: %s', err.message);
                 } else {
-                    console.log('upload by blob success: %s', urls);
+                    console.log('upload by blob success: %s', JSON.stringify(urls));
                 }
             });
         });

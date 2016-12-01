@@ -1,7 +1,7 @@
 import {CommonServiceImpl, CommonService} from "./common";
 import {Friend, MyGroup, RoomInfo, ChatRecord, Attributes, APIOptions, Callback, UserOutline} from "../model/models";
-import * as fetch from "isomorphic-fetch";
-import {ParrotError} from "../helper/utils";
+import axios = require('axios');
+import ResponseInterceptor = Axios.ResponseInterceptor;
 
 interface TalkingBuilder {
     ofFriend(friendid: string, callback?: Callback<ChatRecord[]>): Context;
@@ -145,18 +145,14 @@ class TalkingBuilderImpl implements TalkingBuilder {
         if (q.length > 0) {
             url += '?' + q.join('&');
         }
-        let opts = {
-            headers: this.apiOptions.headers
-        };
-        fetch(url, opts)
+
+        axios.get(url, {headers: this.apiOptions.headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
+                return response.data as ChatRecord[];
             })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
-                    callback(null, res[1] as ChatRecord[]);
+            .then(records => {
+                if (callback) {
+                    callback(null, records);
                 }
             })
             .catch(e => {
@@ -164,6 +160,26 @@ class TalkingBuilderImpl implements TalkingBuilder {
                     callback(e);
                 }
             });
+
+        // let opts = {
+        //     headers: this.apiOptions.headers
+        // };
+        // fetch(url, opts)
+        //     .then(response => {
+        //         return response.json().then(result => [response.ok, result]);
+        //     })
+        //     .then(res => {
+        //         if (!res[0]) {
+        //             throw new ParrotError(res[1]);
+        //         } else if (callback) {
+        //             callback(null, res[1] as ChatRecord[]);
+        //         }
+        //     })
+        //     .catch(e => {
+        //         if (callback) {
+        //             callback(e);
+        //         }
+        //     });
         return this.context;
     }
 
@@ -214,18 +230,13 @@ export class ContextImpl extends CommonServiceImpl implements Context {
 
     private listSomething<T>(path: string, callback: Callback<T>) {
         let url = `${super.options().server}${path}`;
-        let opts = {
-            headers: super.options().headers
-        };
-        fetch(url, opts)
+        axios.get(url, {headers: super.options().headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
+                return response.data as T;
             })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
-                    callback(null, res[1] as T);
+            .then(result => {
+                if (callback) {
+                    callback(null, result);
                 }
             })
             .catch(e => {
@@ -277,18 +288,9 @@ export class ContextImpl extends CommonServiceImpl implements Context {
 
     public joinFriend(userid: string, callback?: Callback<void>): Context {
         let url = `${super.options().server}/ctx/${this.you}/friends/${userid}`;
-        let opts = {
-            method: 'POST',
-            headers: super.options().headers
-        };
-        fetch(url, opts)
+        axios.post(url, null, {headers: super.options().headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
+                if (callback) {
                     callback(null, null);
                 }
             })
@@ -303,23 +305,14 @@ export class ContextImpl extends CommonServiceImpl implements Context {
     public joinGroup(groupid: string, callback?: Callback<void>): Context {
         let url = `${super.options().server}/groups/${groupid}/members/${this.you}`;
 
-        let opts = {
-            method: 'POST',
-            headers: super.options().headers
-        };
 
-        fetch(url, opts)
+        axios.post(url, null, {headers: super.options().headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
+                if (callback) {
                     callback(null, null);
                 }
             })
-            .catch(e=> {
+            .catch(e => {
                 if (callback) {
                     callback(e);
                 }
@@ -330,19 +323,10 @@ export class ContextImpl extends CommonServiceImpl implements Context {
     public joinRoom(roomid: string, callback?: Callback<void>): Context {
         let url = `${super.options().server}/rooms/${roomid}/members/${this.you}`;
 
-        let opts = {
-            method: 'POST',
-            headers: super.options().headers
-        };
 
-        fetch(url, opts)
+        axios.post(url, null, {headers: super.options().headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
+                if (callback) {
                     callback(null, null);
                 }
             })
@@ -360,26 +344,18 @@ export class ContextImpl extends CommonServiceImpl implements Context {
 
     private deleteSomething(path: string, callback: Callback<void>): Context {
         let url = `${super.options().server}${path}`;
-        let opts = {
-            method: 'DELETE',
-            headers: super.options().headers
-        };
-        fetch(url, opts)
+        axios.delete(url, {headers: super.options().headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
+                if (callback) {
                     callback(null, null);
                 }
             })
-            .catch(e=> {
+            .catch(e => {
                 if (callback) {
                     callback(e);
                 }
             });
+
         return this;
     }
 
@@ -399,28 +375,21 @@ export class ContextImpl extends CommonServiceImpl implements Context {
     }
 
     public setMyAttributes(attributes: Attributes, overwrite?: boolean, callback?: Callback<void>): Context {
-        let url = `/ctx/${this.you}/attributes`;
-        let opts = {
-            method: overwrite ? 'PUT' : 'POST',
-            body: JSON.stringify(attributes),
-            headers: this.options().headers
-        };
-        fetch(url, opts)
+        let url = `/ctx/${this.you}/attributes`,
+            postData = JSON.stringify(attributes),
+            cfg = {headers: this.options().headers};
+        (overwrite ? axios.put(url, postData, cfg) : axios.post(url, postData, cfg))
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
+                if (callback) {
                     callback(null, null);
                 }
             })
-            .catch(e=> {
+            .catch(e => {
                 if (callback) {
                     callback(e);
                 }
             });
+
         return this;
     }
 

@@ -9,3 +9,5 @@ tsconfig.json
 bower.json
 gulpfile.js
 .gitignore
+/.yarnclean
+/yarn.lock

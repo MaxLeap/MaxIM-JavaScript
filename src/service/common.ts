@@ -1,6 +1,6 @@
 import {UserDetail, GroupInfo, RoomInfo, UserOutline, Passenger, APIOptions, Callback} from "../model/models";
-import * as fetch from "isomorphic-fetch";
-import {ParrotError} from "../helper/utils";
+import axios = require('axios');
+import ResponseInterceptor = Axios.ResponseInterceptor;
 
 interface SearchBuilder {
     forUsers(callback: Callback<UserOutline[]>);
@@ -88,21 +88,14 @@ class AttachmentBuilderImpl implements AttachmentBuilder {
                 header[k] = this.apiOptions.headers[k];
             }
         }
-        // header['content-type'] = 'multipart/form-data';
-        let opts = {
-            method: 'POST',
-            headers: header,
-            body: data
-        };
-        fetch(url, opts)
+
+        axios.post(url, data, {headers: header})
             .then(response => {
-                return response.json().then(json => [response.ok, json]);
+                return response.data as string[];
             })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
-                    callback(null, res[1] as string[]);
+            .then(result => {
+                if (callback) {
+                    callback(null, result);
                 }
             })
             .catch(e => {
@@ -110,6 +103,31 @@ class AttachmentBuilderImpl implements AttachmentBuilder {
                     callback(e);
                 }
             });
+
+        // // header['content-type'] = 'multipart/form-data';
+        // let opts = {
+        //     method: 'POST',
+        //     headers: header,
+        //     body: data
+        // };
+
+        // fetch(url, opts)
+        //     .then(response => {
+        //         return response.json().then(json => [response.ok, json]);
+        //     })
+        //     .then(res => {
+        //         if (!res[0]) {
+        //             throw new ParrotError(res[1]);
+        //         } else if (callback) {
+        //             callback(null, res[1] as string[]);
+        //         }
+        //     })
+        //     .catch(e => {
+        //         if (callback) {
+        //             callback(e);
+        //         }
+        //     });
+
     }
 }
 
@@ -130,27 +148,43 @@ class GetAttributesBuilderImpl implements GetAttributesBuilder {
         if (this.attr) {
             url += `/${this.attr}`;
         }
-        let opts = {
-            method: 'GET',
-            headers: this.common.options().headers
-        };
-        fetch(url, opts)
-            .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
-                    callback(null, res[1]);
-                }
 
+        axios.get(url, {headers: this.common.options().headers})
+            .then(response => {
+                return response.data as string;
+            })
+            .then(result => {
+                if (callback) {
+                    callback(null, result);
+                }
             })
             .catch(e => {
                 if (callback) {
                     callback(e);
                 }
             });
+
+        // let opts = {
+        //     method: 'GET',
+        //     headers: this.common.options().headers
+        // };
+        // fetch(url, opts)
+        //     .then(response => {
+        //         return response.json().then(result => [response.ok, result]);
+        //     })
+        //     .then(res => {
+        //         if (!res[0]) {
+        //             throw new ParrotError(res[1]);
+        //         } else if (callback) {
+        //             callback(null, res[1]);
+        //         }
+        //
+        //     })
+        //     .catch(e => {
+        //         if (callback) {
+        //             callback(e);
+        //         }
+        //     });
     }
 
     forUser(callback?: Callback<any>) {
@@ -190,19 +224,13 @@ class LoadBuilderImpl extends Builder<LoadOptions> implements LoadBuilder {
     private forSomething<T>(path: string, callback: Callback<T>) {
         let url = `${this.apiOptions.server}${path}/${this.extOptions.id}`;
 
-        let opts = {
-            headers: this.apiOptions.headers
-        };
-
-        fetch(url, opts)
+        axios.post(url, null, {headers: this.apiOptions.headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
+                return response.data as T;
             })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
-                    callback(null, res[1] as T);
+            .then(result => {
+                if (callback) {
+                    callback(null, result);
                 }
             })
             .catch(e => {
@@ -210,6 +238,27 @@ class LoadBuilderImpl extends Builder<LoadOptions> implements LoadBuilder {
                     callback(e);
                 }
             });
+
+        // let opts = {
+        //     headers: this.apiOptions.headers
+        // };
+        //
+        // fetch(url, opts)
+        //     .then(response => {
+        //         return response.json().then(result => [response.ok, result]);
+        //     })
+        //     .then(res => {
+        //         if (!res[0]) {
+        //             throw new ParrotError(res[1]);
+        //         } else if (callback) {
+        //             callback(null, res[1] as T);
+        //         }
+        //     })
+        //     .catch(e => {
+        //         if (callback) {
+        //             callback(e);
+        //         }
+        //     });
     }
 
     forUser(callback: Callback<UserDetail>) {
@@ -244,18 +293,15 @@ class SearchBuilderImpl extends Builder<SearchOptions> implements SearchBuilder 
 
     private forSomething<T>(path: string, callback: Callback<T>) {
         let url = this.getUrl(path);
-        let opts = {
-            headers: this.apiOptions.headers
-        };
-        fetch(url, opts)
+
+
+        axios.get(url, {headers: this.apiOptions.headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
+                return response.data as T;
             })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
-                    callback(null, res[1] as T);
+            .then(result => {
+                if (callback) {
+                    callback(null, result);
                 }
             })
             .catch(e => {

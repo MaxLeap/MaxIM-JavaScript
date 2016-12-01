@@ -1,8 +1,8 @@
 import {CommonService, CommonServiceImpl} from "./common";
 import {SystemMessageTo, Media, Receiver, PushSettings} from "../model/messages";
 import {Attributes, Callback} from "../model/models";
-import * as fetch from "isomorphic-fetch";
-import {ParrotError} from "../helper/utils";
+import axios = require("axios");
+import ResponseInterceptor = Axios.ResponseInterceptor;
 
 export interface Admin extends CommonService {
     /**
@@ -68,18 +68,10 @@ class GroupDestroyImpl implements GroupDestroy {
 
     ok(callback?: Callback<void>): Admin {
         let url = `${this.admin.options().server}/groups/${this.groupid}`;
-        let opts = {
-            method: 'DELETE',
-            headers: this.admin.options().headers
-        };
-        fetch(url, opts)
+
+        axios.delete(url, {headers: this.admin.options().headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
+                if (callback) {
                     callback(null, null);
                 }
             })
@@ -108,18 +100,10 @@ class RoomDestroyImpl implements RoomDestroy {
 
     ok(callback?: Callback<void>): Admin {
         let url = `${this.admin.options().server}/rooms/${this.roomid}`;
-        let opts = {
-            method: 'DELETE',
-            headers: this.admin.options().headers
-        };
-        fetch(url, opts)
+
+        axios.delete(url, {headers: this.admin.options().headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
+                if (callback) {
                     callback(null, null);
                 }
             })
@@ -205,40 +189,26 @@ class GroupBuilderImpl implements GroupBuilder {
     }
 
     ok(callback?: Callback<string>): Admin {
-        let op = this.admin.options();
-        let url = `${op.server}/groups`;
+        let url = `${this.admin.options().server}/groups`;
         let data = {
             owner: this.owner,
             members: this.appends
         };
-        let opts = {
-            method: 'POST',
-            headers: op.headers,
-            body: JSON.stringify(data)
-        };
 
-        fetch(url, opts)
+        axios.post(url, JSON.stringify(data), {headers: this.admin.options().headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else {
-                    return res[1];
-                }
+                return response.data as string;
             })
             .then(groupid => {
                 this.admin
                     .setAttributes(this.attributes)
                     .forGroup(groupid, (err) => {
-                        if (!callback) {
-                            return;
-                        }
-                        if (err) {
-                            callback(err);
-                        } else {
-                            callback(null, groupid);
+                        if (callback) {
+                            if (err) {
+                                callback(err);
+                            } else {
+                                callback(null, groupid);
+                            }
                         }
                     });
             })
@@ -249,7 +219,6 @@ class GroupBuilderImpl implements GroupBuilder {
             });
         return this.admin;
     }
-
 }
 
 interface MemberAppendCommand {
@@ -278,20 +247,9 @@ class MemberAppendCommandImpl implements MemberAppendCommand {
 
     private _append(path: string, callback?: Callback<void>): Admin {
         let url = `${this.admin.options().server}${path}/members`;
-        let opts = {
-            method: 'POST',
-            headers: this.admin.options().headers,
-            body: JSON.stringify(this.members)
-        };
-
-        fetch(url, opts)
+        axios.post(url, JSON.stringify(this.members), {headers: this.admin.options().headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
+                if (callback) {
                     callback(null, null);
                 }
             })
@@ -330,19 +288,15 @@ class MemberRemoveCommandImpl implements MemberRemoveCommand {
     private _delete(path: string, callback?: Callback<void>): Admin {
         let op = this.admin.options();
         let url = `${op.server}${path}/members`;
-        let opts = {
+        let req = {
+            url: url,
             method: 'DELETE',
-            body: JSON.stringify(this.members),
+            data: JSON.stringify(this.members),
             headers: op.headers
         };
-        fetch(url, opts)
+        axios.request(req)
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
+                if (callback) {
                     callback(null, null);
                 }
             })
@@ -534,20 +488,9 @@ class MessageLauncherImpl implements MessageLauncher {
             }
         }
 
-        let opts = {
-            method: 'POST',
-            headers: this.admin.options().headers,
-            body: JSON.stringify(this.message)
-        };
-
-        fetch(url, opts)
+        axios.post(url, JSON.stringify(this.message), {headers: this.admin.options().headers})
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
+                if (callback) {
                     callback(null, null);
                 }
             })
@@ -581,19 +524,12 @@ class AttributeBuilderImpl implements AttributeBuilder {
 
     private process(path: string, callback: Callback<void>): Admin {
         let url = `${this.admin.options().server}${path}`;
-        let opts = {
-            method: this.overwrite ? 'PUT' : 'POST',
-            headers: this.admin.options().headers,
-            body: JSON.stringify(this.attributes)
-        };
-        fetch(url, opts)
+        let postData = JSON.stringify(this.attributes);
+        let cfg = {headers: this.admin.options().headers};
+
+        (this.overwrite ? axios.put(url, postData, cfg) : axios.post(url, postData, cfg))
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
+                if (callback) {
                     callback(null, null);
                 }
             })
@@ -657,46 +593,26 @@ class RoomBuilderImpl implements RoomBuilder {
     ok(callback?: Callback<string>): Admin {
         let op = this.admin.options();
         let url = `${op.server}/rooms`;
-
         let body = {
             members: this.appends
         };
-        let opts = {
-            method: 'POST',
-            body: JSON.stringify(body),
-            headers: op.headers
-        };
-        fetch(url, opts)
+
+        let config = {headers: op.headers};
+        axios.post(url, JSON.stringify(body), config)
             .then(response => {
-                return response.json().then(result => [response.ok, result]);
-            })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else {
-                    return res[1];
-                }
+                return response.data as string;
             })
             .then(roomid => {
-                let url = `${op.server}/rooms/${roomid}/attributes`;
-                let opts = {
-                    method: 'POST',
-                    body: JSON.stringify(this.attributes),
-                    headers: op.headers
-                };
-                return fetch(url, opts).then(response => {
-                    if (response.ok) {
-                        return [true, roomid];
-                    } else {
-                        return response.json().then(result => [false, result]);
-                    }
-                });
+                let url2 = `${op.server}/rooms/${roomid}/attributes`;
+                let postData = JSON.stringify(this.attributes);
+                return axios.post(url2, postData, {headers: op.headers})
+                    .then(response => {
+                        return roomid;
+                    });
             })
-            .then(res => {
-                if (!res[0]) {
-                    throw new ParrotError(res[1]);
-                } else if (callback) {
-                    callback(null, res[1]);
+            .then(roomid => {
+                if (callback) {
+                    callback(null, roomid);
                 }
             })
             .catch(e => {

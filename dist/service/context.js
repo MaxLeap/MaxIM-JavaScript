@@ -1,306 +1,253 @@
-"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var common_1 = require("./common");
-var fetch = require("isomorphic-fetch");
-var utils_1 = require("../helper/utils");
-var TalkingBuilderImpl = (function () {
-    function TalkingBuilderImpl(context, ts, size, you, apiOptions) {
-        this.ts = ts;
-        this.size = size;
-        this.context = context;
-        this.you = you;
-        this.apiOptions = apiOptions;
+(function (factory) {
+    if (typeof module === 'object' && typeof module.exports === 'object') {
+        var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
-    TalkingBuilderImpl.prototype.listHistories = function (path, callback) {
-        var url = "" + this.apiOptions.server + path;
-        var q = [];
-        if (this.ts > 0) {
-            q.push("ts=" + this.ts);
-        }
-        if (this.size > 0) {
-            q.push("limit=" + this.size);
-        }
-        if (q.length > 0) {
-            url += '?' + q.join('&');
-        }
-        var opts = {
-            headers: this.apiOptions.headers
-        };
-        fetch(url, opts)
-            .then(function (response) {
-            return response.json().then(function (result) { return [response.ok, result]; });
-        })
-            .then(function (res) {
-            if (!res[0]) {
-                throw new utils_1.ParrotError(res[1]);
-            }
-            else if (callback) {
-                callback(null, res[1]);
-            }
-        })
-            .catch(function (e) {
-            if (callback) {
-                callback(e);
-            }
-        });
-        return this.context;
-    };
-    TalkingBuilderImpl.prototype.ofFriend = function (friendid, callback) {
-        if (!callback) {
-            return this.context;
-        }
-        var path = "/ctx/" + this.you + "/friends/" + friendid + "/chats";
-        return this.listHistories(path, callback);
-    };
-    TalkingBuilderImpl.prototype.ofGroup = function (groupid, callback) {
-        if (!callback) {
-            return this.context;
-        }
-        var path = "/groups/" + groupid + "/chats";
-        return this.listHistories(path, callback);
-    };
-    TalkingBuilderImpl.prototype.ofStranger = function (strangerid, callback) {
-        if (!callback) {
-            return this.context;
-        }
-        var path = "/ctx/" + this.you + "/strangers/" + strangerid + "/chats";
-        return this.listHistories(path, callback);
-    };
-    TalkingBuilderImpl.prototype.ofPassenger = function (passengerid, callback) {
-        if (!callback) {
-            return this.context;
-        }
-        var path = "/passengers/" + passengerid + "/chats/" + this.you;
-        return this.listHistories(path, callback);
-    };
-    return TalkingBuilderImpl;
-}());
-var ContextImpl = (function (_super) {
-    __extends(ContextImpl, _super);
-    function ContextImpl(apiOptions, you) {
-        _super.call(this, apiOptions);
-        this.you = you;
+    else if (typeof define === 'function' && define.amd) {
+        define(["require", "exports", "./common", 'axios'], factory);
     }
-    ContextImpl.prototype.listSomething = function (path, callback) {
-        var url = "" + _super.prototype.options.call(this).server + path;
-        var opts = {
-            headers: _super.prototype.options.call(this).headers
+})(function (require, exports) {
+    "use strict";
+    var common_1 = require("./common");
+    var axios = require('axios');
+    var TalkingBuilderImpl = (function () {
+        function TalkingBuilderImpl(context, ts, size, you, apiOptions) {
+            this.ts = ts;
+            this.size = size;
+            this.context = context;
+            this.you = you;
+            this.apiOptions = apiOptions;
+        }
+        TalkingBuilderImpl.prototype.listHistories = function (path, callback) {
+            var url = "" + this.apiOptions.server + path;
+            var q = [];
+            if (this.ts > 0) {
+                q.push("ts=" + this.ts);
+            }
+            if (this.size > 0) {
+                q.push("limit=" + this.size);
+            }
+            if (q.length > 0) {
+                url += '?' + q.join('&');
+            }
+            axios.get(url, { headers: this.apiOptions.headers })
+                .then(function (response) {
+                return response.data;
+            })
+                .then(function (records) {
+                if (callback) {
+                    callback(null, records);
+                }
+            })
+                .catch(function (e) {
+                if (callback) {
+                    callback(e);
+                }
+            });
+            return this.context;
         };
-        fetch(url, opts)
-            .then(function (response) {
-            return response.json().then(function (result) { return [response.ok, result]; });
-        })
-            .then(function (res) {
-            if (!res[0]) {
-                throw new utils_1.ParrotError(res[1]);
+        TalkingBuilderImpl.prototype.ofFriend = function (friendid, callback) {
+            if (!callback) {
+                return this.context;
             }
-            else if (callback) {
-                callback(null, res[1]);
+            var path = "/ctx/" + this.you + "/friends/" + friendid + "/chats";
+            return this.listHistories(path, callback);
+        };
+        TalkingBuilderImpl.prototype.ofGroup = function (groupid, callback) {
+            if (!callback) {
+                return this.context;
             }
-        })
-            .catch(function (e) {
-            if (callback) {
-                callback(e);
+            var path = "/groups/" + groupid + "/chats";
+            return this.listHistories(path, callback);
+        };
+        TalkingBuilderImpl.prototype.ofStranger = function (strangerid, callback) {
+            if (!callback) {
+                return this.context;
             }
-        });
-        return this;
-    };
-    ContextImpl.prototype.listFriends = function (callback) {
-        if (!callback) {
+            var path = "/ctx/" + this.you + "/strangers/" + strangerid + "/chats";
+            return this.listHistories(path, callback);
+        };
+        TalkingBuilderImpl.prototype.ofPassenger = function (passengerid, callback) {
+            if (!callback) {
+                return this.context;
+            }
+            var path = "/passengers/" + passengerid + "/chats/" + this.you;
+            return this.listHistories(path, callback);
+        };
+        return TalkingBuilderImpl;
+    }());
+    var ContextImpl = (function (_super) {
+        __extends(ContextImpl, _super);
+        function ContextImpl(apiOptions, you) {
+            _super.call(this, apiOptions);
+            this.you = you;
+        }
+        ContextImpl.prototype.listSomething = function (path, callback) {
+            var url = "" + _super.prototype.options.call(this).server + path;
+            axios.get(url, { headers: _super.prototype.options.call(this).headers })
+                .then(function (response) {
+                return response.data;
+            })
+                .then(function (result) {
+                if (callback) {
+                    callback(null, result);
+                }
+            })
+                .catch(function (e) {
+                if (callback) {
+                    callback(e);
+                }
+            });
             return this;
-        }
-        var path = "/ctx/" + this.you + "/friends?detail";
-        return this.listSomething(path, callback);
-    };
-    ContextImpl.prototype.listGroups = function (callback) {
-        if (!callback) {
+        };
+        ContextImpl.prototype.listFriends = function (callback) {
+            if (!callback) {
+                return this;
+            }
+            var path = "/ctx/" + this.you + "/friends?detail";
+            return this.listSomething(path, callback);
+        };
+        ContextImpl.prototype.listGroups = function (callback) {
+            if (!callback) {
+                return this;
+            }
+            var path = "/ctx/" + this.you + "/groups?detail";
+            return this.listSomething(path, callback);
+        };
+        ContextImpl.prototype.listRooms = function (callback) {
+            if (!callback) {
+                return this;
+            }
+            var path = "/ctx/" + this.you + "/rooms?detail";
+            return this.listSomething(path, callback);
+        };
+        ContextImpl.prototype.listStrangers = function (callback, skip, limit) {
+            if (!callback) {
+                return this;
+            }
+            var path = "/ctx/" + this.you + "/strangers?detail";
+            if (skip) {
+                path += "&skip=" + skip;
+            }
+            if (limit) {
+                path += "&limit=" + limit;
+            }
+            return this.listSomething(path, callback);
+        };
+        ContextImpl.prototype.joinFriend = function (userid, callback) {
+            var url = _super.prototype.options.call(this).server + "/ctx/" + this.you + "/friends/" + userid;
+            axios.post(url, null, { headers: _super.prototype.options.call(this).headers })
+                .then(function (response) {
+                if (callback) {
+                    callback(null, null);
+                }
+            })
+                .catch(function (e) {
+                if (callback) {
+                    callback(e);
+                }
+            });
             return this;
-        }
-        var path = "/ctx/" + this.you + "/groups?detail";
-        return this.listSomething(path, callback);
-    };
-    ContextImpl.prototype.listRooms = function (callback) {
-        if (!callback) {
+        };
+        ContextImpl.prototype.joinGroup = function (groupid, callback) {
+            var url = _super.prototype.options.call(this).server + "/groups/" + groupid + "/members/" + this.you;
+            axios.post(url, null, { headers: _super.prototype.options.call(this).headers })
+                .then(function (response) {
+                if (callback) {
+                    callback(null, null);
+                }
+            })
+                .catch(function (e) {
+                if (callback) {
+                    callback(e);
+                }
+            });
             return this;
-        }
-        var path = "/ctx/" + this.you + "/rooms?detail";
-        return this.listSomething(path, callback);
-    };
-    ContextImpl.prototype.listStrangers = function (callback, skip, limit) {
-        if (!callback) {
+        };
+        ContextImpl.prototype.joinRoom = function (roomid, callback) {
+            var url = _super.prototype.options.call(this).server + "/rooms/" + roomid + "/members/" + this.you;
+            axios.post(url, null, { headers: _super.prototype.options.call(this).headers })
+                .then(function (response) {
+                if (callback) {
+                    callback(null, null);
+                }
+            })
+                .catch(function (e) {
+                if (callback) {
+                    callback(e);
+                }
+            });
             return this;
-        }
-        var path = "/ctx/" + this.you + "/strangers?detail";
-        if (skip) {
-            path += "&skip=" + skip;
-        }
-        if (limit) {
-            path += "&limit=" + limit;
-        }
-        return this.listSomething(path, callback);
-    };
-    ContextImpl.prototype.joinFriend = function (userid, callback) {
-        var url = _super.prototype.options.call(this).server + "/ctx/" + this.you + "/friends/" + userid;
-        var opts = {
-            method: 'POST',
-            headers: _super.prototype.options.call(this).headers
         };
-        fetch(url, opts)
-            .then(function (response) {
-            return response.json().then(function (result) { return [response.ok, result]; });
-        })
-            .then(function (res) {
-            if (!res[0]) {
-                throw new utils_1.ParrotError(res[1]);
-            }
-            else if (callback) {
-                callback(null, null);
-            }
-        })
-            .catch(function (e) {
-            if (callback) {
-                callback(e);
-            }
-        });
-        return this;
-    };
-    ContextImpl.prototype.joinGroup = function (groupid, callback) {
-        var url = _super.prototype.options.call(this).server + "/groups/" + groupid + "/members/" + this.you;
-        var opts = {
-            method: 'POST',
-            headers: _super.prototype.options.call(this).headers
+        ContextImpl.prototype.listTalkings = function (endTimestamp, size) {
+            return new TalkingBuilderImpl(this, endTimestamp || 0, size || 0, this.you, _super.prototype.options.call(this));
         };
-        fetch(url, opts)
-            .then(function (response) {
-            return response.json().then(function (result) { return [response.ok, result]; });
-        })
-            .then(function (res) {
-            if (!res[0]) {
-                throw new utils_1.ParrotError(res[1]);
-            }
-            else if (callback) {
-                callback(null, null);
-            }
-        })
-            .catch(function (e) {
-            if (callback) {
-                callback(e);
-            }
-        });
-        return this;
-    };
-    ContextImpl.prototype.joinRoom = function (roomid, callback) {
-        var url = _super.prototype.options.call(this).server + "/rooms/" + roomid + "/members/" + this.you;
-        var opts = {
-            method: 'POST',
-            headers: _super.prototype.options.call(this).headers
+        ContextImpl.prototype.deleteSomething = function (path, callback) {
+            var url = "" + _super.prototype.options.call(this).server + path;
+            axios.delete(url, { headers: _super.prototype.options.call(this).headers })
+                .then(function (response) {
+                if (callback) {
+                    callback(null, null);
+                }
+            })
+                .catch(function (e) {
+                if (callback) {
+                    callback(e);
+                }
+            });
+            return this;
         };
-        fetch(url, opts)
-            .then(function (response) {
-            return response.json().then(function (result) { return [response.ok, result]; });
-        })
-            .then(function (res) {
-            if (!res[0]) {
-                throw new utils_1.ParrotError(res[1]);
-            }
-            else if (callback) {
-                callback(null, null);
-            }
-        })
-            .catch(function (e) {
-            if (callback) {
-                callback(e);
-            }
-        });
-        return this;
-    };
-    ContextImpl.prototype.listTalkings = function (endTimestamp, size) {
-        return new TalkingBuilderImpl(this, endTimestamp || 0, size || 0, this.you, _super.prototype.options.call(this));
-    };
-    ContextImpl.prototype.deleteSomething = function (path, callback) {
-        var url = "" + _super.prototype.options.call(this).server + path;
-        var opts = {
-            method: 'DELETE',
-            headers: _super.prototype.options.call(this).headers
+        ContextImpl.prototype.leaveFriend = function (userid, callback) {
+            var path = "/ctx/" + this.you + "/friends/" + userid;
+            return this.deleteSomething(path, callback);
         };
-        fetch(url, opts)
-            .then(function (response) {
-            return response.json().then(function (result) { return [response.ok, result]; });
-        })
-            .then(function (res) {
-            if (!res[0]) {
-                throw new utils_1.ParrotError(res[1]);
-            }
-            else if (callback) {
-                callback(null, null);
-            }
-        })
-            .catch(function (e) {
-            if (callback) {
-                callback(e);
-            }
-        });
-        return this;
-    };
-    ContextImpl.prototype.leaveFriend = function (userid, callback) {
-        var path = "/ctx/" + this.you + "/friends/" + userid;
-        return this.deleteSomething(path, callback);
-    };
-    ContextImpl.prototype.leaveGroup = function (groupid, callback) {
-        var path = "/groups/" + groupid + "/members/" + this.you;
-        return this.deleteSomething(path, callback);
-    };
-    ContextImpl.prototype.leaveRoom = function (roomid, callback) {
-        var path = "/rooms/" + roomid + "/members/" + this.you;
-        return this.deleteSomething(path, callback);
-    };
-    ContextImpl.prototype.setMyAttributes = function (attributes, overwrite, callback) {
-        var url = "/ctx/" + this.you + "/attributes";
-        var opts = {
-            method: overwrite ? 'PUT' : 'POST',
-            body: JSON.stringify(attributes),
-            headers: this.options().headers
+        ContextImpl.prototype.leaveGroup = function (groupid, callback) {
+            var path = "/groups/" + groupid + "/members/" + this.you;
+            return this.deleteSomething(path, callback);
         };
-        fetch(url, opts)
-            .then(function (response) {
-            return response.json().then(function (result) { return [response.ok, result]; });
-        })
-            .then(function (res) {
-            if (!res[0]) {
-                throw new utils_1.ParrotError(res[1]);
-            }
-            else if (callback) {
-                callback(null, null);
-            }
-        })
-            .catch(function (e) {
+        ContextImpl.prototype.leaveRoom = function (roomid, callback) {
+            var path = "/rooms/" + roomid + "/members/" + this.you;
+            return this.deleteSomething(path, callback);
+        };
+        ContextImpl.prototype.setMyAttributes = function (attributes, overwrite, callback) {
+            var url = "/ctx/" + this.you + "/attributes", postData = JSON.stringify(attributes), cfg = { headers: this.options().headers };
+            (overwrite ? axios.put(url, postData, cfg) : axios.post(url, postData, cfg))
+                .then(function (response) {
+                if (callback) {
+                    callback(null, null);
+                }
+            })
+                .catch(function (e) {
+                if (callback) {
+                    callback(e);
+                }
+            });
+            return this;
+        };
+        ContextImpl.prototype.setMyAttribute = function (name, value, callback) {
+            var attributes = {};
+            attributes[name] = value;
+            return this.setMyAttributes(attributes, false, callback);
+        };
+        ContextImpl.prototype.getMyAttributes = function (callback) {
             if (callback) {
-                callback(e);
+                _super.prototype.getAttributes.call(this, this.you).forUser(callback);
             }
-        });
-        return this;
-    };
-    ContextImpl.prototype.setMyAttribute = function (name, value, callback) {
-        var attributes = {};
-        attributes[name] = value;
-        return this.setMyAttributes(attributes, false, callback);
-    };
-    ContextImpl.prototype.getMyAttributes = function (callback) {
-        if (callback) {
-            _super.prototype.getAttributes.call(this, this.you).forUser(callback);
-        }
-        return this;
-    };
-    ContextImpl.prototype.getMyAttribute = function (attributeName, callback) {
-        if (callback) {
-            _super.prototype.getAttributes.call(this, this.you, attributeName).forUser(callback);
-        }
-        return this;
-    };
-    return ContextImpl;
-}(common_1.CommonServiceImpl));
-exports.ContextImpl = ContextImpl;
+            return this;
+        };
+        ContextImpl.prototype.getMyAttribute = function (attributeName, callback) {
+            if (callback) {
+                _super.prototype.getAttributes.call(this, this.you, attributeName).forUser(callback);
+            }
+            return this;
+        };
+        return ContextImpl;
+    }(common_1.CommonServiceImpl));
+    exports.ContextImpl = ContextImpl;
+});
+
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9zZXJ2aWNlL2NvbnRleHQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7SUFBQSx1QkFBK0MsVUFBVSxDQUFDLENBQUE7SUFFMUQsSUFBTyxLQUFLLFdBQVcsT0FBTyxDQUFDLENBQUM7SUFvSGhDO1FBUUksNEJBQVksT0FBZ0IsRUFBRSxFQUFVLEVBQUUsSUFBWSxFQUFFLEdBQVcsRUFBRSxVQUFzQjtZQUN2RixJQUFJLENBQUMsRUFBRSxHQUFHLEVBQUUsQ0FBQztZQUNiLElBQUksQ0FBQyxJQUFJLEdBQUcsSUFBSSxDQUFDO1lBQ2pCLElBQUksQ0FBQyxPQUFPLEdBQUcsT0FBTyxDQUFDO1lBQ3ZCLElBQUksQ0FBQyxHQUFHLEdBQUcsR0FBRyxDQUFDO1lBQ2YsSUFBSSxDQUFDLFVBQVUsR0FBRyxVQUFVLENBQUM7UUFDakMsQ0FBQztRQUVPLDBDQUFhLEdBQXJCLFVBQXNCLElBQVksRUFBRSxRQUFnQztZQUNoRSxJQUFJLEdBQUcsR0FBRyxLQUFHLElBQUksQ0FBQyxVQUFVLENBQUMsTUFBTSxHQUFHLElBQU0sQ0FBQztZQUM3QyxJQUFJLENBQUMsR0FBYSxFQUFFLENBQUM7WUFDckIsRUFBRSxDQUFDLENBQUMsSUFBSSxDQUFDLEVBQUUsR0FBRyxDQUFDLENBQUMsQ0FBQyxDQUFDO2dCQUNkLENBQUMsQ0FBQyxJQUFJLENBQUMsUUFBTSxJQUFJLENBQUMsRUFBSSxDQUFDLENBQUM7WUFDNUIsQ0FBQztZQUNELEVBQUUsQ0FBQyxDQUFDLElBQUksQ0FBQyxJQUFJLEdBQUcsQ0FBQyxDQUFDLENBQUMsQ0FBQztnQkFDaEIsQ0FBQyxDQUFDLElBQUksQ0FBQyxXQUFTLElBQUksQ0FBQyxJQUFNLENBQUMsQ0FBQztZQUNqQyxDQUFDO1lBRUQsRUFBRSxDQUFDLENBQUMsQ0FBQyxDQUFDLE1BQU0sR0FBRyxDQUFDLENBQUMsQ0FBQyxDQUFDO2dCQUNmLEdBQUcsSUFBSSxHQUFHLEdBQUcsQ0FBQyxDQUFDLElBQUks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TUFBTSxDQUFDLElBQUksQ0FBQztRQUNoQixDQUFDO1FBRU0sb0NBQWMsR0FBckIsVUFBc0IsYUFBcUIsRUFBRSxRQUF3QjtZQUNqRSxFQUFFLENBQUMsQ0FBQyxRQUFRLENBQUMsQ0FBQyxDQUFDO2dCQUNYLGdCQUFLLENBQUMsYUFBYSxZQUFDLElBQUksQ0FBQyxHQUFHLEVBQUUsYUFBYSxDQUFDLENBQUMsT0FBTyxDQUFDLFFBQVEsQ0FBQyxDQUFDO1lBQ25FLENBQUM7WUFDRCxNQUFNLENBQUMsSUFBSSxDQUFDO1FBQ2hCLENBQUM7UUFDTCxrQkFBQztJQUFELENBak1BLEFBaU1DLENBak1nQywwQkFBaUIsR0FpTWpEO0lBak1ZLG1CQUFXLGNBaU12QixDQUFBIiwiZmlsZSI6InNlcnZpY2UvY29udGV4dC5qcyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7Q29tbW9uU2VydmljZUltcGwsIENvbW1vblNlcnZpY2V9IGZyb20gXCIuL2NvbW1vblwiO1xuaW1wb3J0IHtGcmllbmQsIE15R3JvdXAsIFJvb21JbmZvLCBDaGF0UmVjb3JkLCBBdHRyaWJ1dGVzLCBBUElPcHRpb25zLCBDYWxsYmFjaywgVXNlck91dGxpbmV9IGZyb20gXCIuLi9tb2RlbC9tb2RlbHNcIjtcbmltcG9ydCBheGlvcyA9IHJlcXVpcmUoJ2F4aW9zJyk7XG5pbXBvcnQgUmVzcG9uc2VJbnRlcmNlcHRvciA9IEF4aW9zLlJlc3BvbnNlSW50ZXJjZXB0b3I7XG5cbmludGVyZmFjZSBUYWxraW5nQnVpbGRlciB7XG4gICAgb2ZGcmllbmQoZnJpZW5kaWQ6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazxDaGF0UmVjb3JkW10+KTogQ29udGV4dDtcbiAgICBvZkdyb3VwKGdyb3VwaWQ6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazxDaGF0UmVjb3JkW10+KTogQ29udGV4dDtcbiAgICBvZlN0cmFuZ2VyKHN0cmFuZ2VyaWQ6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazxDaGF0UmVjb3JkW10+KTogQ29udGV4dDtcbiAgICBvZlBhc3NlbmdlcihwYXNzZW5nZXJpZDogc3RyaW5nLCBjYWxsYmFjaz86IENhbGxiYWNrPENoYXRSZWNvcmRbXT4pOiBDb250ZXh0O1xufVxuXG5leHBvcnQgaW50ZXJmYWNlIENvbnRleHQgZXh0ZW5kcyBDb21tb25TZXJ2aWNlIHtcblxuICAgIC8qKlxuICAgICAqIOWIl+WHuuWlveWPi+ivpuaDhVxuICAgICAqIEBwYXJhbSBjYWxsYmFja1xuICAgICAqL1xuICAgIGxpc3RGcmllbmRzKGNhbGxiYWNrPzogQ2FsbGJhY2s8RnJpZW5kW10+KTogQ29udGV4dDtcblxuICAgIC8qKlxuICAgICAqIOWIl+WHuuW3suWKoOWFpeeahOe+pOe7hFxuICAgICAqIEBwYXJhbSBjYWxsYmFja1xuICAgICAqL1xuICAgIGxpc3RHcm91cHMoY2FsbGJhY2s/OiBDYWxsYmFjazxNeUdyb3VwW10+KTogQ29udGV4dDtcblxuICAgIC8qKlxuICAgICAqIOWIl+WHuuW3suWKoOWFpeeahOiBiuWkqeWupFxuICAgICAqIEBwYXJhbSBjYWxsYmFja1xuICAgICAqL1xuICAgIGxpc3RSb29tcyhjYWxsYmFjaz86IENhbGxiYWNrPFJvb21JbmZvW10+KTogQ29udGV4dDtcblxuICAgIC8qKlxuICAgICAqIOWIl+WHuuWFs+iBlOeahOmZjOeUn+S6uuWIl+ihqCwg5YiG6aG15p+l6K+iXG4gICAgICogQHBhcmFtIGNhbGxiYWNrXG4gICAgICogQHBhcmFtIHNraXBcbiAgICAgKiBAcGFyYW0gbGltaXRcbiAgICAgKi9cbiAgICBsaXN0U3RyYW5nZXJzKGNhbGxiYWNrOiBDYWxsYmFjazxVc2VyT3V0bGluZVtdPiwgc2tpcD86IG51bWJlciwgbGltaXQ/OiBudW1iZXIpOiBDb250ZXh0O1xuXG4gICAgLyoqXG4gICAgICog5p+l6K+i6IGK5aSp6K6w5b2VXG4gICAgICogQHBhcmFtIGVuZFRpbWVzdGFtcCDmnIDlkI7miKrmraLml7bpl7TmiLNcbiAgICAgKiBAcGFyYW0gc2l6ZSDov5Tlm57orrDlvZXmlbBcbiAgICAgKi9cbiAgICBsaXN0VGFsa2luZ3MoZW5kVGltZXN0YW1wPzogbnVtYmVyLCBzaXplPzogbnVtYmVyKTogVGFsa2luZ0J1aWxkZXI7XG5cbiAgICAvKipcbiAgICAgKiDmt7vliqDlpb3lj4tcbiAgICAgKiBAcGFyYW0gdXNlcmlkIOWlveWPi+eUqOaIt0lEXG4gICAgICogQHBhcmFtIGNhbGxiYWNrXG4gICAgICovXG4gICAgam9pbkZyaWVuZCh1c2VyaWQ6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazx2b2lkPik6IENvbnRleHQ7XG4gICAgLyoqXG4gICAgICog5Yqg5YWl5p+Q5Liq576k57uEXG4gICAgICogQHBhcmFtIGdyb3VwaWQg576k57uESURcbiAgICAgKiBAcGFyYW0gY2FsbGJhY2tcbiAgICAgKi9cbiAgICBqb2luR3JvdXAoZ3JvdXBpZDogc3RyaW5nLCBjYWxsYmFjaz86IENhbGxiYWNrPHZvaWQ+KTogQ29udGV4dDtcbiAgICAvKipcbiAgICAgKiDliqDlhaXmn5DkuKrogYrlpKnlrqRcbiAgICAgKiBAcGFyYW0gcm9vbWlkIOiBiuWkqeWupElEXG4gICAgICogQHBhcmFtIGNhbGxiYWNrXG4gICAgICovXG4gICAgam9pblJvb20ocm9vbWlkOiBzdHJpbmcsIGNhbGxiYWNrPzogQ2FsbGJhY2s8dm9pZD4pOiBDb250ZXh0O1xuICAgIC8qKlxuICAgICAqIOino+mZpOafkOS4quWlveWPi1xuICAgICAqIEBwYXJhbSB1c2VyaWQg5aW95Y+LSURcbiAgICAgKiBAcGFyYW0gY2FsbGJhY2tcbiAgICAgKi9cbiAgICBsZWF2ZUZyaWVuZCh1c2VyaWQ6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazx2b2lkPik6IENvbnRleHQ7XG4gICAgLyoqXG4gICAgICog56a75byA5p+Q5Liq576k57uEXG4gICAgICogQHBhcmFtIGdyb3VwaWQg576k57uESURcbiAgICAgKiBAcGFyYW0gY2FsbGJhY2tcbiAgICAgKi9cbiAgICBsZWF2ZUdyb3VwKGdyb3VwaWQ6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazx2b2lkPik6IENvbnRleHQ7XG4gICAgLyoqXG4gICAgICog56a75byA5p+Q5Liq6IGK5aSp5a6kXG4gICAgICogQHBhcmFtIHJvb21pZCDogYrlpKnlrqRJRFxuICAgICAqIEBwYXJhbSBjYWxsYmFja1xuICAgICAqL1xuICAgIGxlYXZlUm9vbShyb29taWQ6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazx2b2lkPik6IENvbnRleHQ7XG5cbiAgICAvKipcbiAgICAgKiDorr7nva7lvZPliY3kuIrkuIvmlofnlKjmiLfnmoTlsZ7mgKdcbiAgICAgKiBAcGFyYW0gYXR0cmlidXRlcyDlsZ7mgKfooahcbiAgICAgKiBAcGFyYW0gb3ZlcndyaXRlIOW8uuWItuimhuebllxuICAgICAqIEBwYXJhbSBjYWxsYmFjayDlm57osINcbiAgICAgKi9cbiAgICBzZXRNeUF0dHJpYnV0ZXMoYXR0cmlidXRlczogQXR0cmlidXRlcywgb3ZlcndyaXRlPzogYm9vbGVhbiwgY2FsbGJhY2s/OiBDYWxsYmFjazx2b2lkPik6IENvbnRleHQ7XG5cbiAgICAvKipcbiAgICAgKiDorr7nva7lvZPliY3kuIrkuIvmlofnlKjmiLfnmoTljZXkuKrlsZ7mgKdcbiAgICAgKiBAcGFyYW0gbmFtZSDlsZ7mgKflkI1cbiAgICAgKiBAcGFyYW0gdmFsdWUg5bGe5oCn6KGoXG4gICAgICogQHBhcmFtIGNhbGxiYWNrIOWbnuiwg1xuICAgICAqL1xuICAgIHNldE15QXR0cmlidXRlKG5hbWU6IHN0cmluZywgdmFsdWU6IGFueSwgY2FsbGJhY2s/OiBDYWxsYmFjazx2b2lkPik6IENvbnRleHQ7XG5cbiAgICAvKipcbiAgICAgKiDojrflj5blvZPliY3kuIrkuIvmlofnlKjmiLfnmoTlsZ7mgKfliJfooahcbiAgICAgKiBAcGFyYW0gY2FsbGJhY2tcbiAgICAgKi9cbiAgICBnZXRNeUF0dHJpYnV0ZXMoY2FsbGJhY2s/OiBDYWxsYmFjazxBdHRyaWJ1dGVzPik6IENvbnRleHQ7XG5cbiAgICAvKipcbiAgICAgKiDojrflj5blvZPliY3kuIrkuIvmlofnlKjmiLfnmoTmn5DkuKrlsZ7mgKdcbiAgICAgKiBAcGFyYW0gYXR0cmlidXRlTmFtZVxuICAgICAqIEBwYXJhbSBjYWxsYmFja1xuICAgICAqL1xuICAgIGdldE15QXR0cmlidXRlKGF0dHJpYnV0ZU5hbWU6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazxhbnk+KTogQ29udGV4dDtcblxufVxuXG4vKipcbiAqIFRhbGtpbmdCdWlsZGVy5a6e546w57G7XG4gKi9cbmNsYXNzIFRhbGtpbmdCdWlsZGVySW1wbCBpbXBsZW1lbnRzIFRhbGtpbmdCdWlsZGVyIHtcblxuICAgIHByaXZhdGUgdHM6IG51bWJlcjtcbiAgICBwcml2YXRlIHNpemU6IG51bWJlcjtcbiAgICBwcml2YXRlIGNvbnRleHQ6IENvbnRleHQ7XG4gICAgcHJpdmF0ZSB5b3U6IHN0cmluZztcbiAgICBwcml2YXRlIGFwaU9wdGlvbnM6IEFQSU9wdGlvbnM7XG5cbiAgICBjb25zdHJ1Y3Rvcihjb250ZXh0OiBDb250ZXh0LCB0czogbnVtYmVyLCBzaXplOiBudW1iZXIsIHlvdTogc3RyaW5nLCBhcGlPcHRpb25zOiBBUElPcHRpb25zKSB7XG4gICAgICAgIHRoaXMudHMgPSB0cztcbiAgICAgICAgdGhpcy5zaXplID0gc2l6ZTtcbiAgICAgICAgdGhpcy5jb250ZXh0ID0gY29udGV4dDtcbiAgICAgICAgdGhpcy55b3UgPSB5b3U7XG4gICAgICAgIHRoaXMuYXBpT3B0aW9ucyA9IGFwaU9wdGlvbnM7XG4gICAgfVxuXG4gICAgcHJpdmF0ZSBsaXN0SGlzdG9yaWVzKHBhdGg6IHN0cmluZywgY2FsbGJhY2s6IENhbGxiYWNrPENoYXRSZWNvcmRbXT4pOiBDb250ZXh0IHtcbiAgICAgICAgbGV0IHVybCA9IGAke3RoaXMuYXBpT3B0aW9ucy5zZXJ2ZXJ9JHtwYXRofWA7XG4gICAgICAgIGxldCBxOiBzdHJpbmdbXSA9IFtdO1xuICAgICAgICBpZiAodGhpcy50cyA+IDApIHtcbiAgICAgICAgICAgIHEucHVzaChgdHM9JHt0aGlzLnRzfWApO1xuICAgICAgICB9XG4gICAgICAgIGlmICh0aGlzLnNpemUgPiAwKSB7XG4gICAgICAgICAgICBxLnB1c2goYGxpbWl0PSR7dGhpcy5zaXplfWApO1xuICAgICAgICB9XG5cbiAgICAgICAgaWYgKHEubGVuZ3RoID4gMCkge1xuICAgICAgICAgICAgdXJsICs9ICc/JyArIHEuam9pbignJicpO1xuICAgICAgICB9XG5cbiAgICAgICAgYXhpb3MuZ2V0KHVybCwge2hlYWRlcnM6IHRoaXMuYXBpT3B0aW9ucy5oZWFkZXJzfSlcbiAgICAgICAgICAgIC50aGVuKHJlc3BvbnNlID0+IHtcbiAgICAgICAgICAgICAgICByZXR1cm4gcmVzcG9uc2UuZGF0YSBhcyBDaGF0UmVjb3JkW107XG4gICAgICAgICAgICB9KVxuICAgICAgICAgICAgLnRoZW4ocmVjb3JkcyA9PiB7XG4gICAgICAgICAgICAgICAgaWYgKGNhbGxiYWNrKSB7XG4gICAgICAgICAgICAgICAgICAgIGNhbGxiYWNrKG51bGwsIHJlY29yZHMpO1xuICAgICAgICAgICAgICAgIH1cbiAgICAgICAgICAgIH0pXG4gICAgICAgICAgICAuY2F0Y2goZSA9PiB7XG4gICAgICAgICAgICAgICAgaWYgKGNhbGxiYWNrKSB7XG4gICAgICAgICAgICAgICAgICAgIGNhbGxiYWNrKGUpO1xuICAgICAgICAgICAgICAgIH1cbiAgICAgICAgICAgIH0pO1xuXG4gICAgICAgIC8vIGxldCBvcHRzID0ge1xuICAgICAgICAvLyAgICAgaGVhZGVyczogdGhpcy5hcGlPcHRpb25zLmhlYWRlcnNcbiAgICAgICAgLy8gfTtcbiAgICAgICAgLy8gZmV0Y2godXJsLCBvcHRzKVxuICAgICAgICAvLyAgICAgLnRoZW4ocmVzcG9uc2UgPT4ge1xuICAgICAgICAvLyAgICAgICAgIHJldHVybiByZXNwb25zZS5qc29uKCkudGhlbihyZXN1bHQgPT4gW3Jlc3BvbnNlLm9rLCByZXN1bHRdKTtcbiAgICAgICAgLy8gICAgIH0pXG4gICAgICAgIC8vICAgICAudGhlbihyZXMgPT4ge1xuICAgICAgICAvLyAgICAgICAgIGlmICghcmVzWzBdKSB7XG4gICAgICAgIC8vICAgICAgICAgICAgIHRocm93IG5ldyBQYXJyb3RFcnJvcihyZXNbMV0pO1xuICAgICAgICAvLyAgICAgICAgIH0gZWxzZSBpZiAoY2FsbGJhY2spIHtcbiAgICAgICAgLy8gICAgICAgICAgICAgY2FsbGJhY2sobnVsbCwgcmVzWzFdIGFzIENoYXRSZWNvcmRbXSk7XG4gICAgICAgIC8vICAgICAgICAgfVxuICAgICAgICAvLyAgICAgfSlcbiAgICAgICAgLy8gICAgIC5jYXRjaChlID0+IHtcbiAgICAgICAgLy8gICAgICAgICBpZiAoY2FsbGJhY2spIHtcbiAgICAgICAgLy8gICAgICAgICAgICAgY2FsbGJhY2soZSk7XG4gICAgICAgIC8vICAgICAgICAgfVxuICAgICAgICAvLyAgICAgfSk7XG4gICAgICAgIHJldHVybiB0aGlzLmNvbnRleHQ7XG4gICAgfVxuXG4gICAgb2ZGcmllbmQoZnJpZW5kaWQ6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazxDaGF0UmVjb3JkW10+KTogQ29udGV4dCB7XG4gICAgICAgIGlmICghY2FsbGJhY2spIHtcbiAgICAgICAgICAgIHJldHVybiB0aGlzLmNvbnRleHQ7XG4gICAgICAgIH1cbiAgICAgICAgbGV0IHBhdGggPSBgL2N0eC8ke3RoaXMueW91fS9mcmllbmRzLyR7ZnJpZW5kaWR9L2NoYXRzYDtcbiAgICAgICAgcmV0dXJuIHRoaXMubGlzdEhpc3RvcmllcyhwYXRoLCBjYWxsYmFjayk7XG4gICAgfVxuXG4gICAgb2ZHcm91cChncm91cGlkOiBzdHJpbmcsIGNhbGxiYWNrPzogQ2FsbGJhY2s8Q2hhdFJlY29yZFtdPik6IENvbnRleHQge1xuICAgICAgICBpZiAoIWNhbGxiYWNrKSB7XG4gICAgICAgICAgICByZXR1cm4gdGhpcy5jb250ZXh0O1xuICAgICAgICB9XG4gICAgICAgIGxldCBwYXRoID0gYC9ncm91cHMvJHtncm91cGlkfS9jaGF0c2A7XG4gICAgICAgIHJldHVybiB0aGlzLmxpc3RIaXN0b3JpZXMocGF0aCwgY2FsbGJhY2spO1xuICAgIH1cblxuICAgIG9mU3RyYW5nZXIoc3RyYW5nZXJpZDogc3RyaW5nLCBjYWxsYmFjaz86IENhbGxiYWNrPENoYXRSZWNvcmRbXT4pOiBDb250ZXh0IHtcbiAgICAgICAgaWYgKCFjYWxsYmFjaykge1xuICAgICAgICAgICAgcmV0dXJuIHRoaXMuY29udGV4dDtcbiAgICAgICAgfVxuICAgICAgICBsZXQgcGF0aCA9IGAvY3R4LyR7dGhpcy55b3V9L3N0cmFuZ2Vycy8ke3N0cmFuZ2VyaWR9L2NoYXRzYDtcbiAgICAgICAgcmV0dXJuIHRoaXMubGlzdEhpc3RvcmllcyhwYXRoLCBjYWxsYmFjayk7XG4gICAgfVxuXG4gICAgb2ZQYXNzZW5nZXIocGFzc2VuZ2VyaWQ6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazxDaGF0UmVjb3JkW10+KTogQ29udGV4dCB7XG4gICAgICAgIGlmICghY2FsbGJhY2spIHtcbiAgICAgICAgICAgIHJldHVybiB0aGlzLmNvbnRleHQ7XG4gICAgICAgIH1cbiAgICAgICAgbGV0IHBhdGggPSBgL3Bhc3NlbmdlcnMvJHtwYXNzZW5nZXJpZH0vY2hhdHMvJHt0aGlzLnlvdX1gO1xuICAgICAgICByZXR1cm4gdGhpcy5saXN0SGlzdG9yaWVzKHBhdGgsIGNhbGxiYWNrKTtcbiAgICB9XG59XG5cbi8qKlxuICog55So5oi35LiK5LiL5paH5a6e546w57G7XG4gKi9cbmV4cG9ydCBjbGFzcyBDb250ZXh0SW1wbCBleHRlbmRzIENvbW1vblNlcnZpY2VJbXBsIGltcGxlbWVudHMgQ29udGV4dCB7XG5cbiAgICBwcml2YXRlIHlvdTogc3RyaW5nO1xuXG4gICAgY29uc3RydWN0b3IoYXBpT3B0aW9uczogQVBJT3B0aW9ucywgeW91OiBzdHJpbmcpIHtcbiAgICAgICAgc3VwZXIoYXBpT3B0aW9ucyk7XG4gICAgICAgIHRoaXMueW91ID0geW91O1xuICAgIH1cblxuICAgIHByaXZhdGUgbGlzdFNvbWV0aGluZzxUPihwYXRoOiBzdHJpbmcsIGNhbGxiYWNrOiBDYWxsYmFjazxUPikge1xuICAgICAgICBsZXQgdXJsID0gYCR7c3VwZXIub3B0aW9ucygpLnNlcnZlcn0ke3BhdGh9YDtcbiAgICAgICAgYXhpb3MuZ2V0KHVybCwge2hlYWRlcnM6IHN1cGVyLm9wdGlvbnMoKS5oZWFkZXJzfSlcbiAgICAgICAgICAgIC50aGVuKHJlc3BvbnNlID0+IHtcbiAgICAgICAgICAgICAgICByZXR1cm4gcmVzcG9uc2UuZGF0YSBhcyBUO1xuICAgICAgICAgICAgfSlcbiAgICAgICAgICAgIC50aGVuKHJlc3VsdCA9PiB7XG4gICAgICAgICAgICAgICAgaWYgKGNhbGxiYWNrKSB7XG4gICAgICAgICAgICAgICAgICAgIGNhbGxiYWNrKG51bGwsIHJlc3VsdCk7XG4gICAgICAgICAgICAgICAgfVxuICAgICAgICAgICAgfSlcbiAgICAgICAgICAgIC5jYXRjaChlID0+IHtcbiAgICAgICAgICAgICAgICBpZiAoY2FsbGJhY2spIHtcbiAgICAgICAgICAgICAgICAgICAgY2FsbGJhY2soZSk7XG4gICAgICAgICAgICAgICAgfVxuICAgICAgICAgICAgfSk7XG4gICAgICAgIHJldHVybiB0aGlzO1xuICAgIH1cblxuICAgIHB1YmxpYyBsaXN0RnJpZW5kcyhjYWxsYmFjaz86IENhbGxiYWNrPEZyaWVuZFtdPik6IENvbnRleHQge1xuICAgICAgICBpZiAoIWNhbGxiYWNrKSB7XG4gICAgICAgICAgICByZXR1cm4gdGhpcztcbiAgICAgICAgfVxuICAgICAgICBsZXQgcGF0aCA9IGAvY3R4LyR7dGhpcy55b3V9L2ZyaWVuZHM/ZGV0YWlsYDtcbiAgICAgICAgcmV0dXJuIHRoaXMubGlzdFNvbWV0aGluZyhwYXRoLCBjYWxsYmFjayk7XG4gICAgfVxuXG4gICAgcHVibGljIGxpc3RHcm91cHMoY2FsbGJhY2s/OiBDYWxsYmFjazxNeUdyb3VwW10+KTogQ29udGV4dCB7XG4gICAgICAgIGlmICghY2FsbGJhY2spIHtcbiAgICAgICAgICAgIHJldHVybiB0aGlzO1xuICAgICAgICB9XG4gICAgICAgIGxldCBwYXRoID0gYC9jdHgvJHt0aGlzLnlvdX0vZ3JvdXBzP2RldGFpbGA7XG4gICAgICAgIHJldHVybiB0aGlzLmxpc3RTb21ldGhpbmcocGF0aCwgY2FsbGJhY2spO1xuICAgIH1cblxuICAgIHB1YmxpYyBsaXN0Um9vbXMoY2FsbGJhY2s/OiBDYWxsYmFjazxSb29tSW5mb1tdPik6IENvbnRleHQge1xuICAgICAgICBpZiAoIWNhbGxiYWNrKSB7XG4gICAgICAgICAgICByZXR1cm4gdGhpcztcbiAgICAgICAgfVxuICAgICAgICBsZXQgcGF0aCA9IGAvY3R4LyR7dGhpcy55b3V9L3Jvb21zP2RldGFpbGA7XG4gICAgICAgIHJldHVybiB0aGlzLmxpc3RTb21ldGhpbmcocGF0aCwgY2FsbGJhY2spO1xuICAgIH1cblxuICAgIHB1YmxpYyBsaXN0U3RyYW5nZXJzKGNhbGxiYWNrOiBDYWxsYmFjazxVc2VyT3V0bGluZVtdPiwgc2tpcD86IG51bWJlciwgbGltaXQ/OiBudW1iZXIpOiBDb250ZXh0IHtcbiAgICAgICAgaWYgKCFjYWxsYmFjaykge1xuICAgICAgICAgICAgcmV0dXJuIHRoaXM7XG4gICAgICAgIH1cbiAgICAgICAgbGV0IHBhdGggPSBgL2N0eC8ke3RoaXMueW91fS9zdHJhbmdlcnM/ZGV0YWlsYDtcblxuICAgICAgICBpZiAoc2tpcCkge1xuICAgICAgICAgICAgcGF0aCArPSBgJnNraXA9JHtza2lwfWA7XG4gICAgICAgIH1cbiAgICAgICAgaWYgKGxpbWl0KSB7XG4gICAgICAgICAgICBwYXRoICs9IGAmbGltaXQ9JHtsaW1pdH1gO1xuICAgICAgICB9XG4gICAgICAgIHJldHVybiB0aGlzLmxpc3RTb21ldGhpbmcocGF0aCwgY2FsbGJhY2spO1xuICAgIH1cblxuICAgIHB1YmxpYyBqb2luRnJpZW5kKHVzZXJpZDogc3RyaW5nLCBjYWxsYmFjaz86IENhbGxiYWNrPHZvaWQ+KTogQ29udGV4dCB7XG4gICAgICAgIGxldCB1cmwgPSBgJHtzdXBlci5vcHRpb25zKCkuc2VydmVyfS9jdHgvJHt0aGlzLnlvdX0vZnJpZW5kcy8ke3VzZXJpZH1gO1xuICAgICAgICBheGlvcy5wb3N0KHVybCwgbnVsbCwge2hlYWRlcnM6IHN1cGVyLm9wdGlvbnMoKS5oZWFkZXJzfSlcbiAgICAgICAgICAgIC50aGVuKHJlc3BvbnNlID0+IHtcbiAgICAgICAgICAgICAgICBpZiAoY2FsbGJhY2spIHtcbiAgICAgICAgICAgICAgICAgICAgY2FsbGJhY2sobnVsbCwgbnVsbCk7XG4gICAgICAgICAgICAgICAgfVxuICAgICAgICAgICAgfSlcbiAgICAgICAgICAgIC5jYXRjaChlID0+IHtcbiAgICAgICAgICAgICAgICBpZiAoY2FsbGJhY2spIHtcbiAgICAgICAgICAgICAgICAgICAgY2FsbGJhY2soZSk7XG4gICAgICAgICAgICAgICAgfVxuICAgICAgICAgICAgfSk7XG4gICAgICAgIHJldHVybiB0aGlzO1xuICAgIH1cblxuICAgIHB1YmxpYyBqb2luR3JvdXAoZ3JvdXBpZDogc3RyaW5nLCBjYWxsYmFjaz86IENhbGxiYWNrPHZvaWQ+KTogQ29udGV4dCB7XG4gICAgICAgIGxldCB1cmwgPSBgJHtzdXBlci5vcHRpb25zKCkuc2VydmVyfS9ncm91cHMvJHtncm91cGlkfS9tZW1iZXJzLyR7dGhpcy55b3V9YDtcblxuXG4gICAgICAgIGF4aW9zLnBvc3QodXJsLCBudWxsLCB7aGVhZGVyczogc3VwZXIub3B0aW9ucygpLmhlYWRlcnN9KVxuICAgICAgICAgICAgLnRoZW4ocmVzcG9uc2UgPT4ge1xuICAgICAgICAgICAgICAgIGlmIChjYWxsYmFjaykge1xuICAgICAgICAgICAgICAgICAgICBjYWxsYmFjayhudWxsLCBudWxsKTtcbiAgICAgICAgICAgICAgICB9XG4gICAgICAgICAgICB9KVxuICAgICAgICAgICAgLmNhdGNoKGUgPT4ge1xuICAgICAgICAgICAgICAgIGlmIChjYWxsYmFjaykge1xuICAgICAgICAgICAgICAgICAgICBjYWxsYmFjayhlKTtcbiAgICAgICAgICAgICAgICB9XG4gICAgICAgICAgICB9KTtcbiAgICAgICAgcmV0dXJuIHRoaXM7XG4gICAgfVxuXG4gICAgcHVibGljIGpvaW5Sb29tKHJvb21pZDogc3RyaW5nLCBjYWxsYmFjaz86IENhbGxiYWNrPHZvaWQ+KTogQ29udGV4dCB7XG4gICAgICAgIGxldCB1cmwgPSBgJHtzdXBlci5vcHRpb25zKCkuc2VydmVyfS9yb29tcy8ke3Jvb21pZH0vbWVtYmVycy8ke3RoaXMueW91fWA7XG5cblxuICAgICAgICBheGlvcy5wb3N0KHVybCwgbnVsbCwge2hlYWRlcnM6IHN1cGVyLm9wdGlvbnMoKS5oZWFkZXJzfSlcbiAgICAgICAgICAgIC50aGVuKHJlc3BvbnNlID0+IHtcbiAgICAgICAgICAgICAgICBpZiAoY2FsbGJhY2spIHtcbiAgICAgICAgICAgICAgICAgICAgY2FsbGJhY2sobnVsbCwgbnVsbCk7XG4gICAgICAgICAgICAgICAgfVxuICAgICAgICAgICAgfSlcbiAgICAgICAgICAgIC5jYXRjaChlID0+IHtcbiAgICAgICAgICAgICAgICBpZiAoY2FsbGJhY2spIHtcbiAgICAgICAgICAgICAgICAgICAgY2FsbGJhY2soZSk7XG4gICAgICAgICAgICAgICAgfVxuICAgICAgICAgICAgfSk7XG4gICAgICAgIHJldHVybiB0aGlzO1xuICAgIH1cblxuICAgIHB1YmxpYyBsaXN0VGFsa2luZ3MoZW5kVGltZXN0YW1wPzogbnVtYmVyLCBzaXplPzogbnVtYmVyKTogVGFsa2luZ0J1aWxkZXIge1xuICAgICAgICByZXR1cm4gbmV3IFRhbGtpbmdCdWlsZGVySW1wbCh0aGlzLCBlbmRUaW1lc3RhbXAgfHwgMCwgc2l6ZSB8fCAwLCB0aGlzLnlvdSwgc3VwZXIub3B0aW9ucygpKTtcbiAgICB9XG5cbiAgICBwcml2YXRlIGRlbGV0ZVNvbWV0aGluZyhwYXRoOiBzdHJpbmcsIGNhbGxiYWNrOiBDYWxsYmFjazx2b2lkPik6IENvbnRleHQge1xuICAgICAgICBsZXQgdXJsID0gYCR7c3VwZXIub3B0aW9ucygpLnNlcnZlcn0ke3BhdGh9YDtcbiAgICAgICAgYXhpb3MuZGVsZXRlKHVybCwge2hlYWRlcnM6IHN1cGVyLm9wdGlvbnMoKS5oZWFkZXJzfSlcbiAgICAgICAgICAgIC50aGVuKHJlc3BvbnNlID0+IHtcbiAgICAgICAgICAgICAgICBpZiAoY2FsbGJhY2spIHtcbiAgICAgICAgICAgICAgICAgICAgY2FsbGJhY2sobnVsbCwgbnVsbCk7XG4gICAgICAgICAgICAgICAgfVxuICAgICAgICAgICAgfSlcbiAgICAgICAgICAgIC5jYXRjaChlID0+IHtcbiAgICAgICAgICAgICAgICBpZiAoY2FsbGJhY2spIHtcbiAgICAgICAgICAgICAgICAgICAgY2FsbGJhY2soZSk7XG4gICAgICAgICAgICAgICAgfVxuICAgICAgICAgICAgfSk7XG5cbiAgICAgICAgcmV0dXJuIHRoaXM7XG4gICAgfVxuXG4gICAgcHVibGljIGxlYXZlRnJpZW5kKHVzZXJpZDogc3RyaW5nLCBjYWxsYmFjaz86IENhbGxiYWNrPHZvaWQ+KTogQ29udGV4dCB7XG4gICAgICAgIGxldCBwYXRoID0gYC9jdHgvJHt0aGlzLnlvdX0vZnJpZW5kcy8ke3VzZXJpZH1gO1xuICAgICAgICByZXR1cm4gdGhpcy5kZWxldGVTb21ldGhpbmcocGF0aCwgY2FsbGJhY2spO1xuICAgIH1cblxuICAgIHB1YmxpYyBsZWF2ZUdyb3VwKGdyb3VwaWQ6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazx2b2lkPik6IENvbnRleHQge1xuICAgICAgICBsZXQgcGF0aCA9IGAvZ3JvdXBzLyR7Z3JvdXBpZH0vbWVtYmVycy8ke3RoaXMueW91fWA7XG4gICAgICAgIHJldHVybiB0aGlzLmRlbGV0ZVNvbWV0aGluZyhwYXRoLCBjYWxsYmFjayk7XG4gICAgfVxuXG4gICAgcHVibGljIGxlYXZlUm9vbShyb29taWQ6IHN0cmluZywgY2FsbGJhY2s/OiBDYWxsYmFjazx2b2lkPik6IENvbnRleHQge1xuICAgICAgICBsZXQgcGF0aCA9IGAvcm9vbXMvJHtyb29taWR9L21lbWJlcnMvJHt0aGlzLnlvdX1gO1xuICAgICAgICByZXR1cm4gdGhpcy5kZWxldGVTb21ldGhpbmcocGF0aCwgY2FsbGJhY2spO1xuICAgIH1cblxuICAgIHB1YmxpYyBzZXRNeUF0dHJpYnV0ZXMoYXR0cmlidXRlczogQXR0cmlidXRlcywgb3ZlcndyaXRlPzogYm9vbGVhbiwgY2FsbGJhY2s/OiBDYWxsYmFjazx2b2lkPik6IENvbnRleHQge1xuICAgICAgICBsZXQgdXJsID0gYC9jdHgvJHt0aGlzLnlvdX0vYXR0cmlidXRlc2AsXG4gICAgICAgICAgICBwb3N0RGF0YSA9IEpTT04uc3RyaW5naWZ5KGF0dHJpYnV0ZXMpLFxuICAgICAgICAgICAgY2ZnID0ge2hlYWRlcnM6IHRoaXMub3B0aW9ucygpLmhlYWRlcnN9O1xuICAgICAgICAob3ZlcndyaXRlID8gYXhpb3MucHV0KHVybCwgcG9zdERhdGEsIGNmZykgOiBheGlvcy5wb3N0KHVybCwgcG9zdERhdGEsIGNmZykpXG4gICAgICAgICAgICAudGhlbihyZXNwb25zZSA9PiB7XG4gICAgICAgICAgICAgICAgaWYgKGNhbGxiYWNrKSB7XG4gICAgICAgICAgICAgICAgICAgIGNhbGxiYWNrKG51bGwsIG51bGwpO1xuICAgICAgICAgICAgICAgIH1cbiAgICAgICAgICAgIH0pXG4gICAgICAgICAgICAuY2F0Y2goZSA9PiB7XG4gICAgICAgICAgICAgICAgaWYgKGNhbGxiYWNrKSB7XG4gICAgICAgICAgICAgICAgICAgIGNhbGxiYWNrKGUpO1xuICAgICAgICAgICAgICAgIH1cbiAgICAgICAgICAgIH0pO1xuXG4gICAgICAgIHJldHVybiB0aGlzO1xuICAgIH1cblxuICAgIHB1YmxpYyBzZXRNeUF0dHJpYnV0ZShuYW1lOiBzdHJpbmcsIHZhbHVlOiBhbnksIGNhbGxiYWNrPzogQ2FsbGJhY2s8dm9pZD4pOiBDb250ZXh0IHtcbiAgICAgICAgbGV0IGF0dHJpYnV0ZXMgPSB7fTtcbiAgICAgICAgYXR0cmlidXRlc1tuYW1lXSA9IHZhbHVlO1xuICAgICAgICByZXR1cm4gdGhpcy5zZXRNeUF0dHJpYnV0ZXMoYXR0cmlidXRlcywgZmFsc2UsIGNhbGxiYWNrKTtcbiAgICB9XG5cbiAgICBwdWJsaWMgZ2V0TXlBdHRyaWJ1dGVzKGNhbGxiYWNrPzogQ2FsbGJhY2s8QXR0cmlidXRlcz4pOiBDb250ZXh0IHtcbiAgICAgICAgaWYgKGNhbGxiYWNrKSB7XG4gICAgICAgICAgICBzdXBlci5nZXRBdHRyaWJ1dGVzKHRoaXMueW91KS5mb3JVc2VyKGNhbGxiYWNrKTtcbiAgICAgICAgfVxuICAgICAgICByZXR1cm4gdGhpcztcbiAgICB9XG5cbiAgICBwdWJsaWMgZ2V0TXlBdHRyaWJ1dGUoYXR0cmlidXRlTmFtZTogc3RyaW5nLCBjYWxsYmFjaz86IENhbGxiYWNrPGFueT4pOiBDb250ZXh0IHtcbiAgICAgICAgaWYgKGNhbGxiYWNrKSB7XG4gICAgICAgICAgICBzdXBlci5nZXRBdHRyaWJ1dGVzKHRoaXMueW91LCBhdHRyaWJ1dGVOYW1lKS5mb3JVc2VyKGNhbGxiYWNrKTtcbiAgICAgICAgfVxuICAgICAgICByZXR1cm4gdGhpcztcbiAgICB9XG59Il19
