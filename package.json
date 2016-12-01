@@ -32,9 +32,5 @@
     "gulp-typescript": "^3.1.3",
     "typescript": "^2.0.10",
     "typings": "^2.0.0"
-  },
-  "scripts": {
-    "prepublish": "node_modules/typings/dist/bin.js i",
-    "postpublish": "node_modules/gulp/bin/gulp.js"
   }
 }
