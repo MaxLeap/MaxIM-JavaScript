@@ -34,7 +34,7 @@
     "typings": "^2.0.0"
   },
   "scripts": {
-    "postinstall": "node_modules/typings/dist/bin.js i",
+    "prepublish": "node_modules/typings/dist/bin.js i",
     "postpublish": "node_modules/gulp/bin/gulp.js"
   }
 }
