@@ -13,7 +13,7 @@ gulp.task('clean', cb => {
     del(OUTPUT, cb)
 });
 
-gulp.task('build', () => {
+gulp.task('build-with-sourcemaps', () => {
     return tsProject
         .src()
         .pipe(sourcemaps.init())
@@ -23,6 +23,14 @@ gulp.task('build', () => {
         .pipe(gulp.dest(OUTPUT));
 });
 
-gulp.task('serve', serve('.'));
+gulp.task('build', () => {
+    return tsProject
+        .src()
+        .pipe(tsProject())
+        .js
+        .pipe(gulp.dest(OUTPUT));
+});
 
+gulp.task('serve', serve('.'));
 gulp.task('default', ['clean', 'build']);
+gulp.task('build-dev', ['clean', 'build-with-sourcemaps']);
