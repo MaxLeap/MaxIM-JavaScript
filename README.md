@@ -43,8 +43,7 @@ $ bower install maxleap-im --save
 require.config({
   paths: {
     'socket.io-client': 'bower_components/socket.io-client/socket.io',
-    'fetch': 'bower_components/fetch/fetch',
-    'isomorphic-fetch': 'bower_components/isomorphic-fetch/fetch-bower',
+    'axios': 'bower_components/axios/dist/axios',
     'maxleap-im': 'bower_components/maxleap-im/dist'
   }
 });
