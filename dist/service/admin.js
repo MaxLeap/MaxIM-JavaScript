@@ -153,10 +153,10 @@ define(["require", "exports", "./common", "../model/messages", "axios"], functio
             return this.admin;
         };
         MemberAppendCommandImpl.prototype.intoRoom = function (roomid, callback) {
-            return this._append("/rooms/" + roomid, callback);
+            return this.invokeAppend("/rooms/" + roomid, callback);
         };
         MemberAppendCommandImpl.prototype.intoGroup = function (groupid, callback) {
-            return this._append("/groups/" + groupid, callback);
+            return this.invokeAppend("/groups/" + groupid, callback);
         };
         return MemberAppendCommandImpl;
     }());
@@ -190,10 +190,10 @@ define(["require", "exports", "./common", "../model/messages", "axios"], functio
             return this.admin;
         };
         MemberRemoveCommandImpl.prototype.fromRoom = function (roomid, callback) {
-            return this._delete("/rooms/" + roomid, callback);
+            return this.invokeDelete("/rooms/" + roomid, callback);
         };
         MemberRemoveCommandImpl.prototype.fromGroup = function (groupid, callback) {
-            return this._delete("/groups/" + groupid, callback);
+            return this.invokeDelete("/groups/" + groupid, callback);
         };
         return MemberRemoveCommandImpl;
     }());

@@ -1,6 +1,6 @@
+import {APIOptions} from "./model/models";
 import {Admin, AdminImpl} from "./service/admin";
 import {Login, LoginImpl} from "./service/login";
-import {APIOptions} from "./model/models";
 import {PassengerBuilder, PassengerBuilderImpl} from "./service/passenger";
 
 interface MaxIMOptions {
@@ -30,52 +30,53 @@ interface MaxIM {
 
 class MaxIMImpl implements MaxIM {
 
-  private _options: APIOptions;
-  private _admin: Admin;
+  private currentOptions: APIOptions;
+  private currentAdmin: Admin;
 
   constructor(options: MaxIMOptions) {
     if (!options || !options.app || !options.key) {
-      throw new Error(`invalid options: ${JSON.stringify(options)}`);
+      throw new Error(`invalid options: ${JSON.stringify(options)}.`);
     }
-
-    let server: string, protocol: string = options.useHttp ? 'http://' : 'https://';
-    switch ((options.region || 'cn').toLowerCase()) {
-      case 'us':
-        server = 'im.maxleap.com';
+    let server: string;
+    const protocol: string = options.useHttp ? "http://" : "https://";
+    switch ((options.region || "cn").toLowerCase()) {
+      case "us":
+        server = "im.maxleap.com";
         break;
-      case 'cn':
-        server = 'im.maxleap.cn';
+      case "cn":
+        server = "im.maxleap.cn";
         break;
-      case 'test':
-        server = 'imuat.maxleap.cn';
+      case "test":
+        server = "imuat.maxleap.cn";
         break;
       default:
-        throw new Error(`invalid region ${options.region}`);
+        throw new Error(`invalid region ${options.region}.`);
     }
-    this._options = new APIOptions(`${protocol}${server}`, options.app, options.key);
-    this._admin = new AdminImpl(this._options);
+    this.currentOptions = new APIOptions(`${protocol}${server}`, options.app, options.key);
+    this.currentAdmin = new AdminImpl(this.currentOptions);
   }
 
-  login(): Login {
-    return new LoginImpl(this._options);
+  public login(): Login {
+    return new LoginImpl(this.currentOptions);
   }
 
-  passenger(id?: string): PassengerBuilder {
-    return new PassengerBuilderImpl(this._options, id);
+  public passenger(id?: string): PassengerBuilder {
+    return new PassengerBuilderImpl(this.currentOptions, id);
   }
 
-  admin(): Admin {
-    return this._admin;
+  public admin(): Admin {
+    return this.currentAdmin;
   }
 }
 
-if (typeof window !== 'undefined') {
-  let ml = 'ML', im = 'im';
-  if (typeof window[ml] === 'undefined') {
+if (typeof window !== "undefined") {
+  const ml = "ML";
+  const im = "im";
+  if (typeof window[ml] === "undefined") {
     window[ml] = {};
   }
-  window[ml][im] = function (options: MaxIMOptions): MaxIM {
-    return new MaxIMImpl(options)
+  window[ml][im] = (options: MaxIMOptions) => {
+    return new MaxIMImpl(options);
   };
 }
 

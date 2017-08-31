@@ -76,17 +76,10 @@ export class APIOptions {
 }
 
 export type Handler1<T> = (t?: T) => void;
-
 export type Handler2<T, U> = (t?: T, u?: U) => void;
-
 export type Handler3<T, U, V> = (t?: T, u?: U, v?: V) => void;
-
-export interface Callback<T> extends Handler2<Error, T> {
-}
-
-export interface Callback2<T, U> extends Handler3<Error, T, U> {
-
-}
+export type Callback<T> = (err?: Error, t?: T) => void;
+export type Callback2<T, U> = (err?: Error, t?: T, u?: U) => void;
 
 export interface LoginResult {
   success: boolean;

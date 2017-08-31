@@ -29,6 +29,7 @@ export interface MessageTo {
   content: Content;
   push?: PushSettings;
   remark?: string;
+  ack?: number;
 }
 
 export interface PushSettings {

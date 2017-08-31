@@ -106,7 +106,7 @@ class RoomDestroyImpl implements RoomDestroy {
     const url = `${this.admin.options().server}/rooms/${this.roomid}`;
 
     axios.delete(url, {headers: this.admin.options().headers})
-        .then((response) => {
+        .then((ignore) => {
           if (callback) {
             callback(null, null);
           }
@@ -241,9 +241,7 @@ interface MemberRemoveCommand {
 class MemberAppendCommandImpl implements MemberAppendCommand {
 
   private admin: AdminImpl;
-  private members: {
-    members: string[],
-  };
+  private members: { members: string[] };
 
   constructor(admin: AdminImpl, members: string[]) {
     this.admin = admin;
@@ -252,10 +250,18 @@ class MemberAppendCommandImpl implements MemberAppendCommand {
     };
   }
 
-  private _append(path: string, callback?: Callback<void>): Admin {
+  public intoRoom(roomid: string, callback?: Callback<void>): Admin {
+    return this.invokeAppend(`/rooms/${roomid}`, callback);
+  }
+
+  public intoGroup(groupid: string, callback?: Callback<void>): Admin {
+    return this.invokeAppend(`/groups/${groupid}`, callback);
+  }
+
+  private invokeAppend(path: string, callback?: Callback<void>): Admin {
     const url = `${this.admin.options().server}${path}/members`;
     axios.post(url, JSON.stringify(this.members), {headers: this.admin.options().headers})
-        .then((response) => {
+        .then((ignore) => {
           if (callback) {
             callback(null, null);
           }
@@ -267,15 +273,6 @@ class MemberAppendCommandImpl implements MemberAppendCommand {
         });
     return this.admin;
   }
-
-  public intoRoom(roomid: string, callback?: Callback<void>): Admin {
-    return this._append(`/rooms/${roomid}`, callback);
-  }
-
-  public intoGroup(groupid: string, callback?: Callback<void>): Admin {
-    return this._append(`/groups/${groupid}`, callback);
-  }
-
 }
 
 class MemberRemoveCommandImpl implements MemberRemoveCommand {
@@ -292,7 +289,15 @@ class MemberRemoveCommandImpl implements MemberRemoveCommand {
     };
   }
 
-  private _delete(path: string, callback?: Callback<void>): Admin {
+  public fromRoom(roomid: string, callback?: Callback<void>): Admin {
+    return this.invokeDelete(`/rooms/${roomid}`, callback);
+  }
+
+  public fromGroup(groupid: string, callback?: Callback<void>): Admin {
+    return this.invokeDelete(`/groups/${groupid}`, callback);
+  }
+
+  private invokeDelete(path: string, callback?: Callback<void>): Admin {
     const op = this.admin.options();
     const url = `${op.server}${path}/members`;
     const req = {
@@ -302,7 +307,7 @@ class MemberRemoveCommandImpl implements MemberRemoveCommand {
       headers: op.headers,
     };
     axios.request(req)
-        .then((response) => {
+        .then((ignore) => {
           if (callback) {
             callback(null, null);
           }
@@ -314,15 +319,6 @@ class MemberRemoveCommandImpl implements MemberRemoveCommand {
         });
     return this.admin;
   }
-
-  public fromRoom(roomid: string, callback?: Callback<void>): Admin {
-    return this._delete(`/rooms/${roomid}`, callback);
-  }
-
-  public fromGroup(groupid: string, callback?: Callback<void>): Admin {
-    return this._delete(`/groups/${groupid}`, callback);
-  }
-
 }
 
 interface MessageBuilder {
@@ -381,13 +377,6 @@ class MessageBuilderImpl implements MessageBuilder {
     if (remark !== undefined && remark !== null) {
       this.message.remark = remark;
     }
-  }
-
-  private touchPush(): PushSettings {
-    if (!this.message.push) {
-      this.message.push = {};
-    }
-    return this.message.push;
   }
 
   public disablePush(): MessageBuilder {
@@ -472,6 +461,13 @@ class MessageBuilderImpl implements MessageBuilder {
       type: Receiver.ROOM,
     };
     return new MessageLauncherImpl(this.admin, this.message, this.receiver);
+  }
+
+  private touchPush(): PushSettings {
+    if (!this.message.push) {
+      this.message.push = {};
+    }
+    return this.message.push;
   }
 }
 

@@ -84,7 +84,7 @@ define(["require", "exports", "../model/messages", "../helper/md5", "./common", 
         }
         MessageLauncherImpl.prototype.ok = function (callback) {
             try {
-                this._session._socket.emit('say', this._message);
+                this._session.socket.emit('say', this._message);
                 if (callback) {
                     callback(null, null);
                 }
@@ -100,8 +100,8 @@ define(["require", "exports", "../model/messages", "../helper/md5", "./common", 
     }());
     var PassengerSessionImpl = (function () {
         function PassengerSessionImpl(socket, passengerid) {
-            this._socket = socket;
-            this._id = passengerid;
+            this.socket = socket;
+            this.id = passengerid;
         }
         PassengerSessionImpl.prototype.say = function (text, remark) {
             return new MessageBuilderImpl(this, text, remark);
@@ -111,7 +111,7 @@ define(["require", "exports", "../model/messages", "../helper/md5", "./common", 
                 return;
             }
             this._closed = true;
-            this._socket.close();
+            this.socket.close();
         };
         return PassengerSessionImpl;
     }());

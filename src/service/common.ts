@@ -126,6 +126,27 @@ class GetAttributesBuilderImpl implements GetAttributesBuilder {
     this.attr = attr;
   }
 
+  public forUser(callback?: Callback<any>) {
+    if (!callback) {
+      return;
+    }
+    this.forAttr(`/ctx/${this.id}`, callback);
+  }
+
+  public forGroup(callback?: Callback<any>) {
+    if (!callback) {
+      return;
+    }
+    this.forAttr(`/groups/${this.id}`, callback);
+  }
+
+  public forRoom(callback?: Callback<any>) {
+    if (!callback) {
+      return;
+    }
+    this.forAttr(`/rooms/${this.id}`, callback);
+  }
+
   private forAttr(path: string, callback: Callback<any>) {
     let url = `${this.common.options().server}${path}/attributes`;
     if (this.attr) {
@@ -147,27 +168,6 @@ class GetAttributesBuilderImpl implements GetAttributesBuilder {
           }
         });
   }
-
-  public forUser(callback?: Callback<any>) {
-    if (!callback) {
-      return;
-    }
-    this.forAttr(`/ctx/${this.id}`, callback);
-  }
-
-  public forGroup(callback?: Callback<any>) {
-    if (!callback) {
-      return;
-    }
-    this.forAttr(`/groups/${this.id}`, callback);
-  }
-
-  public forRoom(callback?: Callback<any>) {
-    if (!callback) {
-      return;
-    }
-    this.forAttr(`/rooms/${this.id}`, callback);
-  }
 }
 
 class Builder<T> {
@@ -181,25 +181,6 @@ class Builder<T> {
 }
 
 class LoadBuilderImpl extends Builder<LoadOptions> implements LoadBuilder {
-
-  private forSomething<T>(path: string, callback: Callback<T>) {
-    const url = `${this.apiOptions.server}${path}/${this.extOptions.id}`;
-
-    axios.post(url, null, {headers: this.apiOptions.headers})
-        .then((response) => {
-          return response.data as T;
-        })
-        .then((result) => {
-          if (callback) {
-            callback(null, result);
-          }
-        })
-        .catch((e) => {
-          if (callback) {
-            callback(e);
-          }
-        });
-  }
 
   public forUser(callback: Callback<UserDetail>) {
     this.forSomething("/ctx", callback);
@@ -216,9 +197,39 @@ class LoadBuilderImpl extends Builder<LoadOptions> implements LoadBuilder {
   public forPassenger(callback: Callback<Passenger>) {
     this.forSomething("/passengers", callback);
   }
+
+  private forSomething<T>(path: string, callback: Callback<T>) {
+    const url = `${this.apiOptions.server}${path}/${this.extOptions.id}`;
+    axios.post(url, null, {headers: this.apiOptions.headers})
+        .then((response) => {
+          return response.data as T;
+        })
+        .then((result) => {
+          if (callback) {
+            callback(null, result);
+          }
+        })
+        .catch((e) => {
+          if (callback) {
+            callback(e);
+          }
+        });
+  }
 }
 
 class SearchBuilderImpl extends Builder<SearchOptions> implements SearchBuilder {
+
+  public forUsers(callback?: Callback<UserOutline[]>) {
+    this.forSomething("/ctx", callback);
+  }
+
+  public forGroups(callback?: Callback<GroupInfo[]>) {
+    this.forSomething("/groups", callback);
+  }
+
+  public forRooms(callback?: Callback<RoomInfo[]>) {
+    this.forSomething("/rooms", callback);
+  }
 
   private getUrl(path: string): string {
     const q: string[] = [];
@@ -250,29 +261,18 @@ class SearchBuilderImpl extends Builder<SearchOptions> implements SearchBuilder 
         });
   }
 
-  public forUsers(callback?: Callback<UserOutline[]>) {
-    this.forSomething("/ctx", callback);
-  }
-
-  public forGroups(callback?: Callback<GroupInfo[]>) {
-    this.forSomething("/groups", callback);
-  }
-
-  public forRooms(callback?: Callback<RoomInfo[]>) {
-    this.forSomething("/rooms", callback);
-  }
 }
 
 class CommonServiceImpl implements CommonService {
 
-  private _options: APIOptions;
+  private opts: APIOptions;
 
   constructor(apiOptions: APIOptions) {
-    this._options = apiOptions;
+    this.opts = apiOptions;
   }
 
   public options(): APIOptions {
-    return this._options;
+    return this.opts;
   }
 
   public search(query?: {}, skip?: number, limit?: number, sort?: string[]): SearchBuilder {
@@ -282,14 +282,14 @@ class CommonServiceImpl implements CommonService {
       query,
       sort,
     };
-    return new SearchBuilderImpl(this._options, searchOptions);
+    return new SearchBuilderImpl(this.opts, searchOptions);
   }
 
   public load(id: string): LoadBuilder {
     const opts = {
       id,
     };
-    return new LoadBuilderImpl(this._options, opts);
+    return new LoadBuilderImpl(this.opts, opts);
   }
 
   public getAttributes(id: string, attributeName?: string): GetAttributesBuilder {
@@ -297,7 +297,7 @@ class CommonServiceImpl implements CommonService {
   }
 
   public attachment(attachment: File): AttachmentBuilder {
-    return new AttachmentBuilderImpl(this._options, attachment);
+    return new AttachmentBuilderImpl(this.opts, attachment);
   }
 }
 

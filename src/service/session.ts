@@ -1,4 +1,5 @@
 import io = require("socket.io-client");
+import Socket = SocketIOClient.Socket;
 import {convert2basic} from "../helper/utils";
 import {
   BasicMessageFrom,
@@ -12,9 +13,11 @@ import {
 } from "../model/messages";
 import {APIOptions, Callback, Callback2, Handler1, Handler2, Handler3, LoginResult} from "../model/models";
 import {Context, ContextImpl} from "./context";
-import Socket = SocketIOClient.Socket;
 
 interface MessageBuilder {
+
+  ack(ack: number): MessageBuilder;
+
   asText(): MessageBuilder;
 
   asImage(): MessageBuilder;
@@ -73,6 +76,11 @@ class MessageBuilderImpl implements MessageBuilder {
     }
   }
 
+  public ack(ack: number): MessageBuilder {
+    this.message.ack = parseInt(`${ack}`, 0);
+    return this;
+  }
+
   public asText(): MessageBuilder {
     this.message.content.media = Media.TEXT;
     return this;
@@ -91,13 +99,6 @@ class MessageBuilderImpl implements MessageBuilder {
   public asVideo(): MessageBuilder {
     this.message.content.media = Media.VIDEO;
     return this;
-  }
-
-  private createPushIfNotExist(): PushSettings {
-    if (!this.message.push) {
-      this.message.push = {};
-    }
-    return this.message.push;
   }
 
   public disablePush(): MessageBuilder {
@@ -165,6 +166,13 @@ class MessageBuilderImpl implements MessageBuilder {
     return new MessageLauncherImpl(this.session, this.message);
   }
 
+  private createPushIfNotExist(): PushSettings {
+    if (!this.message.push) {
+      this.message.push = {};
+    }
+    return this.message.push;
+  }
+
 }
 
 class MessageLauncherImpl implements MessageLauncher {
@@ -207,7 +215,7 @@ export class SessionBuilderImpl implements SessionBuilder {
   private yourselfs: Array<Handler1<YourselfMessageFrom>>;
 
   private apiOptions: APIOptions;
-  private authdata: {};
+  private authdata: { [key: string]: any };
 
   constructor(apiOptions: APIOptions, authdata: {}) {
     this.apiOptions = apiOptions;
@@ -384,10 +392,11 @@ export class SessionBuilderImpl implements SessionBuilder {
 }
 
 class SessionImpl implements Session {
-  private closed: boolean;
-  private userid: string;
 
   public socket: Socket;
+
+  private closed: boolean;
+  private userid: string;
 
   constructor(socket: Socket, userid: string) {
     this.closed = false;
@@ -413,7 +422,6 @@ class SessionImpl implements Session {
     this.closed = true;
     this.socket.close();
   }
-
 }
 
 export interface Session {

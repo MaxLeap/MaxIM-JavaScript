@@ -19,7 +19,7 @@ define(["require", "exports", "./session", "../helper/md5"], function (require, 
             var authdata = {
                 client: userid
             };
-            LoginImpl._extend(authdata, this._basicAuth);
+            LoginImpl.extend(authdata, this._basicAuth);
             return new session_1.SessionBuilderImpl(this._options, authdata);
         };
         LoginImpl.prototype.byMaxleapUser = function (username, password) {
@@ -27,7 +27,7 @@ define(["require", "exports", "./session", "../helper/md5"], function (require, 
                 username: username,
                 password: password
             };
-            LoginImpl._extend(authdata, this._basicAuth);
+            LoginImpl.extend(authdata, this._basicAuth);
             return new session_1.SessionBuilderImpl(this._options, authdata);
         };
         LoginImpl.prototype.byPhone = function (phone, verify) {
@@ -35,7 +35,7 @@ define(["require", "exports", "./session", "../helper/md5"], function (require, 
                 phone: phone,
                 password: verify
             };
-            LoginImpl._extend(authdata, this._basicAuth);
+            LoginImpl.extend(authdata, this._basicAuth);
             return new session_1.SessionBuilderImpl(this._options, authdata);
         };
         return LoginImpl;

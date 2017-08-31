@@ -32,31 +32,31 @@ export interface Login {
  */
 export class LoginImpl implements Login {
 
-  private _options: APIOptions;
-  private _basicAuth: {};
-
-  constructor(apiOptions: APIOptions) {
-    this._options = apiOptions;
-    const foo = new Date().getTime();
-    const bar = md5(`${foo}${this._options.sign}`) + "," + foo;
-    this._basicAuth = {
-      app: this._options.app,
-      sign: bar,
-    };
-  }
-
-  private static _extend(target: {}, source: {}): void {
+  private static extend(target: {}, source: {}): void {
     for (const k in source) {
       target[k] = source[k];
     }
+  }
+
+  private options: APIOptions;
+  private basicAuth: {};
+
+  constructor(apiOptions: APIOptions) {
+    this.options = apiOptions;
+    const foo = new Date().getTime();
+    const bar = md5(`${foo}${this.options.sign}`) + "," + foo;
+    this.basicAuth = {
+      app: this.options.app,
+      sign: bar,
+    };
   }
 
   public simple(userid: string): SessionBuilder {
     const authdata = {
       client: userid,
     };
-    LoginImpl._extend(authdata, this._basicAuth);
-    return new SessionBuilderImpl(this._options, authdata);
+    LoginImpl.extend(authdata, this.basicAuth);
+    return new SessionBuilderImpl(this.options, authdata);
   }
 
   public byMaxleapUser(username: string, password: string): SessionBuilder {
@@ -64,8 +64,8 @@ export class LoginImpl implements Login {
       username,
       password,
     };
-    LoginImpl._extend(authdata, this._basicAuth);
-    return new SessionBuilderImpl(this._options, authdata);
+    LoginImpl.extend(authdata, this.basicAuth);
+    return new SessionBuilderImpl(this.options, authdata);
   }
 
   public byPhone(phone: string, verify: string): SessionBuilder {
@@ -73,7 +73,7 @@ export class LoginImpl implements Login {
       phone,
       password: verify,
     };
-    LoginImpl._extend(authdata, this._basicAuth);
-    return new SessionBuilderImpl(this._options, authdata);
+    LoginImpl.extend(authdata, this.basicAuth);
+    return new SessionBuilderImpl(this.options, authdata);
   }
 }

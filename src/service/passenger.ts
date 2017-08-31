@@ -1,10 +1,10 @@
 import io = require("socket.io-client");
+import Socket = SocketIOClient.Socket;
 import {md5} from "../helper/md5";
 import {convert2basic, ParrotError} from "../helper/utils";
 import {BasicMessageFrom, Media, MessageFrom, MessageTo, PushSettings, Receiver} from "../model/messages";
 import {APIOptions, Attributes, Callback, Callback2, Handler1, Handler2, LoginResult} from "../model/models";
 import {CommonService, CommonServiceImpl} from "./common";
-import Socket = SocketIOClient.Socket;
 
 interface PassengerBuilder {
   attribute(name: string, value: any): PassengerBuilder;
@@ -84,13 +84,6 @@ class MessageBuilderImpl implements MessageBuilder {
     }
   }
 
-  private createPushIfNotExist(): PushSettings {
-    if (!this.message.push) {
-      this.message.push = {};
-    }
-    return this.message.push;
-  }
-
   public disablePush(): MessageBuilder {
     this.createPushIfNotExist().enable = false;
     return this;
@@ -151,21 +144,28 @@ class MessageBuilderImpl implements MessageBuilder {
     return new MessageLauncherImpl(this.session, this.message);
   }
 
+  private createPushIfNotExist(): PushSettings {
+    if (!this.message.push) {
+      this.message.push = {};
+    }
+    return this.message.push;
+  }
+
 }
 
 class MessageLauncherImpl implements MessageLauncher {
 
-  private _session: PassengerSessionImpl;
-  private _message: MessageTo;
+  private session: PassengerSessionImpl;
+  private msg: MessageTo;
 
   constructor(session: PassengerSessionImpl, message: MessageTo) {
-    this._session = session;
-    this._message = message;
+    this.session = session;
+    this.msg = message;
   }
 
   public ok(callback?: Callback<void>): PassengerSession {
     try {
-      this._session._socket.emit("say", this._message);
+      this.session.socket.emit("say", this.msg);
       if (callback) {
         callback(null, null);
       }
@@ -174,20 +174,19 @@ class MessageLauncherImpl implements MessageLauncher {
         callback(e);
       }
     }
-    return this._session;
+    return this.session;
   }
 }
 
 class PassengerSessionImpl implements PassengerSession {
 
-  public _socket: Socket;
-  public _id: string;
-
-  private _closed: boolean;
+  public socket: Socket;
+  public id: string;
+  private closed: boolean;
 
   constructor(socket: Socket, passengerid: string) {
-    this._socket = socket;
-    this._id = passengerid;
+    this.socket = socket;
+    this.id = passengerid;
   }
 
   public say(text: string, remark?: string): MessageBuilder {
@@ -195,90 +194,90 @@ class PassengerSessionImpl implements PassengerSession {
   }
 
   public close(callback?: Callback<void>) {
-    if (this._closed) {
+    if (this.closed) {
       return;
     }
-    this._closed = true;
-    this._socket.close();
+    this.closed = true;
+    this.socket.close();
   }
 
 }
 
 class PassengerContextImpl extends CommonServiceImpl implements PassengerContext {
 
-  private _you: string;
+  private you: string;
 
   constructor(options: APIOptions, you: string) {
     super(options);
-    this._you = you;
+    this.you = you;
   }
 
   public current(): string {
-    return this._you;
+    return this.you;
   }
 
 }
 
 class PassengerBuilderImpl implements PassengerBuilder {
 
-  private _id: string;
-  private _options: APIOptions;
-  private _attributes: Attributes = [];
-  private _fromuser: Array<Handler2<string, BasicMessageFrom>> = [];
-  private _fromsystem: Array<Handler1<BasicMessageFrom>> = [];
-  private _fromStrangerOnline: Array<Handler1<string>> = [];
-  private _fromStrangerOffline: Array<Handler1<string>> = [];
+  private id: string;
+  private options: APIOptions;
+  private attributes: Attributes = [];
+  private fromUser: Array<Handler2<string, BasicMessageFrom>> = [];
+  private fromSystem: Array<Handler1<BasicMessageFrom>> = [];
+  private fromStrangerOnline: Array<Handler1<string>> = [];
+  private fromStrangerOffline: Array<Handler1<string>> = [];
 
   constructor(options: APIOptions, id?: string) {
-    this._options = options;
-    this._id = id;
+    this.options = options;
+    this.id = id;
   }
 
   public attribute(name: string, value: any): PassengerBuilder {
-    this._attributes[name] = value;
+    this.attributes[name] = value;
     return this;
   }
 
   public onUserMessage(callback: Handler2<string, BasicMessageFrom>): PassengerBuilder {
-    this._fromuser.push(callback);
+    this.fromUser.push(callback);
     return this;
   }
 
   public onSystemMessage(callback: Handler1<BasicMessageFrom>): PassengerBuilder {
-    this._fromsystem.push(callback);
+    this.fromSystem.push(callback);
     return this;
   }
 
   public onStrangerOnline(callback: Handler1<string>): PassengerBuilder {
-    this._fromStrangerOnline.push(callback);
+    this.fromStrangerOnline.push(callback);
     return this;
   }
 
   public onStrangerOffline(callback: Handler1<string>): PassengerBuilder {
-    this._fromStrangerOffline.push(callback);
+    this.fromStrangerOffline.push(callback);
     return this;
   }
 
   public ok(callback: Callback2<PassengerSession, PassengerContext>) {
-    const url = `${this._options.server}/chat`;
+    const url = `${this.options.server}/chat`;
 
     const foo = new Date().getTime();
-    const bar = md5(`${foo}${this._options.sign}`) + "," + foo;
+    const bar = md5(`${foo}${this.options.sign}`) + "," + foo;
     const authdata = {
-      app: this._options.app,
+      app: this.options.app,
       sign: bar,
       passenger: {},
     };
 
-    for (const k in this._attributes) {
+    for (const k in this.attributes) {
       if (k === "id") {
         continue;
       }
-      authdata.passenger[k] = this._attributes[k];
+      authdata.passenger[k] = this.attributes[k];
     }
 
-    if (this._id) {
-      authdata.passenger.id = this._id;
+    if (this.id) {
+      authdata.passenger.id = this.id;
     }
 
     const socket = io.connect(url, {
@@ -289,7 +288,7 @@ class PassengerBuilderImpl implements PassengerBuilder {
       const foo = result as LoginResult;
       if (foo.success) {
         const session = new PassengerSessionImpl(socket, foo.id);
-        const ctx = new PassengerContextImpl(this._options, foo.id);
+        const ctx = new PassengerContextImpl(this.options, foo.id);
         callback(null, session, ctx);
       } else {
         const err = new ParrotError({errorCode: foo.error, errorMessage: ""});
@@ -303,7 +302,7 @@ class PassengerBuilderImpl implements PassengerBuilder {
 
       switch (msg.from.type) {
         case Receiver.ACTOR:
-          for (const handler of this._fromuser) {
+          for (const handler of this.fromUser) {
             handler(msg.from.id, basicmsg);
           }
           break;
@@ -313,20 +312,20 @@ class PassengerBuilderImpl implements PassengerBuilder {
     });
 
     socket.on("online_x", (onlineid) => {
-      for (const handler of this._fromStrangerOnline) {
+      for (const handler of this.fromStrangerOnline) {
         handler(onlineid as string);
       }
     });
 
     socket.on("offline_x", (offlineid) => {
-      for (const handler of this._fromStrangerOffline) {
+      for (const handler of this.fromStrangerOffline) {
         handler(offlineid as string);
       }
     });
 
     socket.on("sys", (income) => {
       const msg = income as BasicMessageFrom;
-      for (const handler of this._fromsystem) {
+      for (const handler of this.fromSystem) {
         handler(msg);
       }
     });

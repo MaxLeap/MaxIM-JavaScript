@@ -139,57 +139,6 @@ class TalkingBuilderImpl implements TalkingBuilder {
     this.apiOptions = apiOptions;
   }
 
-  private listHistories(path: string, callback: Callback<ChatRecord[]>): Context {
-    let url = `${this.apiOptions.server}${path}`;
-    const q: string[] = [];
-    if (this.ts > 0) {
-      q.push(`ts=${this.ts}`);
-    }
-    if (this.size > 0) {
-      q.push(`limit=${this.size}`);
-    }
-
-    if (q.length > 0) {
-      url += "?" + q.join("&");
-    }
-
-    axios.get(url, {headers: this.apiOptions.headers})
-        .then((response) => {
-          return response.data as ChatRecord[];
-        })
-        .then((records) => {
-          if (callback) {
-            callback(null, records);
-          }
-        })
-        .catch((e) => {
-          if (callback) {
-            callback(e);
-          }
-        });
-
-    // let opts = {
-    //     headers: this.apiOptions.headers
-    // };
-    // fetch(url, opts)
-    //     .then(response => {
-    //         return response.json().then(result => [response.ok, result]);
-    //     })
-    //     .then(res => {
-    //         if (!res[0]) {
-    //             throw new ParrotError(res[1]);
-    //         } else if (callback) {
-    //             callback(null, res[1] as ChatRecord[]);
-    //         }
-    //     })
-    //     .catch(e => {
-    //         if (callback) {
-    //             callback(e);
-    //         }
-    //     });
-    return this.context;
-  }
-
   public ofFriend(friendid: string, callback?: Callback<ChatRecord[]>): Context {
     if (!callback) {
       return this.context;
@@ -221,6 +170,37 @@ class TalkingBuilderImpl implements TalkingBuilder {
     const path = `/passengers/${passengerid}/chats/${this.you}`;
     return this.listHistories(path, callback);
   }
+
+  private listHistories(path: string, callback: Callback<ChatRecord[]>): Context {
+    let url = `${this.apiOptions.server}${path}`;
+    const q: string[] = [];
+    if (this.ts > 0) {
+      q.push(`ts=${this.ts}`);
+    }
+    if (this.size > 0) {
+      q.push(`limit=${this.size}`);
+    }
+
+    if (q.length > 0) {
+      url += "?" + q.join("&");
+    }
+
+    axios.get(url, {headers: this.apiOptions.headers})
+        .then((response) => {
+          return response.data as ChatRecord[];
+        })
+        .then((records) => {
+          if (callback) {
+            callback(null, records);
+          }
+        })
+        .catch((e) => {
+          if (callback) {
+            callback(e);
+          }
+        });
+    return this.context;
+  }
 }
 
 /**
@@ -233,6 +213,147 @@ export class ContextImpl extends CommonServiceImpl implements Context {
   constructor(apiOptions: APIOptions, you: string) {
     super(apiOptions);
     this.you = you;
+  }
+
+  public listFriends(callback?: Callback<Friend[]>): Context {
+    if (!callback) {
+      return this;
+    }
+    return this.listSomething(`/ctx/${this.you}/friends?detail`, callback);
+  }
+
+  public listGroups(callback?: Callback<MyGroup[]>): Context {
+    if (!callback) {
+      return this;
+    }
+    return this.listSomething(`/ctx/${this.you}/groups?detail`, callback);
+  }
+
+  public listRooms(callback?: Callback<RoomInfo[]>): Context {
+    if (!callback) {
+      return this;
+    }
+    return this.listSomething(`/ctx/${this.you}/rooms?detail`, callback);
+  }
+
+  public listStrangers(callback: Callback<UserOutline[]>, skip?: number, limit?: number): Context {
+    if (!callback) {
+      return this;
+    }
+    let path = `/ctx/${this.you}/strangers?detail`;
+    if (skip) {
+      path += `&skip=${skip}`;
+    }
+    if (limit) {
+      path += `&limit=${limit}`;
+    }
+    return this.listSomething(path, callback);
+  }
+
+  public joinFriend(userid: string, callback?: Callback<void>): Context {
+    const url = `${super.options().server}/ctx/${this.you}/friends/${userid}`;
+    axios.post(url, null, {headers: super.options().headers})
+        .then((ignore) => {
+          if (callback) {
+            callback(null, null);
+          }
+        })
+        .catch((e) => {
+          if (callback) {
+            callback(e);
+          }
+        });
+    return this;
+  }
+
+  public joinGroup(groupid: string, callback?: Callback<void>): Context {
+    const url = `${super.options().server}/groups/${groupid}/members/${this.you}`;
+    axios.post(url, null, {headers: super.options().headers})
+        .then((ignore) => {
+          if (callback) {
+            callback(null, null);
+          }
+        })
+        .catch((e) => {
+          if (callback) {
+            callback(e);
+          }
+        });
+    return this;
+  }
+
+  public joinRoom(roomid: string, callback?: Callback<void>): Context {
+    const url = `${super.options().server}/rooms/${roomid}/members/${this.you}`;
+
+    axios.post(url, null, {headers: super.options().headers})
+        .then((ignore) => {
+          if (callback) {
+            callback(null, null);
+          }
+        })
+        .catch((e) => {
+          if (callback) {
+            callback(e);
+          }
+        });
+    return this;
+  }
+
+  public listTalkings(endTimestamp?: number, size?: number): TalkingBuilder {
+    return new TalkingBuilderImpl(this, endTimestamp || 0, size || 0, this.you, super.options());
+  }
+
+  public leaveFriend(userid: string, callback?: Callback<void>): Context {
+    const path = `/ctx/${this.you}/friends/${userid}`;
+    return this.deleteSomething(path, callback);
+  }
+
+  public leaveGroup(groupid: string, callback?: Callback<void>): Context {
+    const path = `/groups/${groupid}/members/${this.you}`;
+    return this.deleteSomething(path, callback);
+  }
+
+  public leaveRoom(roomid: string, callback?: Callback<void>): Context {
+    const path = `/rooms/${roomid}/members/${this.you}`;
+    return this.deleteSomething(path, callback);
+  }
+
+  public setMyAttributes(attributes: Attributes, overwrite?: boolean, callback?: Callback<void>): Context {
+    const url = `/ctx/${this.you}/attributes`;
+    const postData = JSON.stringify(attributes);
+    const cfg = {headers: this.options().headers};
+    (overwrite ? axios.put(url, postData, cfg) : axios.post(url, postData, cfg))
+        .then((ignore) => {
+          if (callback) {
+            callback(null, null);
+          }
+        })
+        .catch((e) => {
+          if (callback) {
+            callback(e);
+          }
+        });
+    return this;
+  }
+
+  public setMyAttribute(name: string, value: any, callback?: Callback<void>): Context {
+    const attributes = {};
+    attributes[name] = value;
+    return this.setMyAttributes(attributes, false, callback);
+  }
+
+  public getMyAttributes(callback?: Callback<Attributes>): Context {
+    if (callback) {
+      super.getAttributes(this.you).forUser(callback);
+    }
+    return this;
+  }
+
+  public getMyAttribute(attributeName: string, callback?: Callback<any>): Context {
+    if (callback) {
+      super.getAttributes(this.you, attributeName).forUser(callback);
+    }
+    return this;
   }
 
   private listSomething<T>(path: string, callback: Callback<T>) {
@@ -254,103 +375,10 @@ export class ContextImpl extends CommonServiceImpl implements Context {
     return this;
   }
 
-  public listFriends(callback?: Callback<Friend[]>): Context {
-    if (!callback) {
-      return this;
-    }
-    const path = `/ctx/${this.you}/friends?detail`;
-    return this.listSomething(path, callback);
-  }
-
-  public listGroups(callback?: Callback<MyGroup[]>): Context {
-    if (!callback) {
-      return this;
-    }
-    const path = `/ctx/${this.you}/groups?detail`;
-    return this.listSomething(path, callback);
-  }
-
-  public listRooms(callback?: Callback<RoomInfo[]>): Context {
-    if (!callback) {
-      return this;
-    }
-    const path = `/ctx/${this.you}/rooms?detail`;
-    return this.listSomething(path, callback);
-  }
-
-  public listStrangers(callback: Callback<UserOutline[]>, skip?: number, limit?: number): Context {
-    if (!callback) {
-      return this;
-    }
-    let path = `/ctx/${this.you}/strangers?detail`;
-
-    if (skip) {
-      path += `&skip=${skip}`;
-    }
-    if (limit) {
-      path += `&limit=${limit}`;
-    }
-    return this.listSomething(path, callback);
-  }
-
-  public joinFriend(userid: string, callback?: Callback<void>): Context {
-    const url = `${super.options().server}/ctx/${this.you}/friends/${userid}`;
-    axios.post(url, null, {headers: super.options().headers})
-        .then((response) => {
-          if (callback) {
-            callback(null, null);
-          }
-        })
-        .catch((e) => {
-          if (callback) {
-            callback(e);
-          }
-        });
-    return this;
-  }
-
-  public joinGroup(groupid: string, callback?: Callback<void>): Context {
-    const url = `${super.options().server}/groups/${groupid}/members/${this.you}`;
-
-    axios.post(url, null, {headers: super.options().headers})
-        .then((response) => {
-          if (callback) {
-            callback(null, null);
-          }
-        })
-        .catch((e) => {
-          if (callback) {
-            callback(e);
-          }
-        });
-    return this;
-  }
-
-  public joinRoom(roomid: string, callback?: Callback<void>): Context {
-    const url = `${super.options().server}/rooms/${roomid}/members/${this.you}`;
-
-    axios.post(url, null, {headers: super.options().headers})
-        .then((response) => {
-          if (callback) {
-            callback(null, null);
-          }
-        })
-        .catch((e) => {
-          if (callback) {
-            callback(e);
-          }
-        });
-    return this;
-  }
-
-  public listTalkings(endTimestamp?: number, size?: number): TalkingBuilder {
-    return new TalkingBuilderImpl(this, endTimestamp || 0, size || 0, this.you, super.options());
-  }
-
   private deleteSomething(path: string, callback: Callback<void>): Context {
     const url = `${super.options().server}${path}`;
     axios.delete(url, {headers: super.options().headers})
-        .then((response) => {
+        .then((ignore) => {
           if (callback) {
             callback(null, null);
           }
@@ -361,60 +389,6 @@ export class ContextImpl extends CommonServiceImpl implements Context {
           }
         });
 
-    return this;
-  }
-
-  public leaveFriend(userid: string, callback?: Callback<void>): Context {
-    const path = `/ctx/${this.you}/friends/${userid}`;
-    return this.deleteSomething(path, callback);
-  }
-
-  public leaveGroup(groupid: string, callback?: Callback<void>): Context {
-    const path = `/groups/${groupid}/members/${this.you}`;
-    return this.deleteSomething(path, callback);
-  }
-
-  public leaveRoom(roomid: string, callback?: Callback<void>): Context {
-    const path = `/rooms/${roomid}/members/${this.you}`;
-    return this.deleteSomething(path, callback);
-  }
-
-  public setMyAttributes(attributes: Attributes, overwrite?: boolean, callback?: Callback<void>): Context {
-    const url = `/ctx/${this.you}/attributes`,
-        postData = JSON.stringify(attributes),
-        cfg = {headers: this.options().headers};
-    (overwrite ? axios.put(url, postData, cfg) : axios.post(url, postData, cfg))
-        .then((response) => {
-          if (callback) {
-            callback(null, null);
-          }
-        })
-        .catch((e) => {
-          if (callback) {
-            callback(e);
-          }
-        });
-
-    return this;
-  }
-
-  public setMyAttribute(name: string, value: any, callback?: Callback<void>): Context {
-    const attributes = {};
-    attributes[name] = value;
-    return this.setMyAttributes(attributes, false, callback);
-  }
-
-  public getMyAttributes(callback?: Callback<Attributes>): Context {
-    if (callback) {
-      super.getAttributes(this.you).forUser(callback);
-    }
-    return this;
-  }
-
-  public getMyAttribute(attributeName: string, callback?: Callback<any>): Context {
-    if (callback) {
-      super.getAttributes(this.you, attributeName).forUser(callback);
-    }
     return this;
   }
 }
