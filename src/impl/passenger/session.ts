@@ -1,4 +1,4 @@
-import {PassengerMessageBuilder, PassengerSession} from "../../api/passenger";
+import {MessageBuilder, PassengerSession} from "../../api/passenger";
 import {Callback} from "../../model/models";
 import {PassengerMessageBuilderImpl} from "./buildMessage";
 import Socket = SocketIOClient.Socket;
@@ -14,7 +14,7 @@ class PassengerSessionImpl implements PassengerSession {
     this.id = passengerid;
   }
 
-  public say(text: string, remark?: string): PassengerMessageBuilder {
+  public say(text: string, remark?: string): MessageBuilder {
     return new PassengerMessageBuilderImpl(this, text, remark);
   }
 

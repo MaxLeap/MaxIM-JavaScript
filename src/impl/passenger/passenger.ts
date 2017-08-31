@@ -16,6 +16,7 @@ class PassengerBuilderImpl implements PassengerBuilder {
   private fromSystem: Array<Handler1<BasicMessageFrom>> = [];
   private fromStrangerOnline: Array<Handler1<string>> = [];
   private fromStrangerOffline: Array<Handler1<string>> = [];
+  private acks: Array<Handler2<number, number>> = [];
 
   constructor(options: APIOptions, id?: string) {
     this.options = options;
@@ -44,6 +45,11 @@ class PassengerBuilderImpl implements PassengerBuilder {
 
   public onStrangerOffline(callback: Handler1<string>): PassengerBuilder {
     this.fromStrangerOffline.push(callback);
+    return this;
+  }
+
+  public onAck(callback: Handler2<number, number>): PassengerBuilder {
+    this.acks.push(callback);
     return this;
   }
 
@@ -119,6 +125,14 @@ class PassengerBuilderImpl implements PassengerBuilder {
         handler(msg);
       }
     });
+
+    socket.on("ack", (income) => {
+      const msg = income as { ack: number, ts: number };
+      for (const it of this.acks) {
+        it(msg.ack, msg.ts);
+      }
+    });
+
   }
 }
 

@@ -1,6 +1,6 @@
 import {
   Admin,
-  AdminMessageBuilder,
+  MessageBuilder,
   AttributeBuilder,
   CreateCommand,
   DestroyCommand,
@@ -29,7 +29,7 @@ function concat(first: string, ...others): string[] {
 
 class AdminImpl extends CommonServiceImpl implements Admin {
 
-  public say(text: string, remark?: string): AdminMessageBuilder {
+  public say(text: string, remark?: string): MessageBuilder {
     return new AdminMessageBuilderImpl(this, text, remark);
   }
 

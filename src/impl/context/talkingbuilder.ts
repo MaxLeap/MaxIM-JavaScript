@@ -21,32 +21,28 @@ class TalkingBuilderImpl implements TalkingBuilder {
     if (!callback) {
       return this.context;
     }
-    const path = `/ctx/${this.you}/friends/${friendid}/chats`;
-    return this.listHistories(path, callback);
+    return this.listHistories(`/ctx/${this.you}/friends/${friendid}/chats`, callback);
   }
 
   public ofGroup(groupid: string, callback?: Callback<ChatRecord[]>): Context {
     if (!callback) {
       return this.context;
     }
-    const path = `/groups/${groupid}/chats`;
-    return this.listHistories(path, callback);
+    return this.listHistories(`/groups/${groupid}/chats`, callback);
   }
 
   public ofStranger(strangerid: string, callback?: Callback<ChatRecord[]>): Context {
     if (!callback) {
       return this.context;
     }
-    const path = `/ctx/${this.you}/strangers/${strangerid}/chats`;
-    return this.listHistories(path, callback);
+    return this.listHistories(`/ctx/${this.you}/strangers/${strangerid}/chats`, callback);
   }
 
   public ofPassenger(passengerid: string, callback?: Callback<ChatRecord[]>): Context {
     if (!callback) {
       return this.context;
     }
-    const path = `/passengers/${passengerid}/chats/${this.you}`;
-    return this.listHistories(path, callback);
+    return this.listHistories(`/passengers/${passengerid}/chats/${this.you}`, callback);
   }
 
   private listHistories(path: string, callback: Callback<ChatRecord[]>): Context {

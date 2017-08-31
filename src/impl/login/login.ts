@@ -4,16 +4,18 @@ import {md5} from "../../helper/md5";
 import {APIOptions} from "../../model/models";
 import {SessionBuilderImpl} from "../session/buildSession";
 
+function extend(target: {}, source: {}): void {
+  for (const k in source) {
+    if ((typeof k) === "string") {
+      target[k] = source[k];
+    }
+  }
+}
+
 /**
  * 登录器实现类
  */
 class LoginImpl implements Login {
-
-  private static extend(target: {}, source: {}): void {
-    for (const k in source) {
-      target[k] = source[k];
-    }
-  }
 
   private options: APIOptions;
   private basicAuth: {};
@@ -32,7 +34,7 @@ class LoginImpl implements Login {
     const authdata = {
       client: userid,
     };
-    LoginImpl.extend(authdata, this.basicAuth);
+    extend(authdata, this.basicAuth);
     return new SessionBuilderImpl(this.options, authdata);
   }
 
@@ -41,7 +43,7 @@ class LoginImpl implements Login {
       username,
       password,
     };
-    LoginImpl.extend(authdata, this.basicAuth);
+    extend(authdata, this.basicAuth);
     return new SessionBuilderImpl(this.options, authdata);
   }
 
@@ -50,7 +52,7 @@ class LoginImpl implements Login {
       phone,
       password: verify,
     };
-    LoginImpl.extend(authdata, this.basicAuth);
+    extend(authdata, this.basicAuth);
     return new SessionBuilderImpl(this.options, authdata);
   }
 }

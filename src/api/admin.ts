@@ -6,9 +6,9 @@ interface Admin extends CommonService {
    * 发送系统消息
    * @param {string} text
    * @param {string} remark
-   * @return {AdminMessageBuilder}
+   * @return {MessageBuilder}
    */
-  say(text: string, remark?: string): AdminMessageBuilder;
+  say(text: string, remark?: string): MessageBuilder;
 
   /**
    * 属性设置
@@ -185,43 +185,43 @@ interface MemberRemoveCommand {
 /**
  * 消息构建器
  */
-interface AdminMessageBuilder {
+interface MessageBuilder {
 
-  asText(): AdminMessageBuilder;
+  asText(): MessageBuilder;
 
-  asImage(): AdminMessageBuilder;
+  asImage(): MessageBuilder;
 
-  asAudio(): AdminMessageBuilder;
+  asAudio(): MessageBuilder;
 
-  asVideo(): AdminMessageBuilder;
+  asVideo(): MessageBuilder;
 
-  disablePush(): AdminMessageBuilder;
+  disablePush(): MessageBuilder;
 
-  setPushSound(sound: string): AdminMessageBuilder;
+  setPushSound(sound: string): MessageBuilder;
 
-  setPushBadge(badge: number): AdminMessageBuilder;
+  setPushBadge(badge: number): MessageBuilder;
 
-  setPushContentAvailable(contentAvailable: boolean): AdminMessageBuilder;
+  setPushContentAvailable(contentAvailable: boolean): MessageBuilder;
 
-  setPushPrefix(prefix: string): AdminMessageBuilder;
+  setPushPrefix(prefix: string): MessageBuilder;
 
-  setPushSuffix(suffix: string): AdminMessageBuilder;
+  setPushSuffix(suffix: string): MessageBuilder;
 
-  setPushTextOverwrite(text: string): AdminMessageBuilder;
+  setPushTextOverwrite(text: string): MessageBuilder;
 
-  toAll(): AdminMessageLauncher;
+  toAll(): MessageLauncher;
 
-  toUser(userid: string): AdminMessageLauncher;
+  toUser(userid: string): MessageLauncher;
 
-  toGroup(groupid: string): AdminMessageLauncher;
+  toGroup(groupid: string): MessageLauncher;
 
-  toRoom(roomid: string): AdminMessageLauncher;
+  toRoom(roomid: string): MessageLauncher;
 }
 
 /**
  * 消息发射器.
  */
-interface AdminMessageLauncher {
+interface MessageLauncher {
   ok(callback?: Callback<void>): Admin;
 }
 
@@ -271,8 +271,8 @@ export {
   GroupBuilder,
   MemberAppendCommand,
   MemberRemoveCommand,
-  AdminMessageBuilder,
-  AdminMessageLauncher,
+  MessageBuilder,
+  MessageLauncher,
   AttributeBuilder,
   RoomBuilder,
   Admin,

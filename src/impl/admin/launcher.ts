@@ -1,8 +1,8 @@
-import {Admin, AdminMessageLauncher} from "../../api/admin";
+import {Admin, MessageLauncher} from "../../api/admin";
 import {Receiver, SystemMessageTo} from "../../model/messages";
 import {Callback} from "../../model/models";
 
-class AdminMessageLauncherImpl implements AdminMessageLauncher {
+class AdminMessageLauncherImpl implements MessageLauncher {
 
   private admin: Admin;
   private message: SystemMessageTo;

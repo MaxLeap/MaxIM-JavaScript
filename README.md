@@ -73,7 +73,10 @@ require(['maxleap-im/im'],function(IM){
     im.login()
       .simple('12345678')
       .onFriendMessage(function(friendid,message){
-        console.log('message from friend %s: %s',friendid,message.content.body);
+        console.log('message from friend %s: %s', friendid, message.content.body);
+      })
+      .onAck(function(ack,ts){
+        console.log('get message ack %d: time=%d.',ack,ts);
       })
       .ok(function(error,session,context){
         if(error){
@@ -87,7 +90,10 @@ require(['maxleap-im/im'],function(IM){
 
         // send text message.
         session
-          .say('hello world!').toFriend('87654321')
+          .say('hello world!')
+          .ack(12345)
+          .asText()
+          .toFriend('87654321')
           .ok();
 
         // upload image attachment and send it as image message.
@@ -288,6 +294,15 @@ require(['maxleap-im/im'],function(IM){
 | # | 参数名 | 类型 | 说明 |
 |----|----|----|----|
 | 1 | strangerid | string | 陌生人用户ID |
+
+#### SessionBuilder#onAck(callback:(ack,ts)=>void):[SessionBuilder](#sessionbuilder)
+
+绑定消息回执响应。绑定事件后, 当消息发送成功后您会收到通知并回调, **注意: 仅当构建消息时设置了ack才会生效**。其中回调句柄的参数用法:
+
+| # | 参数名 | 类型 | 说明 |
+|----|----|----|----|
+| 1 | ack | number | ack数值, 建议保持每条消息唯一. |
+| 2 | ts | number | 送达时间戳 |
 
 #### SessionBuilder#ok(callback:(error,session,context)=>void)
 
@@ -652,6 +667,15 @@ require(['maxleap-im/im'],function(IM){
 | # | 参数名 | 类型 | 说明 |
 |-----|-----|-----|-----|
 | 1 | strangerid | string | 下线的陌生人用户ID |
+
+#### PassengerBuilder#onAck(callback:(ack,ts)=>void):[PassengerBuilder](#passengerbuilder)
+
+绑定消息回执响应。绑定事件后, 当消息发送成功后您会收到通知并回调, **注意: 仅当构建消息时设置了ack才会生效**。其中回调句柄的参数用法:
+
+| # | 参数名 | 类型 | 说明 |
+|----|----|----|----|
+| 1 | ack | number | ack数值, 建议保持每条消息唯一. |
+| 2 | ts | number | 送达时间戳 |
 
 #### PassengerBuilder#ok(callback:(error,session,context)=>void)
 

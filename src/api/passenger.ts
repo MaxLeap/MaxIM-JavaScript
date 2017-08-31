@@ -13,39 +13,43 @@ interface PassengerBuilder {
 
   onStrangerOffline(callback: Handler1<string>): PassengerBuilder;
 
+  onAck(callback: Handler2<number, number>): PassengerBuilder;
+
   ok(callback: Callback2<PassengerSession, PassengerContext>);
 }
 
 interface PassengerSession {
 
-  say(text: string, remark?: string): PassengerMessageBuilder;
+  say(text: string, remark?: string): MessageBuilder;
 
   close(callback?: Callback<void>);
 }
 
-interface PassengerMessageBuilder {
+interface MessageBuilder {
 
-  asText(): PassengerMessageBuilder;
+  ack(ack: number): MessageBuilder;
 
-  asImage(): PassengerMessageBuilder;
+  asText(): MessageBuilder;
 
-  asAudio(): PassengerMessageBuilder;
+  asImage(): MessageBuilder;
 
-  asVideo(): PassengerMessageBuilder;
+  asAudio(): MessageBuilder;
 
-  disablePush(): PassengerMessageBuilder;
+  asVideo(): MessageBuilder;
 
-  setPushSound(sound: string): PassengerMessageBuilder;
+  disablePush(): MessageBuilder;
 
-  setPushBadge(badge: number): PassengerMessageBuilder;
+  setPushSound(sound: string): MessageBuilder;
 
-  setPushContentAvailable(contentAvailable: boolean): PassengerMessageBuilder;
+  setPushBadge(badge: number): MessageBuilder;
 
-  setPushPrefix(prefix: string): PassengerMessageBuilder;
+  setPushContentAvailable(contentAvailable: boolean): MessageBuilder;
 
-  setPushSuffix(suffix: string): PassengerMessageBuilder;
+  setPushPrefix(prefix: string): MessageBuilder;
 
-  setPushTextOverwrite(text: string): PassengerMessageBuilder;
+  setPushSuffix(suffix: string): MessageBuilder;
+
+  setPushTextOverwrite(text: string): MessageBuilder;
 
   toUser(userid: string): PassengerMessageLauncher;
 }
@@ -62,6 +66,6 @@ interface PassengerContext extends CommonService {
 
 export {PassengerBuilder};
 export {PassengerSession};
-export {PassengerMessageBuilder};
+export {MessageBuilder};
 export {PassengerMessageLauncher};
 export {PassengerContext};
