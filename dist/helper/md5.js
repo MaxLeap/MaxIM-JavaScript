@@ -1,7 +1,10 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
     function md5cycle(x, k) {
-        var a = x[0], b = x[1], c = x[2], d = x[3];
+        var a = x[0];
+        var b = x[1];
+        var c = x[2];
+        var d = x[3];
         a = ff(a, b, c, d, k[0], 7, -680876936);
         d = ff(d, a, b, c, k[1], 12, -389564586);
         c = ff(c, d, a, b, k[2], 17, 606105819);
@@ -88,8 +91,9 @@ define(["require", "exports"], function (require, exports) {
         return cmn(c ^ (b | (~d)), a, b, x, s, t);
     }
     function md51(s) {
-        var n = s.length, state = [1732584193, -271733879, -1732584194, 271733878], i;
-        for (i = 64; i <= s.length; i += 64) {
+        var state = [1732584193, -271733879, -1732584194, 271733878];
+        var i = 64;
+        for (; i <= s.length; i += 64) {
             md5cycle(state, md5blk(s.substring(i - 64, i)));
         }
         s = s.substring(i - 64);
@@ -100,10 +104,11 @@ define(["require", "exports"], function (require, exports) {
         tail[i >> 2] |= 0x80 << ((i % 4) << 3);
         if (i > 55) {
             md5cycle(state, tail);
-            for (i = 0; i < 16; i++)
+            for (i = 0; i < 16; i++) {
                 tail[i] = 0;
+            }
         }
-        tail[14] = n * 8;
+        tail[14] = 8 * s.length;
         md5cycle(state, tail);
         return state;
     }
@@ -117,11 +122,12 @@ define(["require", "exports"], function (require, exports) {
         }
         return md5blks;
     }
-    var hex_chr = '0123456789abcdef'.split('');
+    var hexChars = "0123456789abcdef".split("");
     function rhex(n) {
-        var s = '', j = 0;
+        var s = "";
+        var j = 0;
         for (; j < 4; j++) {
-            s += hex_chr[(n >> (j * 8 + 4)) & 0x0F] + hex_chr[(n >> (j * 8)) & 0x0F];
+            s += hexChars[(n >> (j * 8 + 4)) & 0x0F] + hexChars[(n >> (j * 8)) & 0x0F];
         }
         return s;
     }
@@ -129,7 +135,7 @@ define(["require", "exports"], function (require, exports) {
         for (var i = 0; i < x.length; i++) {
             x[i] = rhex(x[i]);
         }
-        return x.join('');
+        return x.join("");
     }
     function add32(a, b) {
         return (a + b) & 0xFFFFFFFF;

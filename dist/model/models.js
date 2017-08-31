@@ -6,9 +6,9 @@ define(["require", "exports"], function (require, exports) {
             this.app = app;
             this.sign = sign;
             this.headers = {
-                'x-ml-appid': app,
-                'x-ml-apikey': sign,
-                'content-type': 'application/json; charset=utf-8'
+                "x-ml-appid": app,
+                "x-ml-apikey": sign,
+                "content-type": "application/json; charset=utf-8",
             };
         }
         return APIOptions;

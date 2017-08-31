@@ -1,7 +1,10 @@
 // see http://www.myersdaily.org/joseph/javascript/md5.js
 
 function md5cycle(x: number[], k: number[]) {
-  let a = x[0], b = x[1], c = x[2], d = x[3];
+  let a = x[0];
+  let b = x[1];
+  let c = x[2];
+  let d = x[3];
   a = ff(a, b, c, d, k[0], 7, -680876936);
   d = ff(d, a, b, c, k[1], 12, -389564586);
   c = ff(c, d, a, b, k[2], 17, 606105819);
@@ -99,9 +102,9 @@ function ii(a, b, c, d, x, s, t) {
 }
 
 function md51(s: string): number[] {
-  let n = s.length,
-      state = [1732584193, -271733879, -1732584194, 271733878], i;
-  for (i = 64; i <= s.length; i += 64) {
+  const state = [1732584193, -271733879, -1732584194, 271733878];
+  let i = 64;
+  for (; i <= s.length; i += 64) {
     md5cycle(state, md5blk(s.substring(i - 64, i)));
   }
   s = s.substring(i - 64);
@@ -112,9 +115,11 @@ function md51(s: string): number[] {
   tail[i >> 2] |= 0x80 << ((i % 4) << 3);
   if (i > 55) {
     md5cycle(state, tail);
-    for (i = 0; i < 16; i++) tail[i] = 0;
+    for (i = 0; i < 16; i++) {
+      tail[i] = 0;
+    }
   }
-  tail[14] = n * 8;
+  tail[14] = 8 * s.length;
   md5cycle(state, tail);
   return state;
 }
@@ -146,12 +151,13 @@ function md5blk(s) { /* I figured global was faster.   */
   return md5blks;
 }
 
-const hex_chr = "0123456789abcdef".split("");
+const hexChars = "0123456789abcdef".split("");
 
 function rhex(n: number): string {
-  let s = "", j = 0;
+  let s = "";
+  let j = 0;
   for (; j < 4; j++) {
-    s += hex_chr[(n >> (j * 8 + 4)) & 0x0F] + hex_chr[(n >> (j * 8)) & 0x0F];
+    s += hexChars[(n >> (j * 8 + 4)) & 0x0F] + hexChars[(n >> (j * 8)) & 0x0F];
   }
   return s;
 }

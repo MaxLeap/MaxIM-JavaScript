@@ -16,7 +16,7 @@ define(["require", "exports"], function (require, exports) {
         ParrotError.prototype.toJSON = function () {
             return {
                 errorCode: this.errorCode,
-                errorMessage: this.errorMessage
+                errorMessage: this.errorMessage,
             };
         };
         return ParrotError;
@@ -25,7 +25,7 @@ define(["require", "exports"], function (require, exports) {
     function convert2basic(origin) {
         var ret = {
             content: origin.content,
-            ts: origin.ts
+            ts: origin.ts,
         };
         if (origin.remark != null) {
             ret.remark = origin.remark;

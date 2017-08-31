@@ -1,7 +1,10 @@
+import {Login} from "./api/login";
+import {AdminImpl} from "./impl/admin/admin";
+import {LoginImpl} from "./impl/login/login";
+import {PassengerBuilderImpl} from "./impl/passenger/passenger";
 import {APIOptions} from "./model/models";
-import {Admin, AdminImpl} from "./service/admin";
-import {Login, LoginImpl} from "./service/login";
-import {PassengerBuilder, PassengerBuilderImpl} from "./service/passenger";
+import {Admin} from "./api/admin";
+import {PassengerBuilder} from "./api/passenger";
 
 interface MaxIMOptions {
   app: string;
@@ -10,9 +13,13 @@ interface MaxIMOptions {
   useHttp?: boolean;
 }
 
+/**
+ * 主功能接口
+ */
 interface MaxIM {
   /**
    * 登录
+   * @return {Login}
    */
   login(): Login;
 
@@ -24,6 +31,7 @@ interface MaxIM {
 
   /**
    * 获取管理接口
+   * @return {Admin}
    */
   admin(): Admin;
 }
