@@ -1,6 +1,6 @@
 {
   "name": "maxleap-im",
-  "version": "4.1.3",
+  "version": "4.2.0",
   "description": "MaxLeap JavaScript SDK for IM.",
   "main": "lib/im.js",
   "directories": {
@@ -20,6 +20,9 @@
     "url": "https://github.com/MaxLeap/MaxIM-JavaScript/issues"
   },
   "homepage": "https://www.maxleap.cn",
+  "scripts": {
+    "lint": "./node_modules/.bin/tslint -c tslint.json src/**/*.ts --fix"
+  },
   "dependencies": {
     "axios": "^0.15.3",
     "socket.io-client": "~1.4.8"
@@ -30,7 +33,8 @@
     "gulp-serve": "^1.4.0",
     "gulp-sourcemaps": "^1.9.1",
     "gulp-typescript": "^3.1.3",
-    "typescript": "^2.0.10",
-    "typings": "^2.0.0"
+    "typescript": "^2.4.2",
+    "typings": "^2.0.0",
+    "tslint": "^5.4.3"
   }
 }
