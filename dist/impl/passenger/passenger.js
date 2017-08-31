@@ -7,6 +7,7 @@ define(["require", "exports", "socket.io-client", "../../helper/md5", "../../hel
             this.fromSystem = [];
             this.fromStrangerOnline = [];
             this.fromStrangerOffline = [];
+            this.acks = [];
             this.options = options;
             this.id = id;
         }
@@ -28,6 +29,10 @@ define(["require", "exports", "socket.io-client", "../../helper/md5", "../../hel
         };
         PassengerBuilderImpl.prototype.onStrangerOffline = function (callback) {
             this.fromStrangerOffline.push(callback);
+            return this;
+        };
+        PassengerBuilderImpl.prototype.onAck = function (callback) {
+            this.acks.push(callback);
             return this;
         };
         PassengerBuilderImpl.prototype.ok = function (callback) {
@@ -97,6 +102,13 @@ define(["require", "exports", "socket.io-client", "../../helper/md5", "../../hel
                 for (var _i = 0, _a = _this.fromSystem; _i < _a.length; _i++) {
                     var handler = _a[_i];
                     handler(msg);
+                }
+            });
+            socket.on("ack", function (income) {
+                var msg = income;
+                for (var _i = 0, _a = _this.acks; _i < _a.length; _i++) {
+                    var it = _a[_i];
+                    it(msg.ack, msg.ts);
                 }
             });
         };

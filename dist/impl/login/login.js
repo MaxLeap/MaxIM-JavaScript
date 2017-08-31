@@ -1,5 +1,12 @@
 define(["require", "exports", "../../helper/md5", "../session/buildSession"], function (require, exports, md5_1, buildSession_1) {
     "use strict";
+    function extend(target, source) {
+        for (var k in source) {
+            if ((typeof k) === "string") {
+                target[k] = source[k];
+            }
+        }
+    }
     var LoginImpl = (function () {
         function LoginImpl(apiOptions) {
             this.options = apiOptions;
@@ -10,16 +17,11 @@ define(["require", "exports", "../../helper/md5", "../session/buildSession"], fu
                 sign: bar,
             };
         }
-        LoginImpl.extend = function (target, source) {
-            for (var k in source) {
-                target[k] = source[k];
-            }
-        };
         LoginImpl.prototype.simple = function (userid) {
             var authdata = {
                 client: userid,
             };
-            LoginImpl.extend(authdata, this.basicAuth);
+            extend(authdata, this.basicAuth);
             return new buildSession_1.SessionBuilderImpl(this.options, authdata);
         };
         LoginImpl.prototype.byMaxleapUser = function (username, password) {
@@ -27,7 +29,7 @@ define(["require", "exports", "../../helper/md5", "../session/buildSession"], fu
                 username: username,
                 password: password,
             };
-            LoginImpl.extend(authdata, this.basicAuth);
+            extend(authdata, this.basicAuth);
             return new buildSession_1.SessionBuilderImpl(this.options, authdata);
         };
         LoginImpl.prototype.byPhone = function (phone, verify) {
@@ -35,7 +37,7 @@ define(["require", "exports", "../../helper/md5", "../session/buildSession"], fu
                 phone: phone,
                 password: verify,
             };
-            LoginImpl.extend(authdata, this.basicAuth);
+            extend(authdata, this.basicAuth);
             return new buildSession_1.SessionBuilderImpl(this.options, authdata);
         };
         return LoginImpl;

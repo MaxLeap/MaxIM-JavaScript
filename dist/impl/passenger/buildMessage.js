@@ -16,6 +16,10 @@ define(["require", "exports", "../../model/messages", "./launcher"], function (r
                 this.message.remark = remark;
             }
         }
+        PassengerMessageBuilderImpl.prototype.ack = function (ack) {
+            this.message.ack = parseInt("" + ack, 0);
+            return this;
+        };
         PassengerMessageBuilderImpl.prototype.disablePush = function () {
             this.createPushIfNotExist().enable = false;
             return this;
