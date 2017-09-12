@@ -12,3 +12,4 @@ gulpfile.js
 .gitignore
 .yarnclean
 yarn.lock
+tslint.json
