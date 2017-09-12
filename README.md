@@ -28,7 +28,7 @@ var im = IM(options);
 // ......
 ```
 
-### 使用Bower
+### ~~使用Bower(Deprecated)~~
 
 加载方式为AMD, 浏览器端推荐。使用范例如下。
 
