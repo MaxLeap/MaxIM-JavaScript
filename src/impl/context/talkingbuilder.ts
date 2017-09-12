@@ -1,5 +1,6 @@
 import {Context, TalkingBuilder} from "../../api/context";
 import {APIOptions, Callback, ChatRecord} from "../../model/models";
+import Axios from "axios";
 
 class TalkingBuilderImpl implements TalkingBuilder {
 
@@ -58,7 +59,7 @@ class TalkingBuilderImpl implements TalkingBuilder {
     if (q.length > 0) {
       url += "?" + q.join("&");
     }
-    axios.get(url, {headers: this.apiOptions.headers})
+    Axios.get(url, {headers: this.apiOptions.headers})
         .then((response) => {
           return response.data as ChatRecord[];
         })

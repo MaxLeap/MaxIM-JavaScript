@@ -1,5 +1,6 @@
 import {Admin, AttributeBuilder} from "../../api/admin";
 import {Attributes, Callback} from "../../model/models";
+import Axios from "axios";
 
 class AttributeBuilderImpl implements AttributeBuilder {
 
@@ -29,8 +30,7 @@ class AttributeBuilderImpl implements AttributeBuilder {
     const url = `${this.admin.options().server}${path}`;
     const postData = JSON.stringify(this.attributes);
     const cfg = {headers: this.admin.options().headers};
-
-    (this.overwrite ? axios.put(url, postData, cfg) : axios.post(url, postData, cfg))
+    (this.overwrite ? Axios.put(url, postData, cfg) : Axios.post(url, postData, cfg))
         .then((ignore) => {
           if (callback) {
             callback(null, null);

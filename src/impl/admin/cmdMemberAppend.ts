@@ -1,5 +1,6 @@
 import {Admin, MemberAppendCommand} from "../../api/admin";
 import {Callback} from "../../model/models";
+import Axios from "axios";
 
 class MemberAppendCommandImpl implements MemberAppendCommand {
 
@@ -23,7 +24,7 @@ class MemberAppendCommandImpl implements MemberAppendCommand {
 
   private invokeAppend(path: string, callback?: Callback<void>): Admin {
     const url = `${this.admin.options().server}${path}/members`;
-    axios.post(url, JSON.stringify(this.members), {headers: this.admin.options().headers})
+    Axios.post(url, JSON.stringify(this.members), {headers: this.admin.options().headers})
         .then((ignore) => {
           if (callback) {
             callback(null, null);

@@ -1,5 +1,6 @@
 import {Admin, GroupBuilder} from "../../api/admin";
 import {Attributes, Callback} from "../../model/models";
+import Axios from "axios";
 
 class GroupBuilderImpl implements GroupBuilder {
 
@@ -39,7 +40,7 @@ class GroupBuilderImpl implements GroupBuilder {
       members: this.appends,
     };
 
-    axios.post(url, JSON.stringify(data), {headers: this.admin.options().headers})
+    Axios.post(url, JSON.stringify(data), {headers: this.admin.options().headers})
         .then((response) => {
           return response.data as string;
         })

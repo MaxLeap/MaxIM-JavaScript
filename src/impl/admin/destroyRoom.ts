@@ -1,5 +1,6 @@
 import {Admin, RoomDestroy} from "../../api/admin";
 import {Callback} from "../../model/models";
+import Axios from "axios";
 
 class RoomDestroyImpl implements RoomDestroy {
 
@@ -13,8 +14,7 @@ class RoomDestroyImpl implements RoomDestroy {
 
   public ok(callback?: Callback<void>): Admin {
     const url = `${this.admin.options().server}/rooms/${this.roomid}`;
-
-    axios.delete(url, {headers: this.admin.options().headers})
+    Axios.delete(url, {headers: this.admin.options().headers})
         .then((ignore) => {
           if (callback) {
             callback(null, null);

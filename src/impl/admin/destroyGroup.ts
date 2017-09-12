@@ -1,5 +1,6 @@
 import {Admin, GroupDestroy} from "../../api/admin";
 import {Callback} from "../../model/models";
+import Axios from "axios";
 
 class GroupDestroyImpl implements GroupDestroy {
 
@@ -13,7 +14,7 @@ class GroupDestroyImpl implements GroupDestroy {
 
   public ok(callback?: Callback<void>): Admin {
     const url = `${this.admin.options().server}/groups/${this.groupid}`;
-    axios.delete(url, {headers: this.admin.options().headers})
+    Axios.delete(url, {headers: this.admin.options().headers})
         .then((ignore) => {
           if (callback) {
             callback(null, null);

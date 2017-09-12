@@ -1,4 +1,4 @@
-import * as axios from "axios";
+import Axios from "axios";
 import {CommonService, GetAttributesBuilder} from "../../api/common";
 import {Callback} from "../../model/models";
 
@@ -41,7 +41,7 @@ class GetAttributesBuilderImpl implements GetAttributesBuilder {
       url += `/${this.attr}`;
     }
 
-    axios.get(url, {headers: this.common.options().headers})
+    Axios.get(url, {headers: this.common.options().headers})
         .then((response) => {
           return response.data as string;
         })

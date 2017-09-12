@@ -1,5 +1,6 @@
 import {Admin, RoomBuilder} from "../../api/admin";
 import {Callback} from "../../model/models";
+import Axios from "axios";
 
 class RoomBuilderImpl implements RoomBuilder {
 
@@ -36,14 +37,14 @@ class RoomBuilderImpl implements RoomBuilder {
     };
 
     const config = {headers: op.headers};
-    axios.post(url, JSON.stringify(body), config)
+    Axios.post(url, JSON.stringify(body), config)
         .then((response) => {
           return response.data as string;
         })
         .then((roomid) => {
           const url2 = `${op.server}/rooms/${roomid}/attributes`;
           const postData = JSON.stringify(this.attributes);
-          return axios.post(url2, postData, {headers: op.headers})
+          return Axios.post(url2, postData, {headers: op.headers})
               .then((ignore) => {
                 return roomid;
               });

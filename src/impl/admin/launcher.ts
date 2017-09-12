@@ -1,6 +1,7 @@
 import {Admin, MessageLauncher} from "../../api/admin";
 import {Receiver, SystemMessageTo} from "../../model/messages";
 import {Callback} from "../../model/models";
+import Axios from "axios";
 
 class AdminMessageLauncherImpl implements MessageLauncher {
 
@@ -32,7 +33,7 @@ class AdminMessageLauncherImpl implements MessageLauncher {
           break;
       }
     }
-    axios.post(url, JSON.stringify(this.message), {headers: this.admin.options().headers})
+    Axios.post(url, JSON.stringify(this.message), {headers: this.admin.options().headers})
         .then((ignore) => {
           if (callback) {
             callback(null, null);

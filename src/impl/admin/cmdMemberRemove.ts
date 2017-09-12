@@ -1,5 +1,6 @@
 import {Admin, MemberRemoveCommand} from "../../api/admin";
 import {Callback} from "../../model/models";
+import Axios from "axios";
 
 class MemberRemoveCommandImpl implements MemberRemoveCommand {
 
@@ -30,7 +31,7 @@ class MemberRemoveCommandImpl implements MemberRemoveCommand {
       data: JSON.stringify(this.members),
       headers: op.headers,
     };
-    axios.request(req)
+    Axios.request(req)
         .then((ignore) => {
           if (callback) {
             callback(null, null);

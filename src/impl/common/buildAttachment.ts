@@ -1,4 +1,4 @@
-import * as axios from "axios";
+import Axios from "axios";
 import {AttachmentBuilder} from "../../api/common";
 import {APIOptions, Callback} from "../../model/models";
 
@@ -22,7 +22,7 @@ class AttachmentBuilderImpl implements AttachmentBuilder {
         header[k] = this.apiOptions.headers[k];
       }
     }
-    axios.post(url, data, {headers: header})
+    Axios.post(url, data, {headers: header})
         .then((response) => {
           return response.data as string[];
         })

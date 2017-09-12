@@ -1,8 +1,8 @@
-import axios = require("axios");
 import {Context, TalkingBuilder} from "../../api/context";
 import {APIOptions, Attributes, Callback, Friend, MyGroup, RoomInfo, UserOutline} from "../../model/models";
 import {CommonServiceImpl} from "../common/common";
 import {TalkingBuilderImpl} from "./talkingbuilder";
+import Axios from "axios";
 
 class ContextImpl extends CommonServiceImpl implements Context {
 
@@ -50,7 +50,7 @@ class ContextImpl extends CommonServiceImpl implements Context {
 
   public joinFriend(userid: string, callback?: Callback<void>): Context {
     const url = `${super.options().server}/ctx/${this.you}/friends/${userid}`;
-    axios.post(url, null, {headers: super.options().headers})
+    Axios.post(url, null, {headers: super.options().headers})
         .then((ignore) => {
           if (callback) {
             callback(null, null);
@@ -66,7 +66,7 @@ class ContextImpl extends CommonServiceImpl implements Context {
 
   public joinGroup(groupid: string, callback?: Callback<void>): Context {
     const url = `${super.options().server}/groups/${groupid}/members/${this.you}`;
-    axios.post(url, null, {headers: super.options().headers})
+    Axios.post(url, null, {headers: super.options().headers})
         .then((ignore) => {
           if (callback) {
             callback(null, null);
@@ -82,8 +82,7 @@ class ContextImpl extends CommonServiceImpl implements Context {
 
   public joinRoom(roomid: string, callback?: Callback<void>): Context {
     const url = `${super.options().server}/rooms/${roomid}/members/${this.you}`;
-
-    axios.post(url, null, {headers: super.options().headers})
+    Axios.post(url, null, {headers: super.options().headers})
         .then((ignore) => {
           if (callback) {
             callback(null, null);
@@ -120,7 +119,7 @@ class ContextImpl extends CommonServiceImpl implements Context {
     const url = `/ctx/${this.you}/attributes`;
     const postData = JSON.stringify(attributes);
     const cfg = {headers: this.options().headers};
-    (overwrite ? axios.put(url, postData, cfg) : axios.post(url, postData, cfg))
+    (overwrite ? Axios.put(url, postData, cfg) : Axios.post(url, postData, cfg))
         .then((ignore) => {
           if (callback) {
             callback(null, null);
@@ -156,7 +155,7 @@ class ContextImpl extends CommonServiceImpl implements Context {
 
   private listSomething<T>(path: string, callback: Callback<T>) {
     const url = `${super.options().server}${path}`;
-    axios.get(url, {headers: super.options().headers})
+    Axios.get(url, {headers: super.options().headers})
         .then((response) => {
           return response.data as T;
         })
@@ -175,7 +174,7 @@ class ContextImpl extends CommonServiceImpl implements Context {
 
   private deleteSomething(path: string, callback: Callback<void>): Context {
     const url = `${super.options().server}${path}`;
-    axios.delete(url, {headers: super.options().headers})
+    Axios.delete(url, {headers: super.options().headers})
         .then((ignore) => {
           if (callback) {
             callback(null, null);

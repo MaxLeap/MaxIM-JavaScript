@@ -1,4 +1,4 @@
-import * as axios from "axios";
+import Axios from "axios";
 import {SearchBuilder} from "../../api/common";
 import {Callback, GroupInfo, RoomInfo, UserOutline} from "../../model/models";
 import {Builder} from "./builder";
@@ -37,8 +37,7 @@ class SearchBuilderImpl extends Builder<SearchOptions> implements SearchBuilder 
 
   private forSomething<T>(path: string, callback: Callback<T>) {
     const url = this.getUrl(path);
-
-    axios.get(url, {headers: this.apiOptions.headers})
+    Axios.get(url, {headers: this.apiOptions.headers})
         .then((response) => {
           return response.data as T;
         })

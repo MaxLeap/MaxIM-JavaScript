@@ -1,4 +1,4 @@
-import * as axios from "axios";
+import Axios from "axios";
 import {LoadBuilder} from "../../api/common";
 import {Callback, GroupInfo, Passenger, RoomInfo, UserDetail} from "../../model/models";
 import {Builder} from "./builder";
@@ -27,7 +27,7 @@ class LoadBuilderImpl extends Builder<LoadOptions> implements LoadBuilder {
 
   private forSomething<T>(path: string, callback: Callback<T>) {
     const url = `${this.apiOptions.server}${path}/${this.extOptions.id}`;
-    axios.post(url, null, {headers: this.apiOptions.headers})
+    Axios.post(url, null, {headers: this.apiOptions.headers})
         .then((response) => {
           return response.data as T;
         })
