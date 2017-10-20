@@ -23,14 +23,13 @@
   "scripts": {
     "lint": "./node_modules/.bin/tslint -c tslint.json src/**/*.ts --fix",
     "test": "./node_modules/.bin/mocha test",
-    "build": "rm -rf ./dist && ./node_modules/.bin/tsc"
+    "build": "rm -rf ./lib && tsc"
   },
   "dependencies": {
     "axios": "^0.15.3",
     "socket.io-client": "~1.4.8"
   },
   "devDependencies": {
-    "@types/axios": "^0.14.0",
     "@types/socket.io-client": "~1.4.8",
     "chai": "^4.1.2",
     "mocha": "^3.5.3",

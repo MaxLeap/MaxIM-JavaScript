@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "umd",
+    "moduleResolution": "node",
     "outDir": "lib",
     "removeComments": true,
     "target": "es5"
